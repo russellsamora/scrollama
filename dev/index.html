@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Scrollama demo</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			min-height: 101vh;
+		}
+
+		p {
+			margin: 0;
+		}
+
+		#scroll {
+			background: #ccc;
+			position: relative;
+			margin-top: 100vh;
+			margin-bottom: 105vh;
+		}
+
+		.scroll__graphic {
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: auto;
+			background-color: purple;
+			-webkit-transform: translate3d(0, 0, 0) -moz-transform: translate3d(0, 0, 0) transform: translate3d(0, 0, 0)
+		}
+
+		.scroll__graphic.is-fixed {
+			position: fixed;
+		}
+
+		.scroll__graphic.is-bottom {
+			bottom: 0;
+			top: auto;
+		}
+
+		.scroll__text {
+			padding: 1rem;
+			position: relative;
+		}
+
+		.step {
+			max-width: 30rem;
+			margin: 1rem auto;
+			border: 2px solid #333;
+			background-color: #fff;
+		}
+
+		.step p {
+			text-align: center;
+			padding: 1rem;
+		}
+
+		.debug {
+			position: fixed;
+			top: 75vh;
+			left: 0;
+			height: 1px;
+			width: 100%;
+			background-color: red;
+			z-index: 1000;
+		}
+	</style>
+
+</head>
+
+<body>
+	<section id='scroll'>
+		<div class='scroll__graphic'></div>
+		<div class='scroll__text'>
+			<div class='step' data-step='1'>
+				<p>Step 1</p>
+			</div>
+			<div class='step' data-step='2'>
+				<p>Step 2</p>
+			</div>
+			<div class='step' data-step='3'>
+				<p>Step 3</p>
+			</div>
+			<div class='step' data-step='4'>
+				<p>Step 4</p>
+			</div>
+		</div>
+	</section>
+	<div class='debug'></div>
+	<script src='d3.v4.min.js'></script>
+	<script src='scrollama.js'></script>
+	<script>
+		var container = d3.select('#scroll')
+		var graphic = container.select('.scroll__graphic')
+		var text = container.select('.scroll__text')
+		var step = text.selectAll('.step')
+
+		var scroller = scrollama()
+
+		function handleResize() {
+			var h = Math.floor(window.innerHeight * 0.75) + 'px'
+			step.style('height', h)
+
+			graphic
+				.style('height', window.innerHeight / 2 + 'px')
+				.style('width', d3.select('body').node().offsetWidth + 'px')
+
+			scroller.resize()
+		}
+
+		function handleStep(resp) {
+			console.log('step', resp)
+		}
+
+		function handleEnter(resp) {
+			console.log('enter', resp)
+			graphic.classed('is-fixed', true)
+			graphic.classed('is-bottom', false)
+		}
+
+		function handleExit(resp) {
+			console.log('exit', resp)
+			graphic.classed('is-fixed', false)
+			graphic.classed('is-bottom', resp.direction === 'down')
+		}
+
+		function handleIncrement(resp) {
+			console.log('increment', resp)
+		}
+
+		function init() {
+			handleResize()
+
+			scroller.setup({
+				container: '#scroll',
+				graphic: '.scroll__graphic',
+				text: '.scroll__text',
+				step: '.scroll__text .step',
+				offset: 0.75,
+			})
+				.onStep(handleStep)
+				.onIncrement(handleIncrement)
+				.onEnter(handleEnter)
+				.onExit(handleExit)
+
+			window.addEventListener('resize', handleResize)
+		}
+
+		init()
+	</script>
+</body>
+
+</html>

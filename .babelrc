@@ -1,0 +1,4 @@
+{
+  "presets": ["es2015", "stage-1"],
+  "plugins": ["external-helpers", "babel-plugin-transform-object-rest-spread"]
+}

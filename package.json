@@ -1,0 +1,42 @@
+{
+  "name": "scrollama",
+  "version": "0.1.0",
+  "description": "Simple scrollytelling library",
+  "main": "build/scrollama.js",
+  "browser": "build/scrollama.js",
+  "scripts": {
+    "dev": "rollup -w --config rollup.config.dev.js",
+    "pretest": "rm -rf build && mkdir build && rollup --config rollup.config.js",
+    "build": "npm run pretest && uglifyjs -m -c -- build/scrollama.js > build/scrollama.min.js"
+  },
+  "module": "index",
+  "jsnext:main": "index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/russellgoldenberg/scrollama.git"
+  },
+  "homepage": "https://github.com/russellgoldenberg/scrollama#readme",
+  "keywords": [
+    "scrollytelling",
+    "scroll",
+    "observer"
+  ],
+  "author": "Russell Goldenberg (@russellgoldenberg)",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^4.6.1",
+    "eslint-config-airbnb-base": "^12.0.0",
+    "eslint-config-prettier": "^2.4.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-prettier": "^2.2.0",
+    "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-buble": "^0.16.0",
+    "rollup-plugin-commonjs": "^8.2.4",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "uglifyjs": "^2.4.11"
+  },
+  "dependencies": {
+    "intersection-observer": "^0.4.2"
+  }
+}

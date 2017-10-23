@@ -1,0 +1,9 @@
+{
+  "extends": ["airbnb-base", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "quotes": [1, "single"],
+    "no-tabs": 0,
+    "indent": ["error", "tab"]
+  }
+}
