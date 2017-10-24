@@ -28,11 +28,7 @@ function scrollama() {
   }
 
   function notifyIncrement() {
-    // const element = stepEl[index];
-    // if (typeof notification.increment === "function") {
-    //   callback.increment(notification.increment);
-    //   notification.increment = null;
-    // }
+    // TODO
   }
 
   function notifyEnter() {
@@ -47,7 +43,7 @@ function scrollama() {
       callback.exit(resp);
   }
 
-  // OBSERVERS
+  // OBSERVER - INTERSECT HANDLING
   function intersectStepTop(entries) {
     entries.forEach(entry => {
       const { isIntersecting, boundingClientRect, target } = entry;
@@ -93,6 +89,7 @@ function scrollama() {
     }
   }
 
+  // OBSERVER - CREATION
   function updateTopObserver() {
     if (observer.top) observer.top.unobserve(containerEl);
 
