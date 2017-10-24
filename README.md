@@ -130,7 +130,7 @@ Tell scrollama to stop observing for trigger changes.
 
 ### Alternatives
 
-[Tk](https://tk) - utility for morphing between two SVGs in React
+[Tk](https://tk) - other library
 
 ### License
 
