@@ -1,16 +1,13 @@
 {
   "name": "scrollama",
-  "version": "0.0.0",
-  "description":
-    "Lightweight scrollytelling library using IntersectionObserver",
+  "version": "0.1.0",
+  "description": "Lightweight scrollytelling library using IntersectionObserver",
   "main": "build/scrollama.js",
   "browser": "build/scrollama.js",
   "scripts": {
     "dev": "rollup -w --config rollup.config.dev.js",
-    "pretest":
-      "rm -rf build && mkdir build && rollup --config rollup.config.js",
-    "build":
-      "npm run pretest && uglifyjs -m -c -- build/scrollama.js > build/scrollama.min.js"
+    "pretest": "rm -rf build && mkdir build && rollup --config rollup.config.js",
+    "build": "npm run pretest && uglifyjs -m -c -- build/scrollama.js > build/scrollama.min.js"
   },
   "module": "index",
   "jsnext:main": "index",
