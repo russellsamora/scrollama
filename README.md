@@ -101,7 +101,9 @@ The argument of the callback is an object:
 `{ direction: 'string', element: 'DOMElement', index: 'number' }`
 
 `direction`: 'up' or 'down'
+
 `element`: The step element that triggered
+
 `index`: The index of the step of all steps
 
 ### Examples
