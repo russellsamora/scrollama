@@ -1,12 +1,11 @@
 # scrollama.js
 
-Lightweight (< 4kb gzipped) scrollytelling library using IntersectionObserver.
-
-As seen on The Pudding.
+Moderrn & lightweight JavaScript library for scrollytelling.
 
 ### Why?
 
-Scrollytelling can be complicated and bad for performance. The goal of this library is to provide a simple interface for creating scroll-driven interactives, while using modern approaches (IntersectionObserver) to handle scroll events.
+Scrollytelling can be complicated and bad for performance. The goal of this library is to provide a simple interface for creating scroll-driven interactives. Scrollama is built around perfomance by using IntersectionObserver to handle scroll events. It uses an opinionated (but popular) scrollytelling pattern to reduce complexity.
+
 
 ### Installation
 
