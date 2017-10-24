@@ -16,42 +16,35 @@ function scrollama() {
   let debugMode = false;
 
   const callback = {};
-  const notification = {};
   const observer = {};
 
   // NOTIFY CALLBACKS
   function notifyStep(element) {
     // console.log('notify step');
     const index = +element.getAttribute("data-scrollama-index");
-    notification.step = { direction, element, index };
-    if (typeof callback.step && typeof callback.step === "function") {
-      callback.step(notification.step);
-      notification.step = null;
-    }
+    const resp = { direction, element, index };
+    if (callback.step && typeof callback.step === "function")
+      callback.step(resp);
   }
 
   function notifyIncrement() {
-    const element = stepEl[index];
-    if (typeof notification.increment === "function") {
-      callback.increment(notification.increment);
-      notification.increment = null;
-    }
+    // const element = stepEl[index];
+    // if (typeof notification.increment === "function") {
+    //   callback.increment(notification.increment);
+    //   notification.increment = null;
+    // }
   }
 
   function notifyEnter() {
-    notification.enter = { direction };
-    if (typeof callback.enter === "function") {
-      callback.enter(notification.enter);
-      notification.enter = null;
-    }
+    const resp = { direction };
+    if (callback.enter && typeof callback.enter === "function")
+      callback.enter(resp);
   }
 
   function notifyExit() {
-    notification.exit = { direction };
-    if (typeof callback.exit === "function") {
-      callback.exit(notification.exit);
-      notification.exit = null;
-    }
+    const resp = { direction };
+    if (callback.exit && typeof callback.exit === "function")
+      callback.exit(resp);
   }
 
   // OBSERVERS
@@ -95,8 +88,8 @@ function scrollama() {
     const { bottom } = boundingClientRect;
     if (bottom < vh + bboxGraphic.height) {
       direction = isIntersecting ? "up" : "down";
-      const fn = isIntersecting ? notifyEnter : notifyExit;
-      fn.call();
+      if (isIntersecting) notifyEnter();
+      else notifyExit();
     }
   }
 
@@ -241,38 +234,21 @@ function scrollama() {
 
   S.onStep = cb => {
     callback.step = cb;
-    if (notification.step) {
-      console.log("instant step!");
-      callback.step(notification.step);
-      notification.step = null;
-    }
     return S;
   };
 
   S.onIncrement = cb => {
     callback.increment = cb;
-    if (notification.increment) {
-      callback.increment(notification.increment);
-      notification.increment = null;
-    }
     return S;
   };
 
   S.onEnter = cb => {
     callback.enter = cb;
-    if (notification.enter) {
-      callback.enter(notification.enter);
-      notification.enter = null;
-    }
     return S;
   };
 
   S.onExit = cb => {
     callback.exit = cb;
-    if (notification.exit) {
-      callback.exit(notification.exit);
-      notification.exit = null;
-    }
     return S;
   };
 

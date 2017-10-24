@@ -772,34 +772,27 @@ function scrollama() {
   var debugMode = false;
 
   var callback = {};
-  var notification = {};
   var observer = {};
 
   // NOTIFY CALLBACKS
   function notifyStep(element) {
     // console.log('notify step');
     var index = +element.getAttribute("data-scrollama-index");
-    notification.step = { direction: direction, element: element, index: index };
-    if (typeof callback.step && typeof callback.step === "function") {
-      callback.step(notification.step);
-      notification.step = null;
-    }
+    var resp = { direction: direction, element: element, index: index };
+    if (callback.step && typeof callback.step === "function")
+      { callback.step(resp); }
   }
 
   function notifyEnter() {
-    notification.enter = { direction: direction };
-    if (typeof callback.enter === "function") {
-      callback.enter(notification.enter);
-      notification.enter = null;
-    }
+    var resp = { direction: direction };
+    if (callback.enter && typeof callback.enter === "function")
+      { callback.enter(resp); }
   }
 
   function notifyExit() {
-    notification.exit = { direction: direction };
-    if (typeof callback.exit === "function") {
-      callback.exit(notification.exit);
-      notification.exit = null;
-    }
+    var resp = { direction: direction };
+    if (callback.exit && typeof callback.exit === "function")
+      { callback.exit(resp); }
   }
 
   // OBSERVERS
@@ -852,8 +845,8 @@ function scrollama() {
     var bottom = boundingClientRect.bottom;
     if (bottom < vh + bboxGraphic.height) {
       direction = isIntersecting ? "up" : "down";
-      var fn = isIntersecting ? notifyEnter : notifyExit;
-      fn.call();
+      if (isIntersecting) { notifyEnter(); }
+      else { notifyExit(); }
     }
   }
 
@@ -997,38 +990,21 @@ function scrollama() {
 
   S.onStep = function (cb) {
     callback.step = cb;
-    if (notification.step) {
-      console.log("instant step!");
-      callback.step(notification.step);
-      notification.step = null;
-    }
     return S;
   };
 
   S.onIncrement = function (cb) {
     callback.increment = cb;
-    if (notification.increment) {
-      callback.increment(notification.increment);
-      notification.increment = null;
-    }
     return S;
   };
 
   S.onEnter = function (cb) {
     callback.enter = cb;
-    if (notification.enter) {
-      callback.enter(notification.enter);
-      notification.enter = null;
-    }
     return S;
   };
 
   S.onExit = function (cb) {
     callback.exit = cb;
-    if (notification.exit) {
-      callback.exit(notification.exit);
-      notification.exit = null;
-    }
     return S;
   };
 
