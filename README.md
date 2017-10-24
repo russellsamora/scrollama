@@ -4,12 +4,6 @@ Lightweight (0kb!) scrollytelling library using IntersectionObserver.
 
 As seen on The Pudding.
 
-## Installation
-
-## Usage
-
-## Browser support
-
 ### Why?
 
 Scrollytelling can be complicated and bad for performance. The goal of this library is to provide a simple interface for creating scroll-driven interactives, while using modern approaches (IntersectionObserver) to handle scroll events.
