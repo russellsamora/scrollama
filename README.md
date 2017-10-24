@@ -1,6 +1,6 @@
 # scrollama.js
 
-Lightweight (< 2kb gzipped) scrollytelling library using IntersectionObserver.
+Lightweight (< 4kb gzipped) scrollytelling library using IntersectionObserver.
 
 As seen on The Pudding.
 
