@@ -39,29 +39,29 @@ You can use any id/class naming conventions you want, but you need three element
 
 The structure should look like:
 ```html
-	<!--container-->
-	<div class='scroll'>
-			<div class='scroll__graphic'><!--graphic / chart here--></div>
-			<div class='scroll__text'>
-				<div class='step' data-step='a'></div>
-				<div class='step' data-step='b'></div>
-				<div class='step' data-step='c'></div>
-			</div>
-	</div>
+<!--container-->
+<div class='scroll'>
+  <div class='scroll__graphic'><!--graphic / chart here--></div>
+  <div class='scroll__text'>
+    <div class='step' data-step='a'></div>
+    <div class='step' data-step='b'></div>
+    <div class='step' data-step='c'></div>
+  </div>
+</div>
 ```
 
 ```js
-	// instantiate the scrollama
-	const scroller = Scrollama()
-	
-	scroller.setup({
-		container: '.scroll',
-		graphic: '.scroll__graphic',
-		step: '.scroll__text .step',
-	})
-	.onEnter(handleEnter)
-	.onExit(handleExit)
-	.onStep(handleStep)
+// instantiate the scrollama
+const scroller = Scrollama()
+
+scroller.setup({
+  container: '.scroll',
+  graphic: '.scroll__graphic',
+  step: '.scroll__text .step',
+})
+.onEnter(handleEnter)
+.onExit(handleExit)
+.onStep(handleStep)
 ```
 
 ### API
