@@ -12,7 +12,7 @@ Scrollytelling can be complicated and bad for performance. The goal of this libr
 In a browser (exposes the `scrollama` global):
 
 ```html
-<script src='scrollama@0.1.0.js'></script>
+<script src='scrollama.min.js'></script>
 ```
 
 With NPM:
