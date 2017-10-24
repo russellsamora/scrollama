@@ -757,33 +757,29 @@ function selectAll(selector, parent) {
 }
 
 function scrollama() {
-	var offsetVal = 0;
-	var offsetPx = 0;
-	var inversePx = 0;
-	var vh = 0;
-
-	var direction = null;
-	var bboxGraphic = null;
-
 	var containerEl = null;
 	var graphicEl = null;
 	var stepEl = null;
 
+	var offsetVal = 0;
+	var offsetFromTop = 0;
+	var offsetFromBottom = 0;
+	var vh = 0;
+
+	var direction = null;
+	var bboxGraphic = null;
 	var isEnabled = false;
+	var debugMode = false;
 
 	var callback = {};
 	var notification = {};
-
-	var observer = {
-		stepT: null,
-		stepB: null,
-		top: null,
-		bottom: null,
-	};
+	var observer = {};
 
 	// NOTIFY CALLBACKS
 	function notifyStep(element) {
-		notification.step = { direction: direction, element: element };
+		// console.log('notify step');
+		var index = +element.getAttribute('data-scrollama-index');
+		notification.step = { direction: direction, element: element, index: index };
 		if (typeof callback.step && typeof callback.step === 'function') {
 			callback.step(notification.step);
 			notification.step = null;
@@ -806,32 +802,15 @@ function scrollama() {
 		}
 	}
 
-	// HELPER FUNCTIONS
-	function handleResize() {
-		vh = window.innerHeight;
-		bboxGraphic = graphicEl ? graphicEl.getBoundingClientRect() : null;
-		offsetPx = Math.floor(offsetVal * vh);
-		inversePx = vh - offsetPx;
-	}
-
-	function handleEnable(enable) {
-		// TODO
-		if (enable && !isEnabled) {
-			window.addEventListener('scroll', handleScroll, true);
-			isEnabled = true;
-		} else if (!enable) {
-			window.removeEventListener('scroll', handleScroll, true);
-			isEnabled = false;
-		}
-	}
-
-	// SETUP
+	// OBSERVERS
 	function intersectStepTop(entries) {
 		entries.forEach(function (entry) {
 			var isIntersecting = entry.isIntersecting;
 			var boundingClientRect = entry.boundingClientRect;
 			var target = entry.target;
-			if (isIntersecting && boundingClientRect.top < vh - offsetPx) {
+			var topEdge = boundingClientRect.top <= offsetFromTop;
+			var bottomEdge = boundingClientRect.bottom >= offsetFromTop;
+			if (isIntersecting && topEdge && bottomEdge) {
 				direction = 'down';
 				notifyStep(target);
 			}
@@ -843,7 +822,8 @@ function scrollama() {
 			var isIntersecting = entry.isIntersecting;
 			var boundingClientRect = entry.boundingClientRect;
 			var target = entry.target;
-			if (isIntersecting && boundingClientRect.top < inversePx) {
+			var topEdge = boundingClientRect.top <= offsetFromTop;
+			if (isIntersecting && topEdge) {
 				direction = 'up';
 				notifyStep(target);
 			}
@@ -854,10 +834,14 @@ function scrollama() {
 		var ref = entries[0];
 		var isIntersecting = ref.isIntersecting;
 		var boundingClientRect = ref.boundingClientRect;
-		if (boundingClientRect.top < vh) {
-			direction = isIntersecting ? 'down' : 'up';
-			var fn = isIntersecting ? notifyEnter : notifyExit;
-			fn.call();
+		var top = boundingClientRect.top;
+		var bottom = boundingClientRect.bottom;
+		if (isIntersecting && top <= 0 && bottom > vh) {
+			direction = 'down';
+			notifyEnter();
+		} else if (!isIntersecting && top >= 0) {
+			direction = 'up';
+			notifyExit();
 		}
 	}
 
@@ -865,7 +849,8 @@ function scrollama() {
 		var ref = entries[0];
 		var isIntersecting = ref.isIntersecting;
 		var boundingClientRect = ref.boundingClientRect;
-		if (boundingClientRect.bottom < vh + bboxGraphic.height) {
+		var bottom = boundingClientRect.bottom;
+		if (bottom < vh + bboxGraphic.height) {
 			direction = isIntersecting ? 'up' : 'down';
 			var fn = isIntersecting ? notifyEnter : notifyExit;
 			fn.call();
@@ -902,7 +887,7 @@ function scrollama() {
 
 		var options = {
 			root: null,
-			rootMargin: ("0px 0px -" + offsetPx + "px 0px"),
+			rootMargin: ("0px 0px -" + offsetFromBottom + "px 0px"),
 			threshold: 0,
 		};
 
@@ -915,12 +900,59 @@ function scrollama() {
 
 		var options = {
 			root: null,
-			rootMargin: ("-" + inversePx + "px 0px 0px 0px"),
+			rootMargin: ("-" + offsetFromTop + "px 0px 0px 0px"),
 			threshold: 0,
 		};
 
 		observer.stepB = new IntersectionObserver(intersectStepBottom, options);
 		stepEl.forEach(function (el) { return observer.stepB.observe(el); });
+	}
+
+	function updateAllObservers() {
+		updateTopObserver();
+		updateBottomObserver();
+		updateStepTopObserver();
+		updateStepBottomObserver();
+	}
+
+	// HELPER FUNCTIONS
+	function handleResize() {
+		vh = window.innerHeight;
+		bboxGraphic = graphicEl ? graphicEl.getBoundingClientRect() : null;
+		offsetFromTop = Math.floor(offsetVal * vh);
+		offsetFromBottom = Math.floor((1 - offsetVal) * vh);
+		if (isEnabled) { updateAllObservers(); }
+
+		if (debugMode) {
+			var debugEl = document.querySelector('.scrollama__offset');
+			debugEl.style.top = offsetFromTop + "px";
+		}
+	}
+
+	function handleEnable(enable) {
+		if (enable && !isEnabled) {
+			updateAllObservers();
+			isEnabled = true;
+		} else if (!enable) {
+			Object.keys(observer).map(function (k) { return observer[k].disconnect(); });
+			isEnabled = false;
+		}
+	}
+
+	function indexSteps() {
+		stepEl.forEach(function (el, i) { return el.setAttribute('data-scrollama-index', i); });
+	}
+
+	function addDebug() {
+		var el = document.createElement('div');
+		el.setAttribute('class', 'scrollama__offset');
+		el.style.position = 'fixed';
+		el.style.top = '0';
+		el.style.left = '0';
+		el.style.width = '100%';
+		el.style.height = '1px';
+		el.style.backgroundColor = 'lime';
+		document.body.appendChild(el);
 	}
 
 	var S = {};
@@ -930,16 +962,20 @@ function scrollama() {
 		var graphic = ref.graphic;
 		var step = ref.step;
 		var offset = ref.offset; if ( offset === void 0 ) offset = 0.5;
+		var debug = ref.debug; if ( debug === void 0 ) debug = false;
+
 		if (container && graphic && step) {
 			containerEl = select(container);
 			graphicEl = select(graphic);
 			stepEl = selectAll(step);
-			offsetVal = 1 - offset;
+			offsetVal = offset;
+			debugMode = debug;
+
+			if (debugMode) { addDebug(); }
+			// TODO first fire with takeRecords?
+			indexSteps();
 			handleResize();
-			updateTopObserver();
-			updateBottomObserver();
-			updateStepTopObserver();
-			updateStepBottomObserver();
+			handleEnable(true);
 		} else { console.log('improper scrollama setup config'); }
 		return S;
 	};
@@ -962,6 +998,7 @@ function scrollama() {
 	S.onStep = function (cb) {
 		callback.step = cb;
 		if (notification.step) {
+			console.log('instant step!');
 			callback.step(notification.step);
 			notification.step = null;
 		}

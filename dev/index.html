@@ -32,10 +32,10 @@
 		}
 
 		#scroll {
-			background: #ccc;
+			background-color: #cdcdcd;
 			position: relative;
-			margin-top: 100vh;
-			margin-bottom: 105vh;
+			margin-top: 110vh;
+			margin-bottom: 110vh;
 		}
 
 		.scroll__graphic {
@@ -43,7 +43,11 @@
 			top: 0;
 			left: 0;
 			bottom: auto;
-			background-color: purple;
+			background: repeating-linear-gradient( 45deg,
+			#aaa,
+			#aaa 4px,
+			#999 4px,
+			#999 8px);
 			-webkit-transform: translate3d(0, 0, 0) -moz-transform: translate3d(0, 0, 0) transform: translate3d(0, 0, 0)
 		}
 
@@ -68,19 +72,13 @@
 			background-color: #fff;
 		}
 
+		.step.is-active {
+			background-color: lightgoldenrodyellow;
+		}
+
 		.step p {
 			text-align: center;
 			padding: 1rem;
-		}
-
-		.debug {
-			position: fixed;
-			top: 75vh;
-			left: 0;
-			height: 1px;
-			width: 100%;
-			background-color: red;
-			z-index: 1000;
 		}
 	</style>
 
@@ -120,14 +118,17 @@
 			step.style('height', h)
 
 			graphic
-				.style('height', window.innerHeight / 2 + 'px')
+				.style('height', window.innerHeight + 'px')
 				.style('width', d3.select('body').node().offsetWidth + 'px')
 
 			scroller.resize()
 		}
 
 		function handleStep(resp) {
-			console.log('step', resp)
+			// console.log('step', resp)
+			step.classed('is-active', function (d, i) {
+				return i === resp.index
+			})
 		}
 
 		function handleEnter(resp) {
@@ -155,6 +156,7 @@
 				text: '.scroll__text',
 				step: '.scroll__text .step',
 				offset: 0.75,
+				debug: true,
 			})
 				.onStep(handleStep)
 				.onIncrement(handleIncrement)

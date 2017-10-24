@@ -1,41 +1,29 @@
 import { select, selectAll } from './dom';
 
 function scrollama() {
-	const indexPrev = -1;
-	const index = 0;
-	const progressPrev = 0;
-	const progress = 0;
-	const yPos = 0;
-	const yPosPrev = 0;
-
-	let numSteps = 0;
-	let offsetVal = 0;
-	let offsetPx = 0;
-	let inversePx = 0;
-	let vh = 0;
-
-	let direction = null;
-	let bboxGraphic = null;
-
 	let containerEl = null;
 	let graphicEl = null;
 	let stepEl = null;
 
+	let offsetVal = 0;
+	let offsetFromTop = 0;
+	let offsetFromBottom = 0;
+	let vh = 0;
+
+	let direction = null;
+	let bboxGraphic = null;
 	let isEnabled = false;
+	let debugMode = false;
 
 	const callback = {};
 	const notification = {};
-
-	const observer = {
-		stepT: null,
-		stepB: null,
-		top: null,
-		bottom: null,
-	};
+	const observer = {};
 
 	// NOTIFY CALLBACKS
 	function notifyStep(element) {
-		notification.step = { direction, element };
+		// console.log('notify step');
+		const index = +element.getAttribute('data-scrollama-index');
+		notification.step = { direction, element, index };
 		if (typeof callback.step && typeof callback.step === 'function') {
 			callback.step(notification.step);
 			notification.step = null;
@@ -66,44 +54,13 @@ function scrollama() {
 		}
 	}
 
-	// HELPER FUNCTIONS
-	function findStep({ complete, off }) {
-		const i = Math.floor(complete * numSteps);
-		// look at the steps before and after as well to find right one
-		const matches = [i - 1, i, i + 1].filter(d => {
-			const dummy = 0;
-			return (
-				d >= 0 &&
-				d < numSteps &&
-				stepEl[d].getBoundingClientRect().top - off < 0
-			);
-		});
-		return matches.pop() || 0;
-	}
-
-	function handleResize() {
-		vh = window.innerHeight;
-		bboxGraphic = graphicEl ? graphicEl.getBoundingClientRect() : null;
-		offsetPx = Math.floor(offsetVal * vh);
-		inversePx = vh - offsetPx;
-	}
-
-	function handleEnable(enable) {
-		// TODO
-		if (enable && !isEnabled) {
-			window.addEventListener('scroll', handleScroll, true);
-			isEnabled = true;
-		} else if (!enable) {
-			window.removeEventListener('scroll', handleScroll, true);
-			isEnabled = false;
-		}
-	}
-
-	// SETUP
+	// OBSERVERS
 	function intersectStepTop(entries) {
 		entries.forEach(entry => {
 			const { isIntersecting, boundingClientRect, target } = entry;
-			if (isIntersecting && boundingClientRect.top < vh - offsetPx) {
+			const topEdge = boundingClientRect.top <= offsetFromTop;
+			const bottomEdge = boundingClientRect.bottom >= offsetFromTop;
+			if (isIntersecting && topEdge && bottomEdge) {
 				direction = 'down';
 				notifyStep(target);
 			}
@@ -113,7 +70,8 @@ function scrollama() {
 	function intersectStepBottom(entries) {
 		entries.forEach(entry => {
 			const { isIntersecting, boundingClientRect, target } = entry;
-			if (isIntersecting && boundingClientRect.top < inversePx) {
+			const topEdge = boundingClientRect.top <= offsetFromTop;
+			if (isIntersecting && topEdge) {
 				direction = 'up';
 				notifyStep(target);
 			}
@@ -122,16 +80,20 @@ function scrollama() {
 
 	function intersectTop(entries) {
 		const { isIntersecting, boundingClientRect } = entries[0];
-		if (boundingClientRect.top < vh) {
-			direction = isIntersecting ? 'down' : 'up';
-			const fn = isIntersecting ? notifyEnter : notifyExit;
-			fn.call();
+		const { top, bottom } = boundingClientRect;
+		if (isIntersecting && top <= 0 && bottom > vh) {
+			direction = 'down';
+			notifyEnter();
+		} else if (!isIntersecting && top >= 0) {
+			direction = 'up';
+			notifyExit();
 		}
 	}
 
 	function intersectBottom(entries) {
 		const { isIntersecting, boundingClientRect } = entries[0];
-		if (boundingClientRect.bottom < vh + bboxGraphic.height) {
+		const { bottom } = boundingClientRect;
+		if (bottom < vh + bboxGraphic.height) {
 			direction = isIntersecting ? 'up' : 'down';
 			const fn = isIntersecting ? notifyEnter : notifyExit;
 			fn.call();
@@ -168,7 +130,7 @@ function scrollama() {
 
 		const options = {
 			root: null,
-			rootMargin: `0px 0px -${offsetPx}px 0px`,
+			rootMargin: `0px 0px -${offsetFromBottom}px 0px`,
 			threshold: 0,
 		};
 
@@ -181,7 +143,7 @@ function scrollama() {
 
 		const options = {
 			root: null,
-			rootMargin: `-${inversePx}px 0px 0px 0px`,
+			rootMargin: `-${offsetFromTop}px 0px 0px 0px`,
 			threshold: 0,
 		};
 
@@ -189,22 +151,75 @@ function scrollama() {
 		stepEl.forEach(el => observer.stepB.observe(el));
 	}
 
+	function updateAllObservers() {
+		updateTopObserver();
+		updateBottomObserver();
+		updateStepTopObserver();
+		updateStepBottomObserver();
+	}
+
+	// HELPER FUNCTIONS
+	function handleResize() {
+		vh = window.innerHeight;
+		bboxGraphic = graphicEl ? graphicEl.getBoundingClientRect() : null;
+		offsetFromTop = Math.floor(offsetVal * vh);
+		offsetFromBottom = Math.floor((1 - offsetVal) * vh);
+		if (isEnabled) updateAllObservers();
+
+		if (debugMode) {
+			const debugEl = document.querySelector('.scrollama__offset');
+			debugEl.style.top = `${offsetFromTop}px`;
+		}
+	}
+
+	function handleEnable(enable) {
+		if (enable && !isEnabled) {
+			updateAllObservers();
+			isEnabled = true;
+		} else if (!enable) {
+			Object.keys(observer).map(k => observer[k].disconnect());
+			isEnabled = false;
+		}
+	}
+
+	function indexSteps() {
+		stepEl.forEach((el, i) => el.setAttribute('data-scrollama-index', i));
+	}
+
+	function addDebug() {
+		const el = document.createElement('div');
+		el.setAttribute('class', 'scrollama__offset');
+		el.style.position = 'fixed';
+		el.style.top = '0';
+		el.style.left = '0';
+		el.style.width = '100%';
+		el.style.height = '1px';
+		el.style.backgroundColor = 'lime';
+		document.body.appendChild(el);
+	}
+
 	const S = {};
 
-	S.setup = ({ container, graphic, step, offset = 0.5, increment = false }) => {
+	S.setup = ({
+		container,
+		graphic,
+		step,
+		offset = 0.5,
+		increment = false,
+		debug = false,
+	}) => {
 		if (container && graphic && step) {
 			containerEl = select(container);
 			graphicEl = select(graphic);
 			stepEl = selectAll(step);
-			offsetVal = 1 - offset;
-			numSteps = stepEl.length;
+			offsetVal = offset;
+			debugMode = debug;
 
+			if (debugMode) addDebug();
 			// TODO first fire with takeRecords?
+			indexSteps();
 			handleResize();
-			updateTopObserver();
-			updateBottomObserver();
-			updateStepTopObserver();
-			updateStepBottomObserver();
+			handleEnable(true);
 		} else console.log('improper scrollama setup config');
 		return S;
 	};
@@ -227,6 +242,7 @@ function scrollama() {
 	S.onStep = cb => {
 		callback.step = cb;
 		if (notification.step) {
+			console.log('instant step!');
 			callback.step(notification.step);
 			notification.step = null;
 		}

@@ -1,13 +1,16 @@
 {
   "name": "scrollama",
   "version": "0.1.0",
-  "description": "Simple scrollytelling library",
+  "description":
+    "Lightweight scrollytelling library using IntersectionObserver",
   "main": "build/scrollama.js",
   "browser": "build/scrollama.js",
   "scripts": {
     "dev": "rollup -w --config rollup.config.dev.js",
-    "pretest": "rm -rf build && mkdir build && rollup --config rollup.config.js",
-    "build": "npm run pretest && uglifyjs -m -c -- build/scrollama.js > build/scrollama.min.js"
+    "pretest":
+      "rm -rf build && mkdir build && rollup --config rollup.config.js",
+    "build":
+      "npm run pretest && uglifyjs -m -c -- build/scrollama.js > build/scrollama.min.js"
   },
   "module": "index",
   "jsnext:main": "index",
@@ -19,7 +22,12 @@
   "keywords": [
     "scrollytelling",
     "scroll",
-    "observer"
+    "observer",
+    "IntersectionObserver",
+    "enter",
+    "exit",
+    "view",
+    "trigger"
   ],
   "author": "Russell Goldenberg (@russellgoldenberg)",
   "license": "MIT",
