@@ -43,12 +43,13 @@
 			top: 0;
 			left: 0;
 			bottom: auto;
-			background: repeating-linear-gradient( 45deg,
-			#aaa,
-			#aaa 4px,
-			#999 4px,
-			#999 8px);
-			-webkit-transform: translate3d(0, 0, 0) -moz-transform: translate3d(0, 0, 0) transform: translate3d(0, 0, 0)
+			background-color: #ccc;
+			-moz-transition: background-color 250ms ease-in-out;
+			-webkit-transition: background-color 250ms ease-in-out;
+			transition: background-color 250ms ease-in-out;
+			-webkit-transform: translate3d(0, 0, 0);
+			-moz-transform: translate3d(0, 0, 0);
+			transform: translate3d(0, 0, 0);
 		}
 
 		.scroll__graphic.is-fixed {
@@ -88,16 +89,16 @@
 	<section id='scroll'>
 		<div class='scroll__graphic'></div>
 		<div class='scroll__text'>
-			<div class='step' data-step='1'>
+			<div class='step' data-step='#ccc'>
 				<p>Step 1</p>
 			</div>
-			<div class='step' data-step='2'>
+			<div class='step' data-step='#aaa'>
 				<p>Step 2</p>
 			</div>
-			<div class='step' data-step='3'>
+			<div class='step' data-step='#888'>
 				<p>Step 3</p>
 			</div>
-			<div class='step' data-step='4'>
+			<div class='step' data-step='#666'>
 				<p>Step 4</p>
 			</div>
 		</div>
@@ -125,10 +126,11 @@
 		}
 
 		function handleStep(resp) {
-			// console.log('step', resp)
 			step.classed('is-active', function (d, i) {
 				return i === resp.index
 			})
+			var val = d3.select(resp.element).attr('data-step')
+			graphic.style('background-color', val)
 		}
 
 		function handleEnter(resp) {
