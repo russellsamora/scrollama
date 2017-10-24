@@ -106,6 +106,18 @@ The argument of the callback is an object:
 
 `index`: The index of the step of all steps
 
+#### scrollama.resize()
+
+Tell scrollama to get latest dimensions the browser/DOM. It is best practice to throttle resize in your code, update the DOM elements, then call this function at the end.
+
+#### scrollama.enable()
+
+Tell scrollama to resume observing for trigger changes. Only necessary to call if you have previously disabled.
+
+#### scrollama.disable()
+
+Tell scrollama to stop observing for trigger changes.
+
 ### Examples
 
 *Note: most of these demos use D3 to keep the code concise, but this can be used with any library, or with no library at all.*
