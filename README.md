@@ -69,18 +69,18 @@ The structure should look like:
 #### scrollama.setup([options])
 
 *options:*
-* `container` (string): Selector for the element that contains everything for the scroller. *required*
-* `graphic` (string): Selector for the graphic element that will become fixed. *required* 
-* `step` (string): Selector for the step elements that will trigger changes. *required* 
-* `offset` (number, 0 - 1): How far from the top of the viewport to trigger a step. *(default: 0.5)*
-* `debug` (boolean): Whether to show visual debugging tools or not. *(default: false)*
+* `container` (string): Selector for the element that contains everything for the scroller. **required**
+* `graphic` (string): Selector for the graphic element that will become fixed. **required**
+* `step` (string): Selector for the step elements that will trigger changes. **required**
+* `offset` (number, 0 - 1): How far from the top of the viewport to trigger a step. **(default: 0.5)**
+* `debug` (boolean): Whether to show visual debugging tools or not. **(default: false)**
 
 #### scrollama.onEnter(callback)
 
 Callback that fires when the top of container becomes flush with viewport *or* the graphic becomes fully in view coming from the bottom of the container.
 
 The argument of the callback is an object:
-`{ direction: 'string' }`
+`{ direction: string }`
 
 `direction`: 'up' or 'down'
 
@@ -89,7 +89,7 @@ The argument of the callback is an object:
 Callback that fires when the top of container goes below viewport *or* the graphic becomes not full in view leaving the bottom of the container.
 
 The argument of the callback is an object:
-`{ direction: 'string' }`
+`{ direction: string }`
 
 `direction`: 'up' or 'down'
 
@@ -98,7 +98,7 @@ The argument of the callback is an object:
 Callback that fires when the top or bottom edge of a step element passes the offset threshold.
 
 The argument of the callback is an object:
-`{ direction: 'string', element: 'DOMElement', index: 'number' }`
+`{ direction: string, element: DOMElement, index: number }`
 
 `direction`: 'up' or 'down'
 
