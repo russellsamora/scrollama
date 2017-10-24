@@ -25,7 +25,7 @@ npm install scrollama
 And then import/require it:
 
 ```js
-var flubber = require('scrollama'); // Node classic
+const scrollama = require('scrollama'); // Node classic
 import scrollama from 'scrollama' // ES6
 ```
 
