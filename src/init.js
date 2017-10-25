@@ -1,6 +1,7 @@
 import { select, selectAll } from "./dom";
 
 function scrollama() {
+  let ready = false;
   let containerEl = null;
   let graphicEl = null;
   let stepEl = null;
@@ -185,7 +186,7 @@ function scrollama() {
       stepHeights = stepEl.map(el => el.getBoundingClientRect().height);
     }
 
-    if (isEnabled) updateIO();
+    if (isEnabled && ready) updateIO();
 
     if (debugMode) {
       const debugEl = document.querySelector(".scrollama__offset");
@@ -251,6 +252,8 @@ function scrollama() {
       stepEl = selectAll(step);
       offsetVal = offset;
       debugMode = debug;
+
+      ready = true;
 
       if (debugMode) addDebug();
       // createThreshold();
