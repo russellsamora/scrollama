@@ -218,7 +218,7 @@
 		}
 
 		// scrollama event handlers
-		function handleStep(response) {
+		function handleStepEnter(response) {
 			// response = { element, direction, index }
 
 			// make current step visible
@@ -233,7 +233,7 @@
 			chart.style('background-color', color);
 		}
 
-		function handleEnter(response) {
+		function handleContainerEnter(response) {
 			// response = { direction }
 
 			// sticky the graphic
@@ -241,7 +241,7 @@
 			graphic.classed('is-bottom', false);
 		}
 
-		function handleExit(response) {
+		function handleContainerExit(response) {
 			// response = { direction }
 
 			// un-sticky the graphic, and pin to top/bottom of container
@@ -263,9 +263,9 @@
 				step: '.scroll__text .step',
 				debug: true,
 			})
-				.onStepEnter(handleStep)
-				.onContainerEnter(handleEnter)
-				.onContainerExit(handleExit);
+				.onStepEnter(handleStepEnter)
+				.onContainerEnter(handleContainerEnter)
+				.onContainerExit(handleContainerExit);
 
 			// setup resize event
 			window.addEventListener('resize', handleResize);

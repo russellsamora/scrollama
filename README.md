@@ -75,7 +75,7 @@ scroller.setup({
 * `offset` (number, 0 - 1): How far from the top of the viewport to trigger a step. **(default: 0.5)**
 * `debug` (boolean): Whether to show visual debugging tools or not. **(default: false)**
 
-#### scrollama.onEnter(callback)
+#### scrollama.onContainerEnter(callback)
 
 Callback that fires when the top of container becomes flush with viewport *or* the graphic becomes fully in view coming from the bottom of the container.
 
@@ -84,7 +84,7 @@ The argument of the callback is an object:
 
 `direction`: 'up' or 'down'
 
-#### scrollama.onExit(callback)
+#### scrollama.onContainerExit(callback)
 
 Callback that fires when the top of container goes below viewport *or* the graphic becomes not full in view leaving the bottom of the container.
 
@@ -93,9 +93,22 @@ The argument of the callback is an object:
 
 `direction`: 'up' or 'down'
 
-#### scrollama.onStep(callback)
+#### scrollama.onStepEnter(callback)
 
-Callback that fires when the top or bottom edge of a step element passes the offset threshold.
+Callback that fires when the top or bottom edge of a step element enters the offset threshold.
+
+The argument of the callback is an object:
+`{ direction: string, element: DOMElement, index: number }`
+
+`direction`: 'up' or 'down'
+
+`element`: The step element that triggered
+
+`index`: The index of the step of all steps
+
+#### scrollama.onStepExit(callback)
+
+Callback that fires when the top or bottom edge of a step element exits the offset threshold.
 
 The argument of the callback is an object:
 `{ direction: string, element: DOMElement, index: number }`

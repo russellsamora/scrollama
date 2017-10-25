@@ -762,25 +762,32 @@ function scrollama() {
   var stepEl = null;
 
   var offsetVal = 0;
-  var offsetFromTop = 0;
-  var offsetFromBottom = 0;
+  var offsetMargin = 0;
   var vh = 0;
+  // let threshold = [0];
 
   var direction = null;
   var bboxGraphic = null;
   var isEnabled = false;
   var debugMode = false;
 
+  var margin = {};
   var callback = {};
-  var observer = {};
+  var io = {};
 
   // NOTIFY CALLBACKS
-  function notifyStep(element) {
-    // console.log('notify step');
+  function notifyStepEnter(element) {
     var index = +element.getAttribute("data-scrollama-index");
     var resp = { direction: direction, element: element, index: index };
-    if (callback.step && typeof callback.step === "function")
-      { callback.step(resp); }
+    if (callback.stepEnter && typeof callback.stepEnter === "function")
+      { callback.stepEnter(resp); }
+  }
+
+  function notifyStepExit(element) {
+    var index = +element.getAttribute("data-scrollama-index");
+    var resp = { direction: direction, element: element, index: index };
+    if (callback.stepExit && typeof callback.stepExit === "function")
+      { callback.stepExit(resp); }
   }
 
   function notifyEnter() {
@@ -795,17 +802,18 @@ function scrollama() {
       { callback.exit(resp); }
   }
 
-  // OBSERVERS
+  // OBSERVER - INTERSECT HANDLING
   function intersectStepTop(entries) {
     entries.forEach(function (entry) {
       var isIntersecting = entry.isIntersecting;
       var boundingClientRect = entry.boundingClientRect;
       var target = entry.target;
-      var topEdge = boundingClientRect.top <= offsetFromTop;
-      var bottomEdge = boundingClientRect.bottom >= offsetFromTop;
-      if (isIntersecting && topEdge && bottomEdge) {
+      if (isIntersecting && boundingClientRect.bottom >= 0) {
         direction = "down";
-        notifyStep(target);
+        notifyStepEnter(target);
+      } else if (!isIntersecting) {
+        direction = "up";
+        notifyStepExit(target);
       }
     });
   }
@@ -815,10 +823,12 @@ function scrollama() {
       var isIntersecting = entry.isIntersecting;
       var boundingClientRect = entry.boundingClientRect;
       var target = entry.target;
-      var topEdge = boundingClientRect.top <= offsetFromTop;
-      if (isIntersecting && topEdge) {
+      if (isIntersecting && boundingClientRect.top < 0) {
         direction = "up";
-        notifyStep(target);
+        notifyStepEnter(target);
+      } else if (!isIntersecting) {
+        direction = "down";
+        notifyStepExit(target);
       }
     });
   }
@@ -827,14 +837,11 @@ function scrollama() {
     var ref = entries[0];
     var isIntersecting = ref.isIntersecting;
     var boundingClientRect = ref.boundingClientRect;
-    var top = boundingClientRect.top;
     var bottom = boundingClientRect.bottom;
-    if (isIntersecting && top <= 0 && bottom > vh) {
-      direction = "down";
-      notifyEnter();
-    } else if (!isIntersecting && top >= 0) {
-      direction = "up";
-      notifyExit();
+    if (bottom > 0) {
+      direction = isIntersecting ? "down" : "up";
+      if (isIntersecting) { notifyEnter(); }
+      else { notifyExit(); }
     }
   }
 
@@ -842,89 +849,98 @@ function scrollama() {
     var ref = entries[0];
     var isIntersecting = ref.isIntersecting;
     var boundingClientRect = ref.boundingClientRect;
-    var bottom = boundingClientRect.bottom;
-    if (bottom < vh + bboxGraphic.height) {
-      direction = isIntersecting ? "up" : "down";
+    var top = boundingClientRect.top;
+    direction = isIntersecting ? "up" : "down";
+    if (top < 0) {
       if (isIntersecting) { notifyEnter(); }
       else { notifyExit(); }
     }
   }
 
-  function updateTopObserver() {
-    if (observer.top) { observer.top.unobserve(containerEl); }
+  // OBSERVER - CREATION
+  function updateTopIO() {
+    if (io.top) { io.top.unobserve(containerEl); }
 
     var options = {
       root: null,
-      rootMargin: ("0px 0px -" + vh + "px 0px"),
+      rootMargin: (vh + "px 0px -" + vh + "px 0px"),
       threshold: 0
     };
 
-    observer.top = new IntersectionObserver(intersectTop, options);
-    observer.top.observe(containerEl);
+    io.top = new IntersectionObserver(intersectTop, options);
+    io.top.observe(containerEl);
   }
 
-  function updateBottomObserver() {
-    if (observer.bottom) { observer.bottom.unobserve(containerEl); }
+  function updateBottomIO() {
+    if (io.bottom) { io.bottom.unobserve(containerEl); }
     var options = {
       root: null,
-      rootMargin: ("-" + (bboxGraphic.height) + "px 0px 0px 0px"),
+      rootMargin: ("-" + (bboxGraphic.height) + "px 0px " + (bboxGraphic.height) + "px 0px"),
       threshold: 0
     };
 
-    observer.bottom = new IntersectionObserver(intersectBottom, options);
-    observer.bottom.observe(containerEl);
+    io.bottom = new IntersectionObserver(intersectBottom, options);
+    io.bottom.observe(containerEl);
   }
 
-  function updateStepTopObserver() {
-    if (observer.stepT) { observer.stepT.disconnect(); }
-
-    var options = {
-      root: null,
-      rootMargin: ("0px 0px -" + offsetFromBottom + "px 0px"),
-      threshold: 0
-    };
-
-    observer.stepT = new IntersectionObserver(intersectStepTop, options);
-    stepEl.forEach(function (el) { return observer.stepT.observe(el); });
-  }
-
-  function updateStepBottomObserver() {
-    if (observer.stepB) { observer.stepB.disconnect(); }
+  // scrolling down
+  function updateStepTopIO() {
+    if (io.stepTop) { io.StepTop.disconnect(); }
 
     var options = {
       root: null,
-      rootMargin: ("-" + offsetFromTop + "px 0px 0px 0px"),
+      rootMargin: ((margin.top) + "px 0px " + (margin.bottom) + "px 0px"),
       threshold: 0
     };
 
-    observer.stepB = new IntersectionObserver(intersectStepBottom, options);
-    stepEl.forEach(function (el) { return observer.stepB.observe(el); });
+    io.StepTop = new IntersectionObserver(intersectStepTop, options);
+    stepEl.forEach(function (el) { return io.StepTop.observe(el); });
   }
 
-  function updateAllObservers() {
-    updateTopObserver();
-    updateBottomObserver();
-    updateStepTopObserver();
-    updateStepBottomObserver();
+  // scrolling up
+  function updateStepBottomIO() {
+    if (io.stepBottom) { io.StepBottom.disconnect(); }
+
+    var options = {
+      root: null,
+      rootMargin: ("-" + offsetMargin + "px 0px " + offsetMargin + "px 0px"),
+      threshold: 0
+    };
+
+    io.StepBottom = new IntersectionObserver(intersectStepBottom, options);
+    stepEl.forEach(function (el) { return io.StepBottom.observe(el); });
+  }
+
+  function updateIO() {
+    updateTopIO();
+    updateBottomIO();
+    updateStepTopIO();
+    updateStepBottomIO();
   }
 
   // HELPER FUNCTIONS
   function handleResize() {
     vh = window.innerHeight;
     bboxGraphic = graphicEl ? graphicEl.getBoundingClientRect() : null;
-    offsetFromTop = Math.floor(offsetVal * vh);
-    offsetFromBottom = Math.floor((1 - offsetVal) * vh);
-    if (isEnabled) { updateAllObservers(); }
+
+    if (stepEl) {
+      var stepHeight = stepEl[0].getBoundingClientRect().height;
+      offsetMargin = offsetVal * vh;
+      margin.top = stepHeight - offsetMargin;
+      margin.bottom = -vh + offsetMargin;
+    }
+
+    if (isEnabled) { updateIO(); }
 
     if (debugMode) {
       var debugEl = document.querySelector(".scrollama__offset");
-      debugEl.style.top = offsetFromTop + "px";
+      debugEl.style.top = offsetMargin + "px";
     }
   }
 
   function handleEnable(enable) {
     if (enable && !isEnabled) {
-      updateAllObservers();
+      updateIO();
       isEnabled = true;
     } else if (!enable) {
       Object.keys(observer).map(function (k) { return observer[k].disconnect(); });
@@ -944,9 +960,25 @@ function scrollama() {
     el.style.left = "0";
     el.style.width = "100%";
     el.style.height = "1px";
-    el.style.backgroundColor = "lime";
+    el.style.backgroundColor = "red";
+    var text = document.createElement("p");
+    text.innerText = "scrollama trigger: " + offsetVal;
+    text.style.fontSize = "12px";
+    text.style.fontFamily = "monospace";
+    text.style.color = "red";
+    text.style.margin = "0";
+    text.style.padding = "6px";
+    el.appendChild(text);
     document.body.appendChild(el);
   }
+
+  // function createThreshold(count = 100) {
+  //   threshold = [];
+  //   const ratio = 1 / count;
+  //   for (let i = 0; i < count; i++) {
+  //     threshold.push(i * ratio);
+  //   }
+  // }
 
   var S = {};
 
@@ -965,7 +997,7 @@ function scrollama() {
       debugMode = debug;
 
       if (debugMode) { addDebug(); }
-      // TODO first fire with takeRecords?
+      // createThreshold();
       indexSteps();
       handleResize();
       handleEnable(true);
@@ -988,8 +1020,13 @@ function scrollama() {
     return S;
   };
 
-  S.onStep = function (cb) {
-    callback.step = cb;
+  S.onStepEnter = function (cb) {
+    callback.stepEnter = cb;
+    return S;
+  };
+
+  S.onStepExit = function (cb) {
+    callback.stepExit = cb;
     return S;
   };
 
@@ -998,12 +1035,12 @@ function scrollama() {
     return S;
   };
 
-  S.onEnter = function (cb) {
+  S.onContainerEnter = function (cb) {
     callback.enter = cb;
     return S;
   };
 
-  S.onExit = function (cb) {
+  S.onContainerExit = function (cb) {
     callback.exit = cb;
     return S;
   };
