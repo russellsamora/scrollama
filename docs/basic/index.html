@@ -82,8 +82,8 @@
 
 		#scroll {
 			position: relative;
-			border-top: 2px dashed #000;
-			border-bottom: 2px dashed #000;
+			border-top: 1px dashed #000;
+			border-bottom: 1px dashed #000;
 		}
 
 		.scroll__graphic {
@@ -263,9 +263,9 @@
 				step: '.scroll__text .step',
 				debug: true,
 			})
-				.onStep(handleStep)
-				.onEnter(handleEnter)
-				.onExit(handleExit);
+				.onStepEnter(handleStep)
+				.onContainerEnter(handleEnter)
+				.onContainerExit(handleExit);
 
 			// setup resize event
 			window.addEventListener('resize', handleResize);

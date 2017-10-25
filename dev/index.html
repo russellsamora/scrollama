@@ -34,8 +34,8 @@
 		#scroll {
 			background-color: #cdcdcd;
 			position: relative;
-			margin-top: 50vh;
-			margin-bottom: 110vh;
+			margin-top: 105vh;
+			margin-bottom: 200vh;
 		}
 
 		.scroll__graphic {
@@ -95,12 +95,12 @@
 			<div class='step' data-step='#aaa'>
 				<p>Step 2</p>
 			</div>
-			<div class='step' data-step='#888'>
+			<!-- <div class='step' data-step='#888'>
 				<p>Step 3</p>
 			</div>
 			<div class='step' data-step='#666'>
 				<p>Step 4</p>
-			</div>
+			</div> -->
 		</div>
 	</section>
 	<div class='debug'></div>
@@ -125,7 +125,7 @@
 			scroller.resize()
 		}
 
-		function handleStep(resp) {
+		function handleStepEnter(resp) {
 			step.classed('is-active', function (d, i) {
 				return i === resp.index
 			})
@@ -133,13 +133,13 @@
 			graphic.style('background-color', val)
 		}
 
-		function handleEnter(resp) {
+		function handleContainerEnter(resp) {
 			console.log('enter', resp)
 			graphic.classed('is-fixed', true)
 			graphic.classed('is-bottom', false)
 		}
 
-		function handleExit(resp) {
+		function handleContainerExit(resp) {
 			console.log('exit', resp)
 			graphic.classed('is-fixed', false)
 			graphic.classed('is-bottom', resp.direction === 'down')
@@ -160,10 +160,10 @@
 				offset: 0.25,
 				debug: true,
 			})
-				.onStep(handleStep)
-				.onIncrement(handleIncrement)
-				.onEnter(handleEnter)
-				.onExit(handleExit)
+				.onStepEnter(handleStepEnter)
+				.onContainerEnter(handleContainerEnter)
+				.onContainerExit(handleContainerExit)
+			// .onIncrement(handleIncrement)
 
 			window.addEventListener('resize', handleResize)
 		}
