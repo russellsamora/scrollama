@@ -115,8 +115,12 @@
 		var scroller = scrollama()
 
 		function handleResize() {
-			var h = Math.floor(window.innerHeight * 0.75) + 'px'
-			step.style('height', h)
+			// var h = Math.floor(window.innerHeight * 0.75) + 'px'
+			step.each(function () {
+				var ran = 0.5 + Math.random()
+				var h = Math.floor(window.innerHeight * ran) + 'px'
+				d3.select(this).style('height', h)
+			})
 
 			graphic
 				.style('height', window.innerHeight + 'px')
@@ -126,6 +130,7 @@
 		}
 
 		function handleStepEnter(resp) {
+			console.log('enter', resp)
 			step.classed('is-active', function (d, i) {
 				return i === resp.index
 			})
@@ -133,14 +138,18 @@
 			graphic.style('background-color', val)
 		}
 
+		function handleStepExit(resp) {
+			console.log('exit', resp)
+		}
+
 		function handleContainerEnter(resp) {
-			console.log('enter', resp)
+			// console.log('enter', resp)
 			graphic.classed('is-fixed', true)
 			graphic.classed('is-bottom', false)
 		}
 
 		function handleContainerExit(resp) {
-			console.log('exit', resp)
+			// console.log('exit', resp)
 			graphic.classed('is-fixed', false)
 			graphic.classed('is-bottom', resp.direction === 'down')
 		}
@@ -161,6 +170,7 @@
 				debug: true,
 			})
 				.onStepEnter(handleStepEnter)
+				.onStepExit(handleStepExit)
 				.onContainerEnter(handleContainerEnter)
 				.onContainerExit(handleContainerExit)
 			// .onIncrement(handleIncrement)

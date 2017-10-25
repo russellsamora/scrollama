@@ -9,8 +9,8 @@ function scrollama() {
   let offsetVal = 0;
   let offsetMargin = 0;
   let vh = 0;
-  // let threshold = [0];
 
+  let stepHeights = null;
   let direction = null;
   let bboxGraphic = null;
   let isEnabled = false;
@@ -60,12 +60,10 @@ function scrollama() {
         boundingClientRect,
         target
       } = entry;
-      if (isIntersecting && boundingClientRect.bottom >= 0) {
-        direction = "down";
-        notifyStepEnter(target);
-      } else if (!isIntersecting) {
-        direction = "up";
-        notifyStepExit(target);
+      if (boundingClientRect.bottom >= 0) {
+        direction = isIntersecting ? "down" : "up";
+        if (isIntersecting) notifyStepEnter(target);
+        else notifyStepExit(target);
       }
     });
   }
@@ -78,12 +76,10 @@ function scrollama() {
         boundingClientRect,
         target
       } = entry;
-      if (isIntersecting && boundingClientRect.top < 0) {
-        direction = "up";
-        notifyStepEnter(target);
-      } else if (!isIntersecting) {
-        direction = "down";
-        notifyStepExit(target);
+      if (boundingClientRect.top < 0) {
+        direction = isIntersecting ? "up" : "down";
+        if (isIntersecting) notifyStepEnter(target);
+        else notifyStepExit(target);
       }
     });
   }
@@ -101,8 +97,8 @@ function scrollama() {
   function intersectBottom(entries) {
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top } = boundingClientRect;
-    direction = isIntersecting ? "up" : "down";
     if (top < 0) {
+      direction = isIntersecting ? "up" : "down";
       if (isIntersecting) notifyEnter();
       else notifyExit();
     }
@@ -136,30 +132,39 @@ function scrollama() {
 
   // scrolling down
   function updateStepTopIO() {
-    if (io.stepTop) io.StepTop.disconnect();
+    if (io.stepTop) io.stepTop.forEach(d => d.disconnect());
 
-    const options = {
-      root: null,
-      rootMargin: `${margin.top}px 0px ${margin.bottom}px 0px`,
-      threshold: 0
-    };
+    io.stepTop = stepEl.map((el, i) => {
+      const marginTop = stepHeights[i] - offsetMargin;
+      const marginBottom = -vh + offsetMargin;
 
-    io.StepTop = new IntersectionObserver(intersectStepTop, options);
-    stepEl.forEach(el => io.StepTop.observe(el));
+      const options = {
+        root: null,
+        rootMargin: `${marginTop}px 0px ${marginBottom}px 0px`,
+        threshold: 0
+      };
+
+      const obs = new IntersectionObserver(intersectStepTop, options);
+      obs.observe(el);
+      return obs;
+    });
   }
 
   // scrolling up
   function updateStepBottomIO() {
-    if (io.stepBottom) io.StepBottom.disconnect();
+    if (io.stepBottom) io.stepBottom.forEach(d => d.disconnect());
 
-    const options = {
-      root: null,
-      rootMargin: `-${offsetMargin}px 0px ${offsetMargin}px 0px`,
-      threshold: 0
-    };
+    io.stepBottom = stepEl.map((el, i) => {
+      const options = {
+        root: null,
+        rootMargin: `-${offsetMargin}px 0px ${offsetMargin}px 0px`,
+        threshold: 0
+      };
 
-    io.StepBottom = new IntersectionObserver(intersectStepBottom, options);
-    stepEl.forEach(el => io.StepBottom.observe(el));
+      const obs = new IntersectionObserver(intersectStepBottom, options);
+      obs.observe(el);
+      return obs;
+    });
   }
 
   function updateIO() {
@@ -174,11 +179,10 @@ function scrollama() {
     vh = window.innerHeight;
     bboxGraphic = graphicEl ? graphicEl.getBoundingClientRect() : null;
 
+    offsetMargin = offsetVal * vh;
+
     if (stepEl) {
-      const stepHeight = stepEl[0].getBoundingClientRect().height;
-      offsetMargin = offsetVal * vh;
-      margin.top = stepHeight - offsetMargin;
-      margin.bottom = -vh + offsetMargin;
+      stepHeights = stepEl.map(el => el.getBoundingClientRect().height);
     }
 
     if (isEnabled) updateIO();

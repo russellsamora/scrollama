@@ -133,7 +133,7 @@ Tell scrollama to stop observing for trigger changes.
 
 ### Tips
 
-* `Step` elements should be set to the same height
+...
 
 ### Examples
 
