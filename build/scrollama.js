@@ -944,7 +944,7 @@ function scrollama() {
 
   function handleEnable(enable) {
     if (enable && !isEnabled) {
-      updateIO();
+      if (ready) { updateIO(); }
       isEnabled = true;
     } else if (!enable) {
       Object.keys(observer).map(function (k) { return observer[k].disconnect(); });
