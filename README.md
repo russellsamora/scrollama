@@ -130,6 +130,7 @@ Tell scrollama to stop observing for trigger changes.
 
 ### To do
 
+* Step exit event
 * Incremental progress listener
 
 ### Alternatives
