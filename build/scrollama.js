@@ -757,6 +757,7 @@ function selectAll(selector, parent) {
 }
 
 function scrollama() {
+  var ready = false;
   var containerEl = null;
   var graphicEl = null;
   var stepEl = null;
@@ -933,7 +934,7 @@ function scrollama() {
       stepHeights = stepEl.map(function (el) { return el.getBoundingClientRect().height; });
     }
 
-    if (isEnabled) { updateIO(); }
+    if (isEnabled && ready) { updateIO(); }
 
     if (debugMode) {
       var debugEl = document.querySelector(".scrollama__offset");
@@ -998,6 +999,8 @@ function scrollama() {
       stepEl = selectAll(step);
       offsetVal = offset;
       debugMode = debug;
+
+      ready = true;
 
       if (debugMode) { addDebug(); }
       // createThreshold();
