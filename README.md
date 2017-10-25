@@ -25,8 +25,8 @@ npm install scrollama
 And then import/require it:
 
 ```js
-const scrollama = require('scrollama'); // Node classic
-import scrollama from 'scrollama' // ES6
+import scrollama from 'scrollama' // ES6 or...
+const scrollama = require('scrollama');
 ```
 
 ### How to use
