@@ -126,7 +126,7 @@ Tell scrollama to stop observing for trigger changes.
 
 *Note: most of these demos use D3 to keep the code concise, but this can be used with any library, or with no library at all.*
 
-[Tk](https://russellgoldenberg.github.io/scrollama/demos/tk.html)
+[Basic Usage](https://russellgoldenberg.github.io/scrollama/basic)
 
 ### To do
 
@@ -134,7 +134,11 @@ Tell scrollama to stop observing for trigger changes.
 
 ### Alternatives
 
-[Tk](https://tk) - other library
+[Waypoints](http://imakewebthings.com/waypoints/)
+[ScrollStory](https://sjwilliams.github.io/scrollstory/)
+[ScrollMagic](http://scrollmagic.io/)
+[graph-scroll.js](https://1wheel.github.io/graph-scroll/)
+
 
 ### License
 
