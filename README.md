@@ -118,6 +118,10 @@ Tell scrollama to resume observing for trigger changes. Only necessary to call i
 
 Tell scrollama to stop observing for trigger changes.
 
+### Tips
+
+* `Step` elements should be set to the same height
+
 ### Examples
 
 *Note: most of these demos use D3 to keep the code concise, but this can be used with any library, or with no library at all.*
