@@ -217,7 +217,9 @@ function scrollama() {
       if (ready) updateIO();
       isEnabled = true;
     } else if (!enable) {
-      Object.keys(observer).map(k => observer[k].disconnect());
+      Object.keys(io).map(k => {
+        if (io[k]) io[k].disconnect();
+      });
       isEnabled = false;
     }
   }

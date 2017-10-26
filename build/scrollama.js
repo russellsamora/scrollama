@@ -966,7 +966,9 @@ function scrollama() {
       if (ready) { updateIO(); }
       isEnabled = true;
     } else if (!enable) {
-      Object.keys(observer).map(function (k) { return observer[k].disconnect(); });
+      Object.keys(io).map(function (k) {
+        if (io[k]) { io[k].disconnect(); }
+      });
       isEnabled = false;
     }
   }
