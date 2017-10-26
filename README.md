@@ -183,6 +183,7 @@ Tell scrollama to stop observing for trigger changes.
 
 * [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step triggers
 * [Sticky Graphic](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - basic implentation of sticky graphic
+* [Tk](https://russellgoldenberg.github.io/scrollama/basic) - incremental step progress
 
 ### Tips
 
