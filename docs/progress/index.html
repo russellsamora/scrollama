@@ -92,12 +92,13 @@
 
 		.step {
 			margin: 2rem auto 4rem auto;
+			padding: 10rem 1rem;
 			border: 1px solid #333;
 		}
 
 		.step p {
 			text-align: center;
-			padding: 10rem 1rem;
+			margin: 0.5rem auto;
 		}
 	</style>
 
@@ -117,9 +118,11 @@
 		<div class='scroll__text'>
 			<div class='step' data-step='250,220,0'>
 				<p>STEP 1</p>
+				<p class='progress'>0%</p>
 			</div>
 			<div class='step' data-step='50,250,200'>
 				<p>STEP 2</p>
+				<p class='progress'>0%</p>
 			</div>
 		</div>
 	</section>
@@ -140,6 +143,7 @@
 			var val = el.attr('data-step');
 			var rgba = 'rgba(' + val + ', ' + response.progress + ')';
 			el.style('background-color', rgba);
+			el.select('.progress').text(d3.format('.1%')(response.progress))
 		}
 
 		function init() {
