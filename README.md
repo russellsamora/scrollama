@@ -50,8 +50,8 @@ const scroller = Scrollama()
 // setup the instance, pass callback functions
 scroller.setup({
   step: '.step', // required
-  offset: 0.5, // optional, default = 0.5
-  debug: false, // optional, default = false
+  offset: 0.5,   // optional, default = 0.5
+  debug: false,  // optional, default = false
 })
 .onStepEnter(handleStepEnter)
 .onStepExit(handleStepExit)
@@ -64,9 +64,11 @@ To implement the sticky graphic scrollytelling pattern, you need the following t
 <!-- container = ".scroll" -->
 <div class='scroll'>
 	<!-- graphic = ".scroll__graphic" -->
-  <div class='scroll__graphic'><!--graphic / chart code here--></div>
+  <div class='scroll__graphic'>
+    <!--graphic / chart code here-->
+  </div>
   <div class='scroll__text'>
-		<!-- steps = ".step" -->
+    <!-- steps = ".step" -->
     <div class='step' data-step='a'></div>
     <div class='step' data-step='b'></div>
     <div class='step' data-step='c'></div>
@@ -81,10 +83,10 @@ const scroller = Scrollama()
 // setup the instance, pass callback functions
 scroller.setup({
   step: '.scroll__text .step', // required
-  container: '.scroll', // required (for sticky)
+  container: '.scroll',        // required (for sticky)
   graphic: '.scroll__graphic', // required (for sticky)
-  offset: 0.5, // optional, default = 0.5
-  debug: false, // optional, default = false
+  offset: 0.5,                 // optional, default = 0.5
+  debug: false,                // optional, default = false
 })
 .onStepEnter(handleStepEnter)
 .onStepExit(handleStepExit)
