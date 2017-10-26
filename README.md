@@ -165,8 +165,8 @@ Tell scrollama to stop observing for trigger changes.
 
 *Note: most of these demos use D3 to keep the code concise, but this can be used with any library, or with no library at all.*
 
-[Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step triggers
-[Sticky Graphic](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - basic implentation of sticky graphic (tk)
+* [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step triggers
+* [Sticky Graphic](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - basic implentation of sticky graphic
 
 ### To do
 
