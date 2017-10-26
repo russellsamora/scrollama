@@ -68,7 +68,7 @@
 
 		.step {
 			max-width: 30rem;
-			margin: 1rem auto;
+			margin: 3rem auto;
 			border: 2px solid #333;
 			background-color: #fff;
 		}
@@ -92,9 +92,9 @@
 			<div class='step' data-step='#ccc'>
 				<p>Step 1</p>
 			</div>
-			<div class='step' data-step='#aaa'>
+			<!-- <div class='step' data-step='#aaa'>
 				<p>Step 2</p>
-			</div>
+			</div> -->
 			<!-- <div class='step' data-step='#888'>
 				<p>Step 3</p>
 			</div>
@@ -117,7 +117,7 @@
 		function handleResize() {
 			// var h = Math.floor(window.innerHeight * 0.75) + 'px'
 			step.each(function () {
-				var ran = 0.5 + Math.random()
+				var ran = 0.1 + Math.random()
 				var h = Math.floor(window.innerHeight * ran) + 'px'
 				d3.select(this).style('height', h)
 			})
@@ -140,6 +140,7 @@
 
 		function handleStepExit(resp) {
 			console.log('exit', resp)
+			d3.select(resp.element).classed('is-active', false)
 		}
 
 		function handleContainerEnter(resp) {
@@ -162,11 +163,10 @@
 			handleResize()
 
 			scroller.setup({
-				container: '#scroll',
-				graphic: '.scroll__graphic',
-				text: '.scroll__text',
+				// container: '#scroll',
+				// graphic: '.scroll__graphic',
 				step: '.scroll__text .step',
-				offset: 0.25,
+				offset: 0,
 				debug: true,
 			})
 				.onStepEnter(handleStepEnter)

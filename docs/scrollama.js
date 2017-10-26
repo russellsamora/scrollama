@@ -757,6 +757,7 @@ function selectAll(selector, parent) {
 }
 
 function scrollama() {
+  var ready = false;
   var containerEl = null;
   var graphicEl = null;
   var stepEl = null;
@@ -802,12 +803,18 @@ function scrollama() {
   }
 
   // OBSERVER - INTERSECT HANDLING
+
+  // if TOP edge of step crosses threshold,
+  // bottom must be > 0 which means it is on "screen" (shifted by offset)
   function intersectStepTop(entries) {
     entries.forEach(function (entry) {
       var isIntersecting = entry.isIntersecting;
       var boundingClientRect = entry.boundingClientRect;
       var target = entry.target;
-      if (boundingClientRect.bottom >= 0) {
+      var bottom = boundingClientRect.bottom;
+      var bottomAdjusted = bottom - offsetMargin;
+
+      if (bottomAdjusted >= 0) {
         direction = isIntersecting ? "down" : "up";
         if (isIntersecting) { notifyStepEnter(target); }
         else { notifyStepExit(target); }
@@ -820,10 +827,16 @@ function scrollama() {
       var isIntersecting = entry.isIntersecting;
       var boundingClientRect = entry.boundingClientRect;
       var target = entry.target;
-      if (boundingClientRect.top < 0) {
-        direction = isIntersecting ? "up" : "down";
-        if (isIntersecting) { notifyStepEnter(target); }
-        else { notifyStepExit(target); }
+      var bottom = boundingClientRect.bottom;
+      var height = boundingClientRect.height;
+      var bottomAdjusted = bottom - offsetMargin;
+
+      if (bottomAdjusted >= 0 && bottomAdjusted < height && isIntersecting) {
+        direction = "up";
+        notifyStepEnter(target);
+      } else if (bottomAdjusted <= 0 && !isIntersecting) {
+        direction = "down";
+        notifyStepExit(target);
       }
     });
   }
@@ -885,10 +898,11 @@ function scrollama() {
     io.stepTop = stepEl.map(function (el, i) {
       var marginTop = stepHeights[i] - offsetMargin;
       var marginBottom = -vh + offsetMargin;
+      var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
 
       var options = {
         root: null,
-        rootMargin: (marginTop + "px 0px " + marginBottom + "px 0px"),
+        rootMargin: rootMargin,
         threshold: 0
       };
 
@@ -903,9 +917,13 @@ function scrollama() {
     if (io.stepBottom) { io.stepBottom.forEach(function (d) { return d.disconnect(); }); }
 
     io.stepBottom = stepEl.map(function (el, i) {
+      var marginTop = -offsetMargin;
+      var marginBottom = -vh + stepHeights[i] + offsetMargin;
+      var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
+
       var options = {
         root: null,
-        rootMargin: ("-" + offsetMargin + "px 0px " + offsetMargin + "px 0px"),
+        rootMargin: rootMargin,
         threshold: 0
       };
 
@@ -916,10 +934,12 @@ function scrollama() {
   }
 
   function updateIO() {
-    updateTopIO();
-    updateBottomIO();
     updateStepTopIO();
     updateStepBottomIO();
+    if (containerEl && graphicEl) {
+      updateTopIO();
+      updateBottomIO();
+    }
   }
 
   // HELPER FUNCTIONS
@@ -929,11 +949,11 @@ function scrollama() {
 
     offsetMargin = offsetVal * vh;
 
-    if (stepEl) {
-      stepHeights = stepEl.map(function (el) { return el.getBoundingClientRect().height; });
-    }
+    stepHeights = stepEl
+      ? stepEl.map(function (el) { return el.getBoundingClientRect().height; })
+      : [];
 
-    if (isEnabled) { updateIO(); }
+    if (isEnabled && ready) { updateIO(); }
 
     if (debugMode) {
       var debugEl = document.querySelector(".scrollama__offset");
@@ -943,7 +963,7 @@ function scrollama() {
 
   function handleEnable(enable) {
     if (enable && !isEnabled) {
-      updateIO();
+      if (ready) { updateIO(); }
       isEnabled = true;
     } else if (!enable) {
       Object.keys(observer).map(function (k) { return observer[k].disconnect(); });
@@ -956,23 +976,25 @@ function scrollama() {
   }
 
   function addDebug() {
-    var el = document.createElement("div");
-    el.setAttribute("class", "scrollama__offset");
-    el.style.position = "fixed";
-    el.style.top = "0";
-    el.style.left = "0";
-    el.style.width = "100%";
-    el.style.height = "1px";
-    el.style.backgroundColor = "red";
-    var text = document.createElement("p");
-    text.innerText = "scrollama trigger: " + offsetVal;
-    text.style.fontSize = "12px";
-    text.style.fontFamily = "monospace";
-    text.style.color = "red";
-    text.style.margin = "0";
-    text.style.padding = "6px";
-    el.appendChild(text);
-    document.body.appendChild(el);
+    if (debugMode) {
+      var el = document.createElement("div");
+      el.setAttribute("class", "scrollama__offset");
+      el.style.position = "fixed";
+      el.style.top = "0";
+      el.style.left = "0";
+      el.style.width = "100%";
+      el.style.height = "1px";
+      el.style.backgroundColor = "red";
+      var text = document.createElement("p");
+      text.innerText = "scrollama trigger: " + offsetVal;
+      text.style.fontSize = "12px";
+      text.style.fontFamily = "monospace";
+      text.style.color = "red";
+      text.style.margin = "0";
+      text.style.padding = "6px";
+      el.appendChild(text);
+      document.body.appendChild(el);
+    }
   }
 
   // function createThreshold(count = 100) {
@@ -992,19 +1014,20 @@ function scrollama() {
     var offset = ref.offset; if ( offset === void 0 ) offset = 0.5;
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
 
-    if (container && graphic && step) {
-      containerEl = select(container);
-      graphicEl = select(graphic);
+    if (step) {
       stepEl = selectAll(step);
+      containerEl = container ? select(container) : null;
+      graphicEl = graphic ? select(graphic) : null;
       offsetVal = offset;
       debugMode = debug;
+      ready = true;
 
-      if (debugMode) { addDebug(); }
       // createThreshold();
+      addDebug();
       indexSteps();
       handleResize();
       handleEnable(true);
-    } else { console.log("improper scrollama setup config"); }
+    } else { console.error("scrollama error: missing step element"); }
     return S;
   };
 

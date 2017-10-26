@@ -53,6 +53,9 @@ function scrollama() {
   }
 
   // OBSERVER - INTERSECT HANDLING
+
+  // if TOP edge of step crosses threshold,
+  // bottom must be > 0 which means it is on "screen" (shifted by offset)
   function intersectStepTop(entries) {
     entries.forEach(entry => {
       const {
@@ -61,7 +64,10 @@ function scrollama() {
         boundingClientRect,
         target
       } = entry;
-      if (boundingClientRect.bottom >= 0) {
+      const { bottom } = boundingClientRect;
+      const bottomAdjusted = bottom - offsetMargin;
+
+      if (bottomAdjusted >= 0) {
         direction = isIntersecting ? "down" : "up";
         if (isIntersecting) notifyStepEnter(target);
         else notifyStepExit(target);
@@ -77,10 +83,15 @@ function scrollama() {
         boundingClientRect,
         target
       } = entry;
-      if (boundingClientRect.top < 0) {
-        direction = isIntersecting ? "up" : "down";
-        if (isIntersecting) notifyStepEnter(target);
-        else notifyStepExit(target);
+      const { bottom, height } = boundingClientRect;
+      const bottomAdjusted = bottom - offsetMargin;
+
+      if (bottomAdjusted >= 0 && bottomAdjusted < height && isIntersecting) {
+        direction = "up";
+        notifyStepEnter(target);
+      } else if (bottomAdjusted <= 0 && !isIntersecting) {
+        direction = "down";
+        notifyStepExit(target);
       }
     });
   }
@@ -138,10 +149,11 @@ function scrollama() {
     io.stepTop = stepEl.map((el, i) => {
       const marginTop = stepHeights[i] - offsetMargin;
       const marginBottom = -vh + offsetMargin;
+      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
       const options = {
         root: null,
-        rootMargin: `${marginTop}px 0px ${marginBottom}px 0px`,
+        rootMargin,
         threshold: 0
       };
 
@@ -156,9 +168,13 @@ function scrollama() {
     if (io.stepBottom) io.stepBottom.forEach(d => d.disconnect());
 
     io.stepBottom = stepEl.map((el, i) => {
+      const marginTop = -offsetMargin;
+      const marginBottom = -vh + stepHeights[i] + offsetMargin;
+      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+
       const options = {
         root: null,
-        rootMargin: `-${offsetMargin}px 0px ${offsetMargin}px 0px`,
+        rootMargin,
         threshold: 0
       };
 
@@ -211,23 +227,25 @@ function scrollama() {
   }
 
   function addDebug() {
-    const el = document.createElement("div");
-    el.setAttribute("class", "scrollama__offset");
-    el.style.position = "fixed";
-    el.style.top = "0";
-    el.style.left = "0";
-    el.style.width = "100%";
-    el.style.height = "1px";
-    el.style.backgroundColor = "red";
-    const text = document.createElement("p");
-    text.innerText = `scrollama trigger: ${offsetVal}`;
-    text.style.fontSize = "12px";
-    text.style.fontFamily = "monospace";
-    text.style.color = "red";
-    text.style.margin = "0";
-    text.style.padding = "6px";
-    el.appendChild(text);
-    document.body.appendChild(el);
+    if (debugMode) {
+      const el = document.createElement("div");
+      el.setAttribute("class", "scrollama__offset");
+      el.style.position = "fixed";
+      el.style.top = "0";
+      el.style.left = "0";
+      el.style.width = "100%";
+      el.style.height = "1px";
+      el.style.backgroundColor = "red";
+      const text = document.createElement("p");
+      text.innerText = `scrollama trigger: ${offsetVal}`;
+      text.style.fontSize = "12px";
+      text.style.fontFamily = "monospace";
+      text.style.color = "red";
+      text.style.margin = "0";
+      text.style.padding = "6px";
+      el.appendChild(text);
+      document.body.appendChild(el);
+    }
   }
 
   // function createThreshold(count = 100) {
@@ -254,15 +272,14 @@ function scrollama() {
       graphicEl = graphic ? select(graphic) : null;
       offsetVal = offset;
       debugMode = debug;
-
       ready = true;
 
-      if (debugMode) addDebug();
       // createThreshold();
+      addDebug();
       indexSteps();
       handleResize();
       handleEnable(true);
-    } else console.log("improper scrollama setup config");
+    } else console.error("scrollama error: missing step element");
     return S;
   };
 
