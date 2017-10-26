@@ -63,7 +63,7 @@ To implement the sticky graphic scrollytelling pattern, you need the following t
 ```html
 <!-- container = ".scroll" -->
 <div class='scroll'>
-	<!-- graphic = ".scroll__graphic" -->
+  <!-- graphic = ".scroll__graphic" -->
   <div class='scroll__graphic'>
     <!--graphic / chart code here-->
   </div>
