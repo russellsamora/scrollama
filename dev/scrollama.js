@@ -765,12 +765,15 @@ function scrollama() {
   var offsetVal = 0;
   var offsetMargin = 0;
   var vh = 0;
+  var thresholdProgress = 0;
 
   var stepHeights = null;
   var direction = null;
   var bboxGraphic = null;
+
   var isEnabled = false;
   var debugMode = false;
+  var progressMode = false;
 
   var callback = {};
   var io = {};
@@ -778,28 +781,38 @@ function scrollama() {
   // NOTIFY CALLBACKS
   function notifyStepEnter(element) {
     var index = +element.getAttribute("data-scrollama-index");
-    var resp = { direction: direction, element: element, index: index };
+    var resp = { element: element, index: index, direction: direction };
     if (callback.stepEnter && typeof callback.stepEnter === "function")
       { callback.stepEnter(resp); }
   }
 
   function notifyStepExit(element) {
     var index = +element.getAttribute("data-scrollama-index");
-    var resp = { direction: direction, element: element, index: index };
+    var resp = { element: element, index: index, direction: direction };
     if (callback.stepExit && typeof callback.stepExit === "function")
       { callback.stepExit(resp); }
   }
 
-  function notifyEnter() {
-    var resp = { direction: direction };
-    if (callback.enter && typeof callback.enter === "function")
-      { callback.enter(resp); }
+  function notifyStepProgress(element, progress) {
+    var index = +element.getAttribute("data-scrollama-index");
+    var resp = { element: element, index: index, progress: progress };
+    if (callback.stepProgress && typeof callback.stepProgress === "function")
+      { callback.stepProgress(resp); }
   }
 
-  function notifyExit() {
+  function notifyContainerEnter() {
     var resp = { direction: direction };
-    if (callback.exit && typeof callback.exit === "function")
-      { callback.exit(resp); }
+    if (
+      callback.containerEnter &&
+      typeof callback.containerEnter === "function"
+    )
+      { callback.containerEnter(resp); }
+  }
+
+  function notifyContainerExit() {
+    var resp = { direction: direction };
+    if (callback.containerExit && typeof callback.containerExit === "function")
+      { callback.containerExit(resp); }
   }
 
   // OBSERVER - INTERSECT HANDLING
@@ -812,7 +825,9 @@ function scrollama() {
       var boundingClientRect = entry.boundingClientRect;
       var target = entry.target;
       var bottom = boundingClientRect.bottom;
-      if (bottom >= 0) {
+      var bottomAdjusted = bottom - offsetMargin;
+
+      if (bottomAdjusted >= 0) {
         direction = isIntersecting ? "down" : "up";
         if (isIntersecting) { notifyStepEnter(target); }
         else { notifyStepExit(target); }
@@ -827,12 +842,29 @@ function scrollama() {
       var target = entry.target;
       var bottom = boundingClientRect.bottom;
       var height = boundingClientRect.height;
-      if (bottom > 0 && bottom < height && isIntersecting) {
+      var bottomAdjusted = bottom - offsetMargin;
+
+      if (bottomAdjusted >= 0 && bottomAdjusted < height && isIntersecting) {
         direction = "up";
         notifyStepEnter(target);
-      } else if (bottom <= 0 && !isIntersecting) {
+      } else if (bottomAdjusted <= 0 && !isIntersecting) {
         direction = "down";
         notifyStepExit(target);
+      }
+    });
+  }
+
+  function intersectStepProgress(entries) {
+    entries.forEach(function (entry) {
+      var isIntersecting = entry.isIntersecting;
+      var intersectionRatio = entry.intersectionRatio;
+      var boundingClientRect = entry.boundingClientRect;
+      var target = entry.target;
+      var bottom = boundingClientRect.bottom;
+      var bottomAdjusted = bottom - offsetMargin;
+
+      if (isIntersecting && bottomAdjusted >= 0) {
+        notifyStepProgress(target, +intersectionRatio.toFixed(3));
       }
     });
   }
@@ -844,8 +876,8 @@ function scrollama() {
     var bottom = boundingClientRect.bottom;
     if (bottom > 0) {
       direction = isIntersecting ? "down" : "up";
-      if (isIntersecting) { notifyEnter(); }
-      else { notifyExit(); }
+      if (isIntersecting) { notifyContainerEnter(); }
+      else { notifyContainerExit(); }
     }
   }
 
@@ -856,8 +888,8 @@ function scrollama() {
     var top = boundingClientRect.top;
     if (top < 0) {
       direction = isIntersecting ? "up" : "down";
-      if (isIntersecting) { notifyEnter(); }
-      else { notifyExit(); }
+      if (isIntersecting) { notifyContainerEnter(); }
+      else { notifyContainerExit(); }
     }
   }
 
@@ -887,7 +919,7 @@ function scrollama() {
     io.bottom.observe(containerEl);
   }
 
-  // scrolling down
+  // top edge
   function updateStepTopIO() {
     if (io.stepTop) { io.stepTop.forEach(function (d) { return d.disconnect(); }); }
 
@@ -908,7 +940,7 @@ function scrollama() {
     });
   }
 
-  // scrolling up
+  // bottom edge
   function updateStepBottomIO() {
     if (io.stepBottom) { io.stepBottom.forEach(function (d) { return d.disconnect(); }); }
 
@@ -929,9 +961,33 @@ function scrollama() {
     });
   }
 
+  // progress progress tracker
+  function updateStepProgressIO() {
+    if (io.stepProgress) { io.stepProgress.forEach(function (d) { return d.disconnect(); }); }
+
+    io.stepProgress = stepEl.map(function (el, i) {
+      var marginTop = stepHeights[i] - offsetMargin;
+      var marginBottom = -vh + offsetMargin;
+      var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
+
+      var options = {
+        root: null,
+        rootMargin: rootMargin,
+        threshold: thresholdProgress
+      };
+
+      var obs = new IntersectionObserver(intersectStepProgress, options);
+      obs.observe(el);
+      return obs;
+    });
+  }
+
   function updateIO() {
     updateStepTopIO();
     updateStepBottomIO();
+
+    if (progressMode) { updateStepProgressIO(); }
+
     if (containerEl && graphicEl) {
       updateTopIO();
       updateBottomIO();
@@ -962,7 +1018,11 @@ function scrollama() {
       if (ready) { updateIO(); }
       isEnabled = true;
     } else if (!enable) {
-      Object.keys(observer).map(function (k) { return observer[k].disconnect(); });
+      if (io.top) { io.top.disconnect(); }
+      if (io.bottom) { io.bottom.disconnect(); }
+      if (io.stepTop) { io.stepTop.forEach(function (d) { return d.disconnect(); }); }
+      if (io.stepBottom) { io.stepBottom.forEach(function (d) { return d.disconnect(); }); }
+      if (io.stepProgress) { io.stepProgress.forEach(function (d) { return d.disconnect(); }); }
       isEnabled = false;
     }
   }
@@ -993,13 +1053,16 @@ function scrollama() {
     }
   }
 
-  // function createThreshold(count = 100) {
-  //   threshold = [];
-  //   const ratio = 1 / count;
-  //   for (let i = 0; i < count; i++) {
-  //     threshold.push(i * ratio);
-  //   }
-  // }
+  function setThreshold() {
+    var count = 100;
+    if (progressMode) {
+      thresholdProgress = [];
+      var ratio = 1 / count;
+      for (var i = 0; i < count; i++) {
+        thresholdProgress.push(i * ratio);
+      }
+    }
+  }
 
   var S = {};
 
@@ -1008,6 +1071,7 @@ function scrollama() {
     var graphic = ref.graphic;
     var step = ref.step;
     var offset = ref.offset; if ( offset === void 0 ) offset = 0.5;
+    var progress = ref.progress; if ( progress === void 0 ) progress = false;
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
 
     if (step) {
@@ -1016,11 +1080,12 @@ function scrollama() {
       graphicEl = graphic ? select(graphic) : null;
       offsetVal = offset;
       debugMode = debug;
+      progressMode = progress;
       ready = true;
 
-      // createThreshold();
       addDebug();
       indexSteps();
+      setThreshold();
       handleResize();
       handleEnable(true);
     } else { console.error("scrollama error: missing step element"); }
@@ -1052,18 +1117,18 @@ function scrollama() {
     return S;
   };
 
-  S.onIncrement = function (cb) {
-    callback.increment = cb;
+  S.onProgress = function (cb) {
+    callback.stepProgress = cb;
     return S;
   };
 
   S.onContainerEnter = function (cb) {
-    callback.enter = cb;
+    callback.containerEnter = cb;
     return S;
   };
 
   S.onContainerExit = function (cb) {
-    callback.exit = cb;
+    callback.containerExit = cb;
     return S;
   };
 

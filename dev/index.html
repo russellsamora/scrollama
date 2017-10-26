@@ -155,8 +155,8 @@
 			graphic.classed('is-bottom', resp.direction === 'down')
 		}
 
-		function handleIncrement(resp) {
-			console.log('increment', resp)
+		function handleProgress(resp) {
+			console.log('progress', resp)
 		}
 
 		function init() {
@@ -166,14 +166,15 @@
 				// container: '#scroll',
 				// graphic: '.scroll__graphic',
 				step: '.scroll__text .step',
-				offset: 0,
+				offset: 0.33,
 				debug: true,
+				progress: true,
 			})
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit)
 				.onContainerEnter(handleContainerEnter)
 				.onContainerExit(handleContainerExit)
-			// .onIncrement(handleIncrement)
+				.onProgress(handleProgress)
 
 			window.addEventListener('resize', handleResize)
 		}

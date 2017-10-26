@@ -105,6 +105,7 @@ scroller.setup({
 * `container` (string): Selector for the element that contains everything for the scroller. **optional**
 * `graphic` (string): Selector for the graphic element that will become fixed. **optional**
 * `offset` (number, 0 - 1): How far from the top of the viewport to trigger a step. **(default: 0.5)**
+* `progress` (boolean): Whether to fire incremental step progress updates or not. **(default: false)**
 * `debug` (boolean): Whether to show visual debugging tools or not. **(default: false)**
 
 #### scrollama.onStepEnter(callback)
@@ -112,26 +113,39 @@ scroller.setup({
 Callback that fires when the top or bottom edge of a step element enters the offset threshold.
 
 The argument of the callback is an object:
-`{ direction: string, element: DOMElement, index: number }`
-
-`direction`: 'up' or 'down'
+`{ element: DOMElement, index: number, direction: string }`
 
 `element`: The step element that triggered
 
 `index`: The index of the step of all steps
+
+`direction`: 'up' or 'down'
 
 #### scrollama.onStepExit(callback)
 
 Callback that fires when the top or bottom edge of a step element exits the offset threshold.
 
 The argument of the callback is an object:
-`{ direction: string, element: DOMElement, index: number }`
-
-`direction`: 'up' or 'down'
+`{ element: DOMElement, index: number, direction: string }`
 
 `element`: The step element that triggered
 
 `index`: The index of the step of all steps
+
+`direction`: 'up' or 'down'
+
+#### scrollama.onStepProgress(callback)
+
+Callback that fires the progress (0 - 1) a step has made through the threshold.
+
+The argument of the callback is an object:
+`{ element: DOMElement, index: number, progress: number }`
+
+`element`: The step element that triggered
+
+`index`: The index of the step of all steps
+
+`progress`: The percent of completion of the step (0 - 1)
 
 #### scrollama.onContainerEnter(callback)
 

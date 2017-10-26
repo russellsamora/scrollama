@@ -10,12 +10,15 @@ function scrollama() {
   let offsetVal = 0;
   let offsetMargin = 0;
   let vh = 0;
+  let thresholdProgress = 0;
 
   let stepHeights = null;
   let direction = null;
   let bboxGraphic = null;
+
   let isEnabled = false;
   let debugMode = false;
+  let progressMode = false;
 
   const margin = {};
   const callback = {};
@@ -24,32 +27,38 @@ function scrollama() {
   // NOTIFY CALLBACKS
   function notifyStepEnter(element) {
     const index = +element.getAttribute("data-scrollama-index");
-    const resp = { direction, element, index };
+    const resp = { element, index, direction };
     if (callback.stepEnter && typeof callback.stepEnter === "function")
       callback.stepEnter(resp);
   }
 
   function notifyStepExit(element) {
     const index = +element.getAttribute("data-scrollama-index");
-    const resp = { direction, element, index };
+    const resp = { element, index, direction };
     if (callback.stepExit && typeof callback.stepExit === "function")
       callback.stepExit(resp);
   }
 
-  function notifyIncrement() {
-    // TODO
+  function notifyStepProgress(element, progress) {
+    const index = +element.getAttribute("data-scrollama-index");
+    const resp = { element, index, progress };
+    if (callback.stepProgress && typeof callback.stepProgress === "function")
+      callback.stepProgress(resp);
   }
 
-  function notifyEnter() {
+  function notifyContainerEnter() {
     const resp = { direction };
-    if (callback.enter && typeof callback.enter === "function")
-      callback.enter(resp);
+    if (
+      callback.containerEnter &&
+      typeof callback.containerEnter === "function"
+    )
+      callback.containerEnter(resp);
   }
 
-  function notifyExit() {
+  function notifyContainerExit() {
     const resp = { direction };
-    if (callback.exit && typeof callback.exit === "function")
-      callback.exit(resp);
+    if (callback.containerExit && typeof callback.containerExit === "function")
+      callback.containerExit(resp);
   }
 
   // OBSERVER - INTERSECT HANDLING
@@ -96,13 +105,30 @@ function scrollama() {
     });
   }
 
+  function intersectStepProgress(entries) {
+    entries.forEach(entry => {
+      const {
+        isIntersecting,
+        intersectionRatio,
+        boundingClientRect,
+        target
+      } = entry;
+      const { bottom } = boundingClientRect;
+      const bottomAdjusted = bottom - offsetMargin;
+
+      if (isIntersecting && bottomAdjusted >= 0) {
+        notifyStepProgress(target, +intersectionRatio.toFixed(3));
+      }
+    });
+  }
+
   function intersectTop(entries) {
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top, bottom } = boundingClientRect;
     if (bottom > 0) {
       direction = isIntersecting ? "down" : "up";
-      if (isIntersecting) notifyEnter();
-      else notifyExit();
+      if (isIntersecting) notifyContainerEnter();
+      else notifyContainerExit();
     }
   }
 
@@ -111,8 +137,8 @@ function scrollama() {
     const { top } = boundingClientRect;
     if (top < 0) {
       direction = isIntersecting ? "up" : "down";
-      if (isIntersecting) notifyEnter();
-      else notifyExit();
+      if (isIntersecting) notifyContainerEnter();
+      else notifyContainerExit();
     }
   }
 
@@ -142,7 +168,7 @@ function scrollama() {
     io.bottom.observe(containerEl);
   }
 
-  // scrolling down
+  // top edge
   function updateStepTopIO() {
     if (io.stepTop) io.stepTop.forEach(d => d.disconnect());
 
@@ -163,7 +189,7 @@ function scrollama() {
     });
   }
 
-  // scrolling up
+  // bottom edge
   function updateStepBottomIO() {
     if (io.stepBottom) io.stepBottom.forEach(d => d.disconnect());
 
@@ -184,9 +210,33 @@ function scrollama() {
     });
   }
 
+  // progress progress tracker
+  function updateStepProgressIO() {
+    if (io.stepProgress) io.stepProgress.forEach(d => d.disconnect());
+
+    io.stepProgress = stepEl.map((el, i) => {
+      const marginTop = stepHeights[i] - offsetMargin;
+      const marginBottom = -vh + offsetMargin;
+      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+
+      const options = {
+        root: null,
+        rootMargin,
+        threshold: thresholdProgress
+      };
+
+      const obs = new IntersectionObserver(intersectStepProgress, options);
+      obs.observe(el);
+      return obs;
+    });
+  }
+
   function updateIO() {
     updateStepTopIO();
     updateStepBottomIO();
+
+    if (progressMode) updateStepProgressIO();
+
     if (containerEl && graphicEl) {
       updateTopIO();
       updateBottomIO();
@@ -221,6 +271,7 @@ function scrollama() {
       if (io.bottom) io.bottom.disconnect();
       if (io.stepTop) io.stepTop.forEach(d => d.disconnect());
       if (io.stepBottom) io.stepBottom.forEach(d => d.disconnect());
+      if (io.stepProgress) io.stepProgress.forEach(d => d.disconnect());
       isEnabled = false;
     }
   }
@@ -251,13 +302,16 @@ function scrollama() {
     }
   }
 
-  // function createThreshold(count = 100) {
-  //   threshold = [];
-  //   const ratio = 1 / count;
-  //   for (let i = 0; i < count; i++) {
-  //     threshold.push(i * ratio);
-  //   }
-  // }
+  function setThreshold() {
+    const count = 100;
+    if (progressMode) {
+      thresholdProgress = [];
+      const ratio = 1 / count;
+      for (let i = 0; i < count; i++) {
+        thresholdProgress.push(i * ratio);
+      }
+    }
+  }
 
   const S = {};
 
@@ -266,7 +320,7 @@ function scrollama() {
     graphic,
     step,
     offset = 0.5,
-    increment = false,
+    progress = false,
     debug = false
   }) => {
     if (step) {
@@ -275,11 +329,12 @@ function scrollama() {
       graphicEl = graphic ? select(graphic) : null;
       offsetVal = offset;
       debugMode = debug;
+      progressMode = progress;
       ready = true;
 
-      // createThreshold();
       addDebug();
       indexSteps();
+      setThreshold();
       handleResize();
       handleEnable(true);
     } else console.error("scrollama error: missing step element");
@@ -311,18 +366,18 @@ function scrollama() {
     return S;
   };
 
-  S.onIncrement = cb => {
-    callback.increment = cb;
+  S.onProgress = cb => {
+    callback.stepProgress = cb;
     return S;
   };
 
   S.onContainerEnter = cb => {
-    callback.enter = cb;
+    callback.containerEnter = cb;
     return S;
   };
 
   S.onContainerExit = cb => {
-    callback.exit = cb;
+    callback.containerExit = cb;
     return S;
   };
 
