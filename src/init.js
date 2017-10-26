@@ -169,10 +169,12 @@ function scrollama() {
   }
 
   function updateIO() {
-    updateTopIO();
-    updateBottomIO();
     updateStepTopIO();
     updateStepBottomIO();
+    if (containerEl && graphicEl) {
+      updateTopIO();
+      updateBottomIO();
+    }
   }
 
   // HELPER FUNCTIONS
@@ -182,9 +184,9 @@ function scrollama() {
 
     offsetMargin = offsetVal * vh;
 
-    if (stepEl) {
-      stepHeights = stepEl.map(el => el.getBoundingClientRect().height);
-    }
+    stepHeights = stepEl
+      ? stepEl.map(el => el.getBoundingClientRect().height)
+      : [];
 
     if (isEnabled && ready) updateIO();
 
@@ -246,10 +248,10 @@ function scrollama() {
     increment = false,
     debug = false
   }) => {
-    if (container && graphic && step) {
-      containerEl = select(container);
-      graphicEl = select(graphic);
+    if (step) {
       stepEl = selectAll(step);
+      containerEl = container ? select(container) : null;
+      graphicEl = graphic ? select(graphic) : null;
       offsetVal = offset;
       debugMode = debug;
 
