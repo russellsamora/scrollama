@@ -1,6 +1,6 @@
 {
   "name": "scrollama",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Lightweight scrollytelling library using IntersectionObserver",
   "main": "build/scrollama.js",
   "browser": "build/scrollama.js",
