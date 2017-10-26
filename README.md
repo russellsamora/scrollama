@@ -6,7 +6,7 @@ As seen on [The Pudding](https://pudding.cool/2017/10/superteams/).
 
 ### Why?
 
-Scrollytelling can be complicated difficult to make performant. The goal of this library is to provide a simple interface for creating scroll-driven interactives. Scrollama is focused on perfomance by using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)  to handle element position detection. It offers an opinionated (but popular) scrollytelling pattern to reduce more involved DOM calculations.
+Scrollytelling can be complicated to implement and difficult to make performant. The goal of this library is to provide a simple interface for creating scroll-driven interactives. Scrollama is focused on perfomance by using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)  to handle element position detection. It offers an opinionated (but popular) scrollytelling pattern to reduce more involved DOM calculations.
 
 [![scrollytelling pattern](https://thumbs.gfycat.com/FearfulHotArabianoryx-size_restricted.gif)](https://pudding.cool/process/how-to-implement-scrollytelling)
 
