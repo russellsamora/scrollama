@@ -366,7 +366,7 @@ function scrollama() {
     return S;
   };
 
-  S.onProgress = cb => {
+  S.onStepProgress = cb => {
     callback.stepProgress = cb;
     return S;
   };

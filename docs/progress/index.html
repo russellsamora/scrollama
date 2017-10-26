@@ -4,8 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Scrollama Demo: Basic</title>
-	<meta name="description" content="Scrollama Demo: Basic">
+	<title>Scrollama Demo: Progress</title>
+	<meta name="description" content="Scrollama Demo: Progress">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		/* default / demo page */
@@ -95,13 +95,9 @@
 			border: 1px solid #333;
 		}
 
-		.step.is-active {
-			background-color: lightgoldenrodyellow;
-		}
-
 		.step p {
 			text-align: center;
-			padding: 1rem;
+			padding: 10rem 1rem;
 		}
 	</style>
 
@@ -112,24 +108,18 @@
 		<p class='intro__overline'>
 			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
 		</p>
-		<h1 class='intro__hed'>Demo: Basic</h1>
+		<h1 class='intro__hed'>Demo: Progress</h1>
 		<p class='intro__dek'>
 			Start scrolling to see how it works.
 		</p>
 	</section>
 	<section id='scroll'>
 		<div class='scroll__text'>
-			<div class='step' data-step='1'>
+			<div class='step' data-step='250,220,0'>
 				<p>STEP 1</p>
 			</div>
-			<div class='step' data-step='2'>
+			<div class='step' data-step='50,250,200'>
 				<p>STEP 2</p>
-			</div>
-			<div class='step' data-step='3'>
-				<p>STEP 3</p>
-			</div>
-			<div class='step' data-step='4'>
-				<p>STEP 4</p>
 			</div>
 		</div>
 	</section>
@@ -145,37 +135,23 @@
 		// initialize the scrollama
 		var scroller = scrollama();
 
-		// scrollama event handlers
-		function handleStepEnter(response) {
-			// response = { element, direction, index }
-			console.log(response);
-			// add to color to current step
-			d3.select(response.element).classed('is-active', true);
-		}
-
-		function handleStepExit(response) {
-			// response = { element, direction, index }
-			console.log(response);
-			// remove color from current step
-			d3.select(response.element).classed('is-active', false);
+		function handleStepProgress(response) {
+			var el = d3.select(response.element);
+			var val = el.attr('data-step');
+			var rgba = 'rgba(' + val + ', ' + response.progress + ')';
+			el.style('background-color', rgba);
 		}
 
 		function init() {
-			// set random padding for different step heights (not required)
-			step.style('padding', function () {
-				var v = 100 + Math.floor(Math.random() * window.innerHeight / 4)
-				return v + 'px 0px';
-			})
-
-			// 1. setup the scroller with the bare-bones options
+			// 1. setup the scroller with the bare-bones settings
 			// this will also initialize trigger observations
 			// 3. bind scrollama event handlers (this can be chained like below)
 			scroller.setup({
 				step: '.scroll__text .step',
+				progress: true,
 				debug: true,
 			})
-				.onStepEnter(handleStepEnter)
-				.onStepExit(handleStepExit);
+				.onStepProgress(handleStepProgress);
 		}
 
 		// kick things off
