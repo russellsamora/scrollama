@@ -966,9 +966,10 @@ function scrollama() {
       if (ready) { updateIO(); }
       isEnabled = true;
     } else if (!enable) {
-      Object.keys(io).map(function (k) {
-        if (io[k]) { io[k].disconnect(); }
-      });
+      if (io.top) { io.top.disconnect(); }
+      if (io.bottom) { io.bottom.disconnect(); }
+      if (io.stepTop) { io.stepTop.forEach(function (d) { return d.disconnect(); }); }
+      if (io.stepBottom) { io.stepBottom.forEach(function (d) { return d.disconnect(); }); }
       isEnabled = false;
     }
   }

@@ -168,6 +168,10 @@ Tell scrollama to stop observing for trigger changes.
 * [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step triggers
 * [Sticky Graphic](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - basic implentation of sticky graphic
 
+### Tips
+
+* Avoid using `viewport height` (vh) in your CSS because scrolling up and down constantly triggers vh to change, which will also trigger a window resize.
+
 ### To do
 
 * Incremental progress listener

@@ -217,9 +217,10 @@ function scrollama() {
       if (ready) updateIO();
       isEnabled = true;
     } else if (!enable) {
-      Object.keys(io).map(k => {
-        if (io[k]) io[k].disconnect();
-      });
+      if (io.top) io.top.disconnect();
+      if (io.bottom) io.bottom.disconnect();
+      if (io.stepTop) io.stepTop.forEach(d => d.disconnect());
+      if (io.stepBottom) io.stepBottom.forEach(d => d.disconnect());
       isEnabled = false;
     }
   }
