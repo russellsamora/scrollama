@@ -38,6 +38,13 @@
 			margin-bottom: 200vh;
 		}
 
+		#scroll2 {
+			background-color: #cdcdcd;
+			position: relative;
+			margin-top: 50vh;
+			margin-bottom: 200vh;
+		}
+
 		.scroll__graphic {
 			position: absolute;
 			top: 0;
@@ -87,7 +94,22 @@
 
 <body>
 	<section id='scroll'>
-		<div class='scroll__graphic'></div>
+		<div class='scroll__text'>
+			<div class='step' data-step='#ccc'>
+				<p>Step 1</p>
+			</div>
+			<!-- <div class='step' data-step='#aaa'>
+				<p>Step 2</p>
+			</div> -->
+			<!-- <div class='step' data-step='#888'>
+				<p>Step 3</p>
+			</div>
+			<div class='step' data-step='#666'>
+				<p>Step 4</p>
+			</div> -->
+		</div>
+	</section>
+	<section id='scroll2'>
 		<div class='scroll__text'>
 			<div class='step' data-step='#ccc'>
 				<p>Step 1</p>
@@ -108,11 +130,15 @@
 	<script src='scrollama.js'></script>
 	<script>
 		var container = d3.select('#scroll')
-		var graphic = container.select('.scroll__graphic')
 		var text = container.select('.scroll__text')
 		var step = text.selectAll('.step')
 
+		var container2 = d3.select('#scroll2')
+		var text2 = container2.select('.scroll__text')
+		var step2 = text2.selectAll('.step')
+
 		var scroller = scrollama()
+		var scroller2 = scrollama()
 
 		function handleResize() {
 			// var h = Math.floor(window.innerHeight * 0.75) + 'px'
@@ -121,10 +147,6 @@
 				var h = Math.floor(window.innerHeight * ran) + 'px'
 				d3.select(this).style('height', h)
 			})
-
-			graphic
-				.style('height', window.innerHeight + 'px')
-				.style('width', d3.select('body').node().offsetWidth + 'px')
 
 			scroller.resize()
 		}
@@ -135,7 +157,6 @@
 				return i === resp.index
 			})
 			var val = d3.select(resp.element).attr('data-step')
-			graphic.style('background-color', val)
 		}
 
 		function handleStepExit(resp) {
@@ -143,40 +164,65 @@
 			d3.select(resp.element).classed('is-active', false)
 		}
 
-		function handleContainerEnter(resp) {
-			// console.log('enter', resp)
-			graphic.classed('is-fixed', true)
-			graphic.classed('is-bottom', false)
-		}
-
-		function handleContainerExit(resp) {
-			// console.log('exit', resp)
-			graphic.classed('is-fixed', false)
-			graphic.classed('is-bottom', resp.direction === 'down')
-		}
-
 		function handleProgress(resp) {
+			console.log('progress', resp)
+		}
+
+		function handleResize2() {
+			// var h = Math.floor(window.innerHeight * 0.75) + 'px'
+			step2.each(function () {
+				var ran = 0.1 + Math.random()
+				var h = Math.floor(window.innerHeight * ran) + 'px'
+				d3.select(this).style('height', h)
+			})
+
+			scroller2.resize()
+		}
+
+		function handleStepEnter2(resp) {
+			console.log('enter', resp)
+			step2.classed('is-active', function (d, i) {
+				return i === resp.index
+			})
+			var val = d3.select(resp.element).attr('data-step')
+		}
+
+		function handleStepExit2(resp) {
+			console.log('exit', resp)
+			d3.select(resp.element).classed('is-active', false)
+		}
+
+		function handleProgress2(resp) {
 			console.log('progress', resp)
 		}
 
 		function init() {
 			handleResize()
+			handleResize2()
 
 			scroller.setup({
-				// container: '#scroll',
-				// graphic: '.scroll__graphic',
-				step: '.scroll__text .step',
+				step: '#scroll .step',
 				offset: 0.33,
 				debug: true,
 				progress: true,
 			})
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit)
-				.onContainerEnter(handleContainerEnter)
-				.onContainerExit(handleContainerExit)
 				.onStepProgress(handleProgress)
 
-			window.addEventListener('resize', handleResize)
+			scroller2.setup({
+				step: '#scroll2 .step',
+				offset: 0.67,
+				debug: true,
+				progress: true,
+			})
+				.onStepEnter(handleStepEnter2)
+				.onStepExit(handleStepExit2)
+				.onStepProgress(handleProgress2)
+
+			console.log(scroller.getOffset())
+			console.log(scroller2.getOffset())
+			// window.addEventListener('resize', handleResize)
 		}
 
 		init()
