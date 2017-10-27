@@ -757,7 +757,11 @@ function selectAll(selector, parent) {
 }
 
 function scrollama() {
-  var ready = false;
+  var id = Math.floor(Math.random() * 100000);
+  var ZERO_MOE = 1; // zero with some rounding margin of error
+  var callback = {};
+  var io = {};
+
   var containerEl = null;
   var graphicEl = null;
   var stepEl = null;
@@ -765,28 +769,25 @@ function scrollama() {
   var offsetVal = 0;
   var offsetMargin = 0;
   var vh = 0;
-  var thresholdProgress = 0;
-
   var stepHeights = null;
-  var direction = null;
   var bboxGraphic = null;
 
+  var thresholdProgress = 0;
+
+  var isReady = false;
   var isEnabled = false;
   var debugMode = false;
   var progressMode = false;
 
-  var callback = {};
-  var io = {};
-
   // NOTIFY CALLBACKS
-  function notifyStepEnter(element) {
+  function notifyStepEnter(element, direction) {
     var index = +element.getAttribute("data-scrollama-index");
     var resp = { element: element, index: index, direction: direction };
     if (callback.stepEnter && typeof callback.stepEnter === "function")
       { callback.stepEnter(resp); }
   }
 
-  function notifyStepExit(element) {
+  function notifyStepExit(element, direction) {
     var index = +element.getAttribute("data-scrollama-index");
     var resp = { element: element, index: index, direction: direction };
     if (callback.stepExit && typeof callback.stepExit === "function")
@@ -800,7 +801,7 @@ function scrollama() {
       { callback.stepProgress(resp); }
   }
 
-  function notifyContainerEnter() {
+  function notifyContainerEnter(direction) {
     var resp = { direction: direction };
     if (
       callback.containerEnter &&
@@ -809,7 +810,7 @@ function scrollama() {
       { callback.containerEnter(resp); }
   }
 
-  function notifyContainerExit() {
+  function notifyContainerExit(direction) {
     var resp = { direction: direction };
     if (callback.containerExit && typeof callback.containerExit === "function")
       { callback.containerExit(resp); }
@@ -826,11 +827,10 @@ function scrollama() {
       var target = entry.target;
       var bottom = boundingClientRect.bottom;
       var bottomAdjusted = bottom - offsetMargin;
-
-      if (bottomAdjusted >= 0) {
-        direction = isIntersecting ? "down" : "up";
-        if (isIntersecting) { notifyStepEnter(target); }
-        else { notifyStepExit(target); }
+      if (bottomAdjusted >= -ZERO_MOE) {
+        var direction = isIntersecting ? "down" : "up";
+        if (isIntersecting) { notifyStepEnter(target, direction); }
+        else { notifyStepExit(target, direction); }
       }
     });
   }
@@ -843,13 +843,16 @@ function scrollama() {
       var bottom = boundingClientRect.bottom;
       var height = boundingClientRect.height;
       var bottomAdjusted = bottom - offsetMargin;
-
-      if (bottomAdjusted >= 0 && bottomAdjusted < height && isIntersecting) {
-        direction = "up";
-        notifyStepEnter(target);
-      } else if (bottomAdjusted <= 0 && !isIntersecting) {
-        direction = "down";
-        notifyStepExit(target);
+      if (
+        bottomAdjusted >= -ZERO_MOE &&
+        bottomAdjusted < height &&
+        isIntersecting
+      ) {
+        var direction = "up";
+        notifyStepEnter(target, direction);
+      } else if (bottomAdjusted <= ZERO_MOE && !isIntersecting) {
+        var direction$1 = "down";
+        notifyStepExit(target, direction$1);
       }
     });
   }
@@ -863,7 +866,7 @@ function scrollama() {
       var bottom = boundingClientRect.bottom;
       var bottomAdjusted = bottom - offsetMargin;
 
-      if (isIntersecting && bottomAdjusted >= 0) {
+      if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
         notifyStepProgress(target, +intersectionRatio.toFixed(3));
       }
     });
@@ -874,10 +877,10 @@ function scrollama() {
     var isIntersecting = ref.isIntersecting;
     var boundingClientRect = ref.boundingClientRect;
     var bottom = boundingClientRect.bottom;
-    if (bottom > 0) {
-      direction = isIntersecting ? "down" : "up";
-      if (isIntersecting) { notifyContainerEnter(); }
-      else { notifyContainerExit(); }
+    if (bottom > -ZERO_MOE) {
+      var direction = isIntersecting ? "down" : "up";
+      if (isIntersecting) { notifyContainerEnter(direction); }
+      else { notifyContainerExit(direction); }
     }
   }
 
@@ -886,10 +889,10 @@ function scrollama() {
     var isIntersecting = ref.isIntersecting;
     var boundingClientRect = ref.boundingClientRect;
     var top = boundingClientRect.top;
-    if (top < 0) {
-      direction = isIntersecting ? "up" : "down";
-      if (isIntersecting) { notifyContainerEnter(); }
-      else { notifyContainerExit(); }
+    if (top < ZERO_MOE) {
+      var direction = isIntersecting ? "up" : "down";
+      if (isIntersecting) { notifyContainerEnter(direction); }
+      else { notifyContainerExit(direction); }
     }
   }
 
@@ -1005,17 +1008,17 @@ function scrollama() {
       ? stepEl.map(function (el) { return el.getBoundingClientRect().height; })
       : [];
 
-    if (isEnabled && ready) { updateIO(); }
+    if (isEnabled && isReady) { updateIO(); }
 
     if (debugMode) {
-      var debugEl = document.querySelector(".scrollama__offset");
+      var debugEl = document.querySelector(("#scrollama__debug--offset-" + id));
       debugEl.style.top = offsetMargin + "px";
     }
   }
 
   function handleEnable(enable) {
     if (enable && !isEnabled) {
-      if (ready) { updateIO(); }
+      if (isReady) { updateIO(); }
       isEnabled = true;
     } else if (!enable) {
       if (io.top) { io.top.disconnect(); }
@@ -1034,15 +1037,17 @@ function scrollama() {
   function addDebug() {
     if (debugMode) {
       var el = document.createElement("div");
-      el.setAttribute("class", "scrollama__offset");
+      el.setAttribute("id", ("scrollama__debug--offset-" + id));
+      el.setAttribute("class", "scrollama__debug--offset");
       el.style.position = "fixed";
       el.style.top = "0";
       el.style.left = "0";
       el.style.width = "100%";
       el.style.height = "1px";
-      el.style.backgroundColor = "red";
+      el.style.borderBottom = "1px dashed red";
       var text = document.createElement("p");
-      text.innerText = "scrollama trigger: " + offsetVal;
+      var textClass = stepEl[0].getAttribute("class");
+      text.innerText = "\"." + textClass + "\" trigger: " + offsetVal;
       text.style.fontSize = "12px";
       text.style.fontFamily = "monospace";
       text.style.color = "red";
@@ -1081,7 +1086,7 @@ function scrollama() {
       offsetVal = offset;
       debugMode = debug;
       progressMode = progress;
-      ready = true;
+      isReady = true;
 
       addDebug();
       indexSteps();
@@ -1105,6 +1110,10 @@ function scrollama() {
   S.disable = function () {
     handleEnable(false);
     return S;
+  };
+
+  S.getOffset = function () {
+    return offsetVal;
   };
 
   S.onStepEnter = function (cb) {
