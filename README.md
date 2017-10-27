@@ -197,7 +197,7 @@ Tell scrollama to stop observing for trigger changes.
 
 ### To do
 
-* Optionally supress first trigger on page load
+* Optionally suppress first trigger on page load
 
 ### Alternatives
 
