@@ -8,7 +8,6 @@ As seen on [The Pudding](https://pudding.cool/):
 * [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
 * [What City is the Microbrew Capital of the US?](https://pudding.cool/2017/04/beer/)
 
-
 ### Why?
 
 Scrollytelling can be complicated to implement and difficult to make performant. The goal of this library is to provide a simple interface for creating scroll-driven interactives. Scrollama is focused on perfomance by using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)  to handle element position detection. It offers an opinionated (but popular) scrollytelling pattern to reduce more involved DOM calculations. The sticky graphic pattern (enter-stick-exit) can be seen below.
