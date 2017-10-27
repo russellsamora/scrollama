@@ -4,7 +4,10 @@
 
 Moderrn & lightweight JavaScript library for scrollytelling using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) in favor of scroll events.
 
-As seen on [The Pudding](https://pudding.cool/2017/10/superteams/).
+As seen on [The Pudding](https://pudding.cool/):
+* [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
+* [What City is the Microbrew Capital of the US?](https://pudding.cool/2017/04/beer/)
+
 
 ### Why?
 
