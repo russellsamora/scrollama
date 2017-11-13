@@ -1,6 +1,6 @@
 # scrollama.js
 
-<img src="https://russellgoldenberg.github.io/scrollama/alt.png" width="320" />
+<img src="https://russellgoldenberg.github.io/scrollama/alt.png" width="160" />
 
 Moderrn & lightweight JavaScript library for scrollytelling using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) in favor of scroll events.
 
