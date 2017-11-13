@@ -1,8 +1,6 @@
-# scrollama.js
+<img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
-<img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" />
-
-Moderrn & lightweight JavaScript library for scrollytelling using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) in favor of scroll events.
+**Scrollama** is a modern & lightweight JavaScript library for scrollytelling using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) in favor of scroll events.
 
 As seen on [The Pudding](https://pudding.cool/):
 * [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
