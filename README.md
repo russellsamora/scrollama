@@ -203,9 +203,9 @@ Tell scrollama to stop observing for trigger changes.
 ### Alternatives
 
 * [Waypoints](http://imakewebthings.com/waypoints/)
-* [ScrollStory](https://sjwilliams.github.io/scrollstory/)
 * [ScrollMagic](http://scrollmagic.io/)
 * [graph-scroll.js](https://1wheel.github.io/graph-scroll/)
+* [ScrollStory](https://sjwilliams.github.io/scrollstory/)
 
 ### Logo
 Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
