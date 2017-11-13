@@ -207,6 +207,8 @@ Tell scrollama to stop observing for trigger changes.
 * [ScrollMagic](http://scrollmagic.io/)
 * [graph-scroll.js](https://1wheel.github.io/graph-scroll/)
 
+### Logo
+Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 
 ### License
 
