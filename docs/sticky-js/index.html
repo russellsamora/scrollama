@@ -4,8 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Scrollama Demo: Sticky Graphic</title>
-	<meta name="description" content="Scrollama Demo: Sticky Graphic">
+	<title>Scrollama Demo: Sticky JS</title>
+	<meta name="description" content="Scrollama Demo: Sticky JS">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		/* default / demo page */
@@ -81,41 +81,24 @@
 
 		#scroll {
 			position: relative;
-			border-top: 1px dashed #000;
-			border-bottom: 1px dashed #000;
+			border-top: 2px dashed #000;
+			border-bottom: 2px dashed #000;
 		}
 
 		.scroll__graphic {
-			position: absolute;
+			position: -webkit-sticky;
+			position: sticky;
+			float: right;
 			top: 0;
-			left: 0;
-			bottom: auto;
+			right: 2rem;
 			-webkit-transform: translate3d(0, 0, 0);
 			-moz-transform: translate3d(0, 0, 0);
 			transform: translate3d(0, 0, 0);
-		}
-
-		.scroll__graphic.is-fixed {
-			position: fixed;
-		}
-
-		.scroll__graphic.is-bottom {
-			bottom: 0;
-			top: auto;
-		}
-
-		.chart {
-			position: absolute;
-			right: 1rem;
-			top: 50%;
-			-moz-transform: translateY(-50%);
-			-webkit-transform: translateY(-50%);
-			transform: translateY(-50%);
 			background-color: #ddd;
 			border: 1px solid #000;
 		}
 
-		.chart p {
+		.scroll__graphic p {
 			text-align: center;
 			padding: 1rem;
 			position: absolute;
@@ -137,8 +120,12 @@
 		}
 
 		.step {
-			margin: 2rem auto;
+			margin: 0 auto 2rem auto;
 			border: 1px solid #333;
+		}
+
+		.step:last-child {
+			border-bottom: 1px solid #333;
 		}
 
 		.step.is-active {
@@ -159,16 +146,14 @@
 		<p class='intro__overline'>
 			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
 		</p>
-		<h1 class='intro__hed'>Demo: Sticky Graphic</h1>
+		<h1 class='intro__hed'>Demo: Sticky Graphic Position</h1>
 		<p class='intro__dek'>
 			Start scrolling to see how it works.
 		</p>
 	</section>
 	<section id='scroll'>
-		<div class='scroll__graphic'>
-			<div class='chart'>
-				<p>0</p>
-			</div>
+		<div class='scroll__graphic sticky'>
+			<p>0</p>
 		</div>
 		<div class='scroll__text'>
 			<div class='step' data-step='1'>
@@ -188,12 +173,12 @@
 	<section id='outro'></section>
 	<div class='debug'></div>
 	<script src='../d3.v4.min.js'></script>
+	<script src='../stickyfill.min.js'></script>
 	<script src='../scrollama.js'></script>
 	<script>
 		// using d3 for convenience
 		var container = d3.select('#scroll');
 		var graphic = container.select('.scroll__graphic');
-		var chart = graphic.select('.chart');
 		var text = container.select('.scroll__text');
 		var step = text.selectAll('.step');
 
@@ -209,17 +194,16 @@
 			// 2. update width/height of graphic element
 			var bodyWidth = d3.select('body').node().offsetWidth;
 
-			graphic
-				.style('width', bodyWidth + 'px')
-				.style('height', window.innerHeight + 'px');
-
-			var chartMargin = 32;
+			var graphicMargin = 16 * 4;
 			var textWidth = text.node().offsetWidth;
-			var chartWidth = graphic.node().offsetWidth - textWidth - chartMargin;
+			var graphicWidth = container.node().offsetWidth - textWidth - graphicMargin;
+			var graphicHeight = Math.floor(window.innerHeight / 2)
+			var graphicMarginTop = Math.floor(graphicHeight / 2)
 
-			chart
-				.style('width', chartWidth + 'px')
-				.style('height', Math.floor(window.innerHeight / 2) + 'px');
+			graphic
+				.style('width', graphicWidth + 'px')
+				.style('height', graphicHeight + 'px')
+				.style('top', graphicMarginTop + 'px');
 
 
 			// 3. tell scrollama to update new element dimensions
@@ -236,26 +220,26 @@
 			})
 
 			// update graphic based on step
-			chart.select('p').text(response.index + 1)
+			graphic.select('p').text(response.index + 1);
 		}
 
 		function handleContainerEnter(response) {
 			// response = { direction }
-
-			// sticky the graphic
-			graphic.classed('is-fixed', true);
-			graphic.classed('is-bottom', false);
 		}
 
 		function handleContainerExit(response) {
 			// response = { direction }
+		}
 
-			// un-sticky the graphic, and pin to top/bottom of container
-			graphic.classed('is-fixed', false);
-			graphic.classed('is-bottom', response.direction === 'down');
+		function setupStickyfill() {
+			d3.selectAll('.sticky').each(function () {
+				Stickyfill.add(this);
+			});
 		}
 
 		function init() {
+			setupStickyfill();
+
 			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
 			handleResize();
 
@@ -268,6 +252,7 @@
 				text: '.scroll__text',
 				step: '.scroll__text .step',
 				debug: true,
+				offset: 0.33,
 			})
 				.onStepEnter(handleStepEnter)
 				.onContainerEnter(handleContainerEnter)

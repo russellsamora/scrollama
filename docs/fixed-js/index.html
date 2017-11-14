@@ -4,8 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Scrollama Demo: Sticky Graphic Position</title>
-	<meta name="description" content="Scrollama Demo: Sticky Graphic Position">
+	<title>Scrollama Demo: Fixed JS</title>
+	<meta name="description" content="Scrollama Demo: Fixed JS">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		/* default / demo page */
@@ -202,17 +202,14 @@
 			// 2. update width/height of graphic element
 			var bodyWidth = d3.select('body').node().offsetWidth;
 
-			graphic
-				.style('width', bodyWidth + 'px')
-				.style('height', window.innerHeight + 'px');
-
 			var graphicMargin = 16 * 4;
 			var textWidth = text.node().offsetWidth;
 			var graphicWidth = container.node().offsetWidth - textWidth - graphicMargin;
+			var graphicHeight = Math.floor(window.innerHeight / 2)
 
 			graphic
 				.style('width', graphicWidth + 'px')
-				.style('height', Math.floor(window.innerHeight / 2) + 'px');
+				.style('height', graphicHeight + 'px')
 
 
 			// 3. tell scrollama to update new element dimensions
@@ -235,6 +232,7 @@
 		function handleContainerEnter(response) {
 			// response = { direction }
 
+			// old school
 			// sticky the graphic
 			graphic.classed('is-fixed', true);
 			graphic.classed('is-bottom', false);
@@ -243,6 +241,7 @@
 		function handleContainerExit(response) {
 			// response = { direction }
 
+			// old school
 			// un-sticky the graphic, and pin to top/bottom of container
 			graphic.classed('is-fixed', false);
 			graphic.classed('is-bottom', response.direction === 'down');
