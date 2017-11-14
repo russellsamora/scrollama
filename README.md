@@ -187,10 +187,10 @@ Tell scrollama to stop observing for trigger changes.
 
 * [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step triggers
 * [Progress](https://russellgoldenberg.github.io/scrollama/progress) - incremental step progress callback
-* [Sticky Graphic v1a (CSS, positiion sticky)](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - using CSS vertically center chart, and position sticky (+ polyfill) for sticking.
+* [Sticky Graphic v1a (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - using CSS vertically center chart, and position sticky (+ polyfill) for sticking.
 * [Sticky Graphic v1b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/sticky-graphic-position) - using JS vertically center chart, and position sticky (+ polyfill) for sticking. Added bonus ability to start chart at top of steps then vertically.
-* [Sticky Graphic v2a (CSS, positiion fixed)](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - using CSS vertically center chart, and position fixed and absolute for sticking.
-* [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/sticky-graphic-position) - using  position fixed and absolute for sticking.
+* [Sticky Graphic v2a (CSS, position fixed)](https://russellgoldenberg.github.io/scrollama/sticky-graphic) - using CSS vertically center chart, and position fixed and absolute for sticking.
+* [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/sticky-graphic-position) - using  read position fixed and absolute for sticking.
 
 ### Tips
 
