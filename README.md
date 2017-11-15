@@ -169,6 +169,10 @@ The argument of the callback is an object:
 
 `direction`: 'up' or 'down'
 
+#### scrollama.offsetTrigger([number])
+
+Get or set the offset percentage. Value must be between 0-1.
+
 #### scrollama.resize()
 
 Tell scrollama to get latest dimensions the browser/DOM. It is best practice to throttle resize in your code, update the DOM elements, then call this function at the end.

@@ -1083,7 +1083,7 @@ function scrollama() {
       stepEl = selectAll(step);
       containerEl = container ? select(container) : null;
       graphicEl = graphic ? select(graphic) : null;
-      offsetVal = offset;
+      S.offsetTrigger(offset);
       debugMode = debug;
       progressMode = progress;
       isReady = true;
@@ -1112,7 +1112,11 @@ function scrollama() {
     return S;
   };
 
-  S.getOffset = function () {
+  S.offsetTrigger = function (x) {
+    if (x && typeof !isNaN(x)) {
+      offsetVal = Math.min(Math.max(0, x), 1);
+      return S;
+    }
     return offsetVal;
   };
 
