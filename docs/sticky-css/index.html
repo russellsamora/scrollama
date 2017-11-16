@@ -201,13 +201,15 @@
 
 			// 2. update width/height of graphic element
 			var bodyWidth = d3.select('body').node().offsetWidth;
+			var textWidth = text.node().offsetWidth;
+
+			var graphicWidth = bodyWidth - textWidth;
 
 			graphic
-				.style('width', bodyWidth + 'px')
+				.style('width', graphicWidth + 'px')
 				.style('height', window.innerHeight + 'px');
 
 			var chartMargin = 32;
-			var textWidth = text.node().offsetWidth;
 			var chartWidth = graphic.node().offsetWidth - textWidth - chartMargin;
 
 			chart
