@@ -157,6 +157,9 @@
 				debug: true,
 			})
 				.onStepProgress(handleStepProgress);
+
+			// setup resize event
+			window.addEventListener('resize', scroller.resize);
 		}
 
 		// kick things off

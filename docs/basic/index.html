@@ -177,6 +177,9 @@
 			})
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit);
+
+			// setup resize event
+			window.addEventListener('resize', scroller.resize);
 		}
 
 		// kick things off
