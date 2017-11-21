@@ -200,6 +200,7 @@ Tell scrollama to stop observing for trigger changes.
 
 ### Tips
 
+* Always call `scrollama.resize()` after a window resize event to ensure scroll triggers update with new dimensions.
 * Avoid using `viewport height` (vh) in your CSS because scrolling up and down constantly triggers vh to change, which will also trigger a window resize.
 
 ### To do
