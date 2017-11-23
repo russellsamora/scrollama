@@ -5,9 +5,9 @@
   "main": "build/scrollama.js",
   "browser": "build/scrollama.js",
   "scripts": {
-    "dev": "rollup -w --config rollup.config.dev.js",
-    "pretest": "rm -rf build && mkdir build && rollup --config rollup.config.js",
-    "build": "npm run pretest && uglifyjs -m -c -- build/scrollama.js > build/scrollama.min.js",
+    "dev": "cross-env NODE_ENV=development rollup -w -c",
+    "build": "cross-env NODE_ENV=production rollup -c",
+    "pretest": "npm run dev",
     "docs": "cp build/scrollama.js docs"
   },
   "module": "index",
@@ -30,14 +30,16 @@
   "author": "Russell Goldenberg (@russellgoldenberg)",
   "license": "MIT",
   "devDependencies": {
-    "rollup": "^0.50.0",
+    "cross-env": "^5.1.1",
+    "rollup": "^0.51.8",
     "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-buble": "^0.16.0",
-    "rollup-plugin-commonjs": "^8.2.4",
+    "rollup-plugin-buble": "^0.18.0",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-filesize": "^1.5.0",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "uglifyjs": "^2.4.11"
+    "rollup-plugin-uglify": "^2.0.1"
   },
   "dependencies": {
-    "intersection-observer": "^0.4.2"
+    "intersection-observer": "^0.4.3"
   }
 }
