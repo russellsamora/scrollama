@@ -1,4 +1,4 @@
-import { select, selectAll } from "./dom";
+import { select, selectAll } from './dom';
 
 function scrollama() {
   const id = Math.floor(Math.random() * 100000);
@@ -26,23 +26,31 @@ function scrollama() {
 
   // NOTIFY CALLBACKS
   function notifyStepEnter(element, direction) {
-    const index = +element.getAttribute("data-scrollama-index");
+    const index = +element.getAttribute('data-scrollama-index');
     const resp = { element, index, direction };
-    if (callback.stepEnter && typeof callback.stepEnter === "function")
+    if (callback.stepEnter && typeof callback.stepEnter === 'function')
       callback.stepEnter(resp);
+    if (progressMode) {
+      if (direction === 'up') notifyStepProgress(element, 1);
+      else notifyStepProgress(element, 0);
+    }
   }
 
   function notifyStepExit(element, direction) {
-    const index = +element.getAttribute("data-scrollama-index");
+    const index = +element.getAttribute('data-scrollama-index');
     const resp = { element, index, direction };
-    if (callback.stepExit && typeof callback.stepExit === "function")
+    if (callback.stepExit && typeof callback.stepExit === 'function')
       callback.stepExit(resp);
+    if (progressMode) {
+      if (direction === 'up') notifyStepProgress(element, 0);
+      else notifyStepProgress(element, 1);
+    }
   }
 
   function notifyStepProgress(element, progress) {
-    const index = +element.getAttribute("data-scrollama-index");
+    const index = +element.getAttribute('data-scrollama-index');
     const resp = { element, index, progress };
-    if (callback.stepProgress && typeof callback.stepProgress === "function")
+    if (callback.stepProgress && typeof callback.stepProgress === 'function')
       callback.stepProgress(resp);
   }
 
@@ -50,14 +58,14 @@ function scrollama() {
     const resp = { direction };
     if (
       callback.containerEnter &&
-      typeof callback.containerEnter === "function"
+      typeof callback.containerEnter === 'function'
     )
       callback.containerEnter(resp);
   }
 
   function notifyContainerExit(direction) {
     const resp = { direction };
-    if (callback.containerExit && typeof callback.containerExit === "function")
+    if (callback.containerExit && typeof callback.containerExit === 'function')
       callback.containerExit(resp);
   }
 
@@ -76,7 +84,7 @@ function scrollama() {
       const { bottom } = boundingClientRect;
       const bottomAdjusted = bottom - offsetMargin;
       if (bottomAdjusted >= -ZERO_MOE) {
-        const direction = isIntersecting ? "down" : "up";
+        const direction = isIntersecting ? 'down' : 'up';
         if (isIntersecting) notifyStepEnter(target, direction);
         else notifyStepExit(target, direction);
       }
@@ -98,10 +106,10 @@ function scrollama() {
         bottomAdjusted < height &&
         isIntersecting
       ) {
-        const direction = "up";
+        const direction = 'up';
         notifyStepEnter(target, direction);
       } else if (bottomAdjusted <= ZERO_MOE && !isIntersecting) {
-        const direction = "down";
+        const direction = 'down';
         notifyStepExit(target, direction);
       }
     });
@@ -128,7 +136,7 @@ function scrollama() {
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top, bottom } = boundingClientRect;
     if (bottom > -ZERO_MOE) {
-      const direction = isIntersecting ? "down" : "up";
+      const direction = isIntersecting ? 'down' : 'up';
       if (isIntersecting) notifyContainerEnter(direction);
       else notifyContainerExit(direction);
     }
@@ -138,7 +146,7 @@ function scrollama() {
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top } = boundingClientRect;
     if (top < ZERO_MOE) {
-      const direction = isIntersecting ? "up" : "down";
+      const direction = isIntersecting ? 'up' : 'down';
       if (isIntersecting) notifyContainerEnter(direction);
       else notifyContainerExit(direction);
     }
@@ -279,28 +287,28 @@ function scrollama() {
   }
 
   function indexSteps() {
-    stepEl.forEach((el, i) => el.setAttribute("data-scrollama-index", i));
+    stepEl.forEach((el, i) => el.setAttribute('data-scrollama-index', i));
   }
 
   function addDebug() {
     if (debugMode) {
-      const el = document.createElement("div");
-      el.setAttribute("id", `scrollama__debug--offset-${id}`);
-      el.setAttribute("class", "scrollama__debug--offset");
-      el.style.position = "fixed";
-      el.style.top = "0";
-      el.style.left = "0";
-      el.style.width = "100%";
-      el.style.height = "1px";
-      el.style.borderBottom = "1px dashed red";
-      const text = document.createElement("p");
-      const textClass = stepEl[0].getAttribute("class");
+      const el = document.createElement('div');
+      el.setAttribute('id', `scrollama__debug--offset-${id}`);
+      el.setAttribute('class', 'scrollama__debug--offset');
+      el.style.position = 'fixed';
+      el.style.top = '0';
+      el.style.left = '0';
+      el.style.width = '100%';
+      el.style.height = '1px';
+      el.style.borderBottom = '1px dashed red';
+      const text = document.createElement('p');
+      const textClass = stepEl[0].getAttribute('class');
       text.innerText = `".${textClass}" trigger: ${offsetVal}`;
-      text.style.fontSize = "12px";
-      text.style.fontFamily = "monospace";
-      text.style.color = "red";
-      text.style.margin = "0";
-      text.style.padding = "6px";
+      text.style.fontSize = '12px';
+      text.style.fontFamily = 'monospace';
+      text.style.color = 'red';
+      text.style.margin = '0';
+      text.style.padding = '6px';
       el.appendChild(text);
       document.body.appendChild(el);
     }
@@ -308,12 +316,10 @@ function scrollama() {
 
   function setThreshold() {
     const count = 100;
-    if (progressMode) {
-      thresholdProgress = [];
-      const ratio = 1 / count;
-      for (let i = 0; i < count; i++) {
-        thresholdProgress.push(i * ratio);
-      }
+    thresholdProgress = [];
+    const ratio = 1 / count;
+    for (let i = 0; i < count; i++) {
+      thresholdProgress.push(i * ratio);
     }
   }
 
@@ -338,10 +344,10 @@ function scrollama() {
 
       addDebug();
       indexSteps();
-      setThreshold();
+      if (progressMode) setThreshold();
       handleResize();
       handleEnable(true);
-    } else console.error("scrollama error: missing step element");
+    } else console.error('scrollama error: missing step element');
     return S;
   };
 
