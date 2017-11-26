@@ -769,7 +769,7 @@ function scrollama() {
 
   var stepStates = null;
   var previousYOffset = 0;
-  var direction = 'down';
+  var direction = 'up';
 
   function getIndex(element) {
     return +element.getAttribute('data-scrollama-index');
@@ -1018,7 +1018,6 @@ function scrollama() {
       var marginTop = stepHeights[i] - offsetMargin;
       var marginBottom = -vh + offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-      // addDebugStep({ label: 'above', edge: 'orange', marginTop, marginBottom });
 
       var options = {
         root: null,
@@ -1040,7 +1039,7 @@ function scrollama() {
       var marginTop = -offsetMargin;
       var marginBottom = -vh + stepHeights[i] + offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-      // addDebugStep({ label: 'below', edge: 'blue', marginTop, marginBottom });
+
       var options = {
         root: null,
         rootMargin: rootMargin,
@@ -1060,7 +1059,7 @@ function scrollama() {
       var marginTop = 0;
       var marginBottom = -(vh - offsetMargin + stepHeights[i]);
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-      addDebugStep({ label: 'above', edge: 'purple', marginTop: marginTop, marginBottom: marginBottom });
+
       var options = {
         root: null,
         rootMargin: rootMargin,
@@ -1079,7 +1078,7 @@ function scrollama() {
       var marginTop = -(offsetMargin + stepHeights[i]);
       var marginBottom = 0;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-      addDebugStep({ label: 'above', edge: 'purple', marginTop: marginTop, marginBottom: marginBottom });
+
       var options = {
         root: null,
         rootMargin: rootMargin,
@@ -1198,34 +1197,6 @@ function scrollama() {
     }
   }
 
-  function addDebugStep(ref) {
-    var label = ref.label;
-    var edge = ref.edge;
-    var marginTop = ref.marginTop;
-    var marginBottom = ref.marginBottom;
-
-    var el1 = document.createElement('div');
-    el1.setAttribute('id', ("scrollama__debug--" + edge + "-a-" + id));
-    el1.setAttribute('class', 'scrollama__debug--offset');
-    el1.style.position = 'fixed';
-    el1.style.top = (-marginTop) + "px";
-    el1.style.left = '0';
-    el1.style.width = '100%';
-    el1.style.height = '1px';
-    el1.style.borderBottom = "1px dashed " + edge;
-    document.body.appendChild(el1);
-
-    var el2 = document.createElement('div');
-    el2.setAttribute('id', ("scrollama__debug--" + edge + "-b-" + id));
-    el2.setAttribute('class', 'scrollama__debug--offset');
-    el2.style.position = 'fixed';
-    el2.style.bottom = (-marginBottom) + "px";
-    el2.style.left = '0';
-    el2.style.width = '100%';
-    el2.style.height = '1px';
-    el2.style.borderBottom = "1px dashed " + edge;
-    document.body.appendChild(el2);
-  }
   function setThreshold() {
     var count = 100;
     thresholdProgress = [];
