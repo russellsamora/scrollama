@@ -24,31 +24,49 @@ function scrollama() {
   let debugMode = false;
   let progressMode = false;
 
-  // NOTIFY CALLBACKS
-  function notifyStepEnter(element, direction) {
-    const index = +element.getAttribute('data-scrollama-index');
-    const resp = { element, index, direction };
-    if (callback.stepEnter && typeof callback.stepEnter === 'function')
-      callback.stepEnter(resp);
-    if (progressMode) {
-      if (direction === 'up') notifyStepProgress(element, 1);
-      else notifyStepProgress(element, 0);
-    }
+  let stepStates = null;
+
+  function getIndex(element) {
+    return +element.getAttribute('data-scrollama-index');
   }
 
-  function notifyStepExit(element, direction) {
-    const index = +element.getAttribute('data-scrollama-index');
+  // NOTIFY CALLBACKS
+  function notifyStepEnter(element, direction) {
+    const index = getIndex(element);
     const resp = { element, index, direction };
-    if (callback.stepExit && typeof callback.stepExit === 'function')
-      callback.stepExit(resp);
+
+    // store most recent trigger
+    stepStates[index].direction = direction;
+    stepStates[index].state = 'enter';
+
+    if (callback.stepEnter && typeof callback.stepEnter === 'function')
+      callback.stepEnter(resp);
+
     if (progressMode) {
-      if (direction === 'up') notifyStepProgress(element, 0);
+      if (direction === 'down') notifyStepProgress(element, 0);
       else notifyStepProgress(element, 1);
     }
   }
 
+  function notifyStepExit(element, direction) {
+    const index = getIndex(element);
+    const resp = { element, index, direction };
+
+    // store most recent trigger
+    stepStates[index].direction = direction;
+    stepStates[index].state = 'exit';
+
+    if (callback.stepExit && typeof callback.stepExit === 'function')
+      callback.stepExit(resp);
+
+    if (progressMode) {
+      if (direction === 'down') notifyStepProgress(element, 1);
+      else notifyStepProgress(element, 0);
+    }
+  }
+
   function notifyStepProgress(element, progress) {
-    const index = +element.getAttribute('data-scrollama-index');
+    const index = getIndex(element);
     const resp = { element, index, progress };
     if (callback.stepProgress && typeof callback.stepProgress === 'function')
       callback.stepProgress(resp);
@@ -81,13 +99,16 @@ function scrollama() {
         boundingClientRect,
         target
       } = entry;
+      // bottom is how far bottom edge of el is from top of viewport
       const { bottom } = boundingClientRect;
       const bottomAdjusted = bottom - offsetMargin;
+      const index = getIndex(target);
+      const direction = bottom < stepStates[index].bottom ? 'down' : 'up';
       if (bottomAdjusted >= -ZERO_MOE) {
-        const direction = isIntersecting ? 'down' : 'up';
         if (isIntersecting) notifyStepEnter(target, direction);
         else notifyStepExit(target, direction);
       }
+      stepStates[index].bottom = bottom;
     });
   }
 
@@ -101,17 +122,18 @@ function scrollama() {
       } = entry;
       const { bottom, height } = boundingClientRect;
       const bottomAdjusted = bottom - offsetMargin;
+      const index = getIndex(target);
+      const direction = bottom < stepStates[index].bottom ? 'down' : 'up';
       if (
         bottomAdjusted >= -ZERO_MOE &&
         bottomAdjusted < height &&
         isIntersecting
       ) {
-        const direction = 'up';
         notifyStepEnter(target, direction);
       } else if (bottomAdjusted <= ZERO_MOE && !isIntersecting) {
-        const direction = 'down';
         notifyStepExit(target, direction);
       }
+      stepStates[index].bottom = bottom;
     });
   }
 
@@ -290,6 +312,14 @@ function scrollama() {
     stepEl.forEach((el, i) => el.setAttribute('data-scrollama-index', i));
   }
 
+  function setupStepStates() {
+    stepStates = stepEl.map(() => ({
+      direction: null,
+      state: null,
+      bottom: -1
+    }));
+  }
+
   function addDebug() {
     if (debugMode) {
       const el = document.createElement('div');
@@ -344,6 +374,7 @@ function scrollama() {
 
       addDebug();
       indexSteps();
+      setupStepStates();
       if (progressMode) setThreshold();
       handleResize();
       handleEnable(true);
