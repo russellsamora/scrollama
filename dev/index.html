@@ -92,7 +92,7 @@
 			<div class='step' data-step='#ccc'>
 				<p>Step 1</p>
 			</div>
-			<!-- <div class='step' data-step='#aaa'>
+			<div class='step' data-step='#aaa'>
 				<p>Step 2</p>
 			</div>
 			<div class='step' data-step='#888'>
@@ -100,7 +100,7 @@
 			</div>
 			<div class='step' data-step='#666'>
 				<p>Step 4</p>
-			</div> -->
+			</div>
 		</div>
 	</section>
 	<div class='debug'></div>
@@ -117,7 +117,7 @@
 		function handleResize() {
 			// var h = Math.floor(window.innerHeight * 0.75) + 'px'
 			step.each(function () {
-				var ran = 0.05
+				var ran = Math.random * 0.35
 				var h = Math.floor(window.innerHeight * ran) + 'px'
 				d3.select(this).style('height', h)
 			})
@@ -131,16 +131,16 @@
 
 		function handleStepEnter(resp) {
 			console.log('enter', resp)
-			// step.classed('is-active', function (d, i) {
-			// 	return i === resp.index
-			// })
-			// var val = d3.select(resp.element).attr('data-step')
-			// graphic.style('background-color', val)
+			step.classed('is-active', function (d, i) {
+				return i === resp.index
+			})
+			var val = d3.select(resp.element).attr('data-step')
+			graphic.style('background-color', val)
 		}
 
 		function handleStepExit(resp) {
 			console.log('exit', resp)
-			// d3.select(resp.element).classed('is-active', false)
+			d3.select(resp.element).classed('is-active', false)
 		}
 
 		function handleContainerEnter(resp) {
@@ -163,11 +163,11 @@
 			handleResize()
 
 			scroller.setup({
-				// container: '#scroll',
-				// graphic: '.scroll__graphic',
+				container: '#scroll',
+				graphic: '.scroll__graphic',
 				step: '.scroll__text .step',
-				offset: 0.33,
-				debug: 'verbose',
+				offset: 0.5,
+				debug: true,
 				progress: true,
 			})
 				.onStepEnter(handleStepEnter)

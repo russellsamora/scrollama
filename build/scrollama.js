@@ -768,22 +768,21 @@ function scrollama() {
   var progressMode = false;
 
   var stepStates = null;
+  var previousYOffset = 0;
+  var direction = 'down';
 
   function getIndex(element) {
     return +element.getAttribute('data-scrollama-index');
   }
 
-  function getDirection(ref) {
-    var index = ref.index;
-    var bottom = ref.bottom;
-
-    var prev = stepStates[index].bottom;
-    if (bottom === prev) { return stepStates[index].direction; }
-    return bottom < prev ? 'down' : 'up';
+  function updateDirection() {
+    if (window.pageYOffset > previousYOffset) { direction = 'down'; }
+    else if (window.pageYOffset < previousYOffset) { direction = 'up'; }
+    previousYOffset = window.pageYOffset;
   }
 
   // NOTIFY CALLBACKS
-  function notifyStepEnter(element, direction) {
+  function notifyStepEnter(element) {
     var index = getIndex(element);
     var resp = { element: element, index: index, direction: direction };
 
@@ -800,7 +799,7 @@ function scrollama() {
     }
   }
 
-  function notifyStepExit(element, direction) {
+  function notifyStepExit(element) {
     var index = getIndex(element);
     var resp = { element: element, index: index, direction: direction };
 
@@ -824,7 +823,7 @@ function scrollama() {
       { callback.stepProgress(resp); }
   }
 
-  function notifyContainerEnter(direction) {
+  function notifyContainerEnter() {
     var resp = { direction: direction };
     if (
       callback.containerEnter &&
@@ -833,7 +832,7 @@ function scrollama() {
       { callback.containerEnter(resp); }
   }
 
-  function notifyContainerExit(direction) {
+  function notifyContainerExit() {
     var resp = { direction: direction };
     if (callback.containerExit && typeof callback.containerExit === 'function')
       { callback.containerExit(resp); }
@@ -843,7 +842,8 @@ function scrollama() {
 
   // if TOP edge of step crosses threshold,
   // bottom must be > 0 which means it is on "screen" (shifted by offset)
-  function intersectStepTop(entries) {
+  function intersectStepAbove(entries) {
+    updateDirection();
     entries.forEach(function (entry) {
       var isIntersecting = entry.isIntersecting;
       var intersectionRatio = entry.intersectionRatio;
@@ -853,18 +853,22 @@ function scrollama() {
       var bottom = boundingClientRect.bottom;
       var bottomAdjusted = bottom - offsetMargin;
       var index = getIndex(target);
-      var direction = getDirection({ index: index, bottom: bottom });
-      if (debugMode === 'verbose')
-        { console.log({ index: index, entry: entry, direction: direction, bottomAdjusted: bottomAdjusted }); }
+
       if (bottomAdjusted >= -ZERO_MOE) {
-        if (isIntersecting) { notifyStepEnter(target, direction); }
-        else { notifyStepExit(target, direction); }
+        if (isIntersecting && direction === 'down')
+          { notifyStepEnter(target, direction); }
+        else if (direction === 'up') {
+          // we went from exit to exit, must have skipped an enter
+          if (stepStates[index].state === 'exit')
+            { notifyStepEnter(target, direction); }
+          notifyStepExit(target, direction);
+        }
       }
-      stepStates[index].bottom = bottom;
     });
   }
 
-  function intersectStepBottom(entries) {
+  function intersectStepBelow(entries) {
+    updateDirection();
     entries.forEach(function (entry) {
       var isIntersecting = entry.isIntersecting;
       var intersectionRatio = entry.intersectionRatio;
@@ -874,25 +878,73 @@ function scrollama() {
       var height = boundingClientRect.height;
       var bottomAdjusted = bottom - offsetMargin;
       var index = getIndex(target);
-      var direction = getDirection({ index: index, bottom: bottom });
-      if (debugMode === 'verbose')
-        { console.log({ index: index, entry: entry, direction: direction, bottomAdjusted: bottomAdjusted }); }
+
       if (
         bottomAdjusted >= -ZERO_MOE &&
         bottomAdjusted < height &&
-        isIntersecting
+        isIntersecting &&
+        direction === 'up'
       ) {
         notifyStepEnter(target, direction);
-      } else if (bottomAdjusted <= ZERO_MOE && !isIntersecting) {
+      } else if (
+        bottomAdjusted <= ZERO_MOE &&
+        !isIntersecting &&
+        direction === 'down'
+      ) {
+        if (stepStates[index].state === 'exit')
+          { notifyStepEnter(target, direction); }
         notifyStepExit(target, direction);
       }
-      stepStates[index].bottom = bottom;
     });
   }
 
   // if there is a scroll even that skips the entire enter/exit of a step,
   // fallback to trigger the enter/exit if element lands in viewport
+  function intersectViewportAbove(entries) {
+    updateDirection();
+    entries.forEach(function (entry) {
+      var isIntersecting = entry.isIntersecting;
+      var intersectionRatio = entry.intersectionRatio;
+      var boundingClientRect = entry.boundingClientRect;
+      var target = entry.target;
+
+      var index = getIndex(target);
+
+      if (isIntersecting && direction === 'down') {
+        if (
+          stepStates[index].state === 'exit' &&
+          stepStates[index].direction === 'up'
+        ) {
+          notifyStepEnter(target, 'down');
+          notifyStepExit(target, 'down');
+        }
+      }
+    });
+  }
+
+  function intersectViewportBelow(entries) {
+    updateDirection();
+    entries.forEach(function (entry) {
+      var isIntersecting = entry.isIntersecting;
+      var intersectionRatio = entry.intersectionRatio;
+      var boundingClientRect = entry.boundingClientRect;
+      var target = entry.target;
+      var index = getIndex(target);
+
+      if (isIntersecting && direction === 'up') {
+        if (
+          stepStates[index].state === 'exit' &&
+          stepStates[index].direction === 'down'
+        ) {
+          notifyStepEnter(target, 'up');
+          notifyStepExit(target, 'up');
+        }
+      }
+    });
+  }
+
   function intersectStepProgress(entries) {
+    updateDirection();
     entries.forEach(function (entry) {
       var isIntersecting = entry.isIntersecting;
       var intersectionRatio = entry.intersectionRatio;
@@ -908,25 +960,25 @@ function scrollama() {
   }
 
   function intersectTop(entries) {
+    updateDirection();
     var ref = entries[0];
     var isIntersecting = ref.isIntersecting;
     var boundingClientRect = ref.boundingClientRect;
     var top = boundingClientRect.top;
     var bottom = boundingClientRect.bottom;
     if (bottom > -ZERO_MOE) {
-      var direction = isIntersecting ? 'down' : 'up';
       if (isIntersecting) { notifyContainerEnter(direction); }
       else { notifyContainerExit(direction); }
     }
   }
 
   function intersectBottom(entries) {
+    updateDirection();
     var ref = entries[0];
     var isIntersecting = ref.isIntersecting;
     var boundingClientRect = ref.boundingClientRect;
     var top = boundingClientRect.top;
     if (top < ZERO_MOE) {
-      var direction = isIntersecting ? 'up' : 'down';
       if (isIntersecting) { notifyContainerEnter(direction); }
       else { notifyContainerExit(direction); }
     }
@@ -959,13 +1011,14 @@ function scrollama() {
   }
 
   // top edge
-  function updateStepTopIO() {
-    if (io.stepTop) { io.stepTop.forEach(function (d) { return d.disconnect(); }); }
+  function updateStepAboveIO() {
+    if (io.stepAbove) { io.stepAbove.forEach(function (d) { return d.disconnect(); }); }
 
-    io.stepTop = stepEl.map(function (el, i) {
+    io.stepAbove = stepEl.map(function (el, i) {
       var marginTop = stepHeights[i] - offsetMargin;
       var marginBottom = -vh + offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
+      // addDebugStep({ label: 'above', edge: 'orange', marginTop, marginBottom });
 
       var options = {
         root: null,
@@ -973,34 +1026,73 @@ function scrollama() {
         threshold: 0
       };
 
-      var obs = new IntersectionObserver(intersectStepTop, options);
+      var obs = new IntersectionObserver(intersectStepAbove, options);
       obs.observe(el);
       return obs;
     });
   }
 
   // bottom edge
-  function updateStepBottomIO() {
-    if (io.stepBottom) { io.stepBottom.forEach(function (d) { return d.disconnect(); }); }
+  function updateStepBelowIO() {
+    if (io.stepBelow) { io.stepBelow.forEach(function (d) { return d.disconnect(); }); }
 
-    io.stepBottom = stepEl.map(function (el, i) {
+    io.stepBelow = stepEl.map(function (el, i) {
       var marginTop = -offsetMargin;
       var marginBottom = -vh + stepHeights[i] + offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-
+      // addDebugStep({ label: 'below', edge: 'blue', marginTop, marginBottom });
       var options = {
         root: null,
         rootMargin: rootMargin,
         threshold: 0
       };
 
-      var obs = new IntersectionObserver(intersectStepBottom, options);
+      var obs = new IntersectionObserver(intersectStepBelow, options);
       obs.observe(el);
       return obs;
     });
   }
 
   // jump into viewport
+  function updateViewportAboveIO() {
+    if (io.viewportAbove) { io.viewportAbove.forEach(function (d) { return d.disconnect(); }); }
+    io.viewportAbove = stepEl.map(function (el, i) {
+      var marginTop = 0;
+      var marginBottom = -(vh - offsetMargin + stepHeights[i]);
+      var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
+      addDebugStep({ label: 'above', edge: 'purple', marginTop: marginTop, marginBottom: marginBottom });
+      var options = {
+        root: null,
+        rootMargin: rootMargin,
+        threshold: 0
+      };
+
+      var obs = new IntersectionObserver(intersectViewportAbove, options);
+      obs.observe(el);
+      return obs;
+    });
+  }
+
+  function updateViewportBelowIO() {
+    if (io.viewportBelow) { io.viewportBelow.forEach(function (d) { return d.disconnect(); }); }
+    io.viewportBelow = stepEl.map(function (el, i) {
+      var marginTop = -(offsetMargin + stepHeights[i]);
+      var marginBottom = 0;
+      var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
+      addDebugStep({ label: 'above', edge: 'purple', marginTop: marginTop, marginBottom: marginBottom });
+      var options = {
+        root: null,
+        rootMargin: rootMargin,
+        threshold: 0
+      };
+
+      var obs = new IntersectionObserver(intersectViewportBelow, options);
+      obs.observe(el);
+      return obs;
+    });
+  }
+
+  // progress progress tracker
   function updateStepProgressIO() {
     if (io.stepProgress) { io.stepProgress.forEach(function (d) { return d.disconnect(); }); }
 
@@ -1022,10 +1114,10 @@ function scrollama() {
   }
 
   function updateIO() {
-    updateStepTopIO();
-    updateStepBottomIO();
-    // updateViewportTopIO();
-    // updateViewportBottomIO();
+    updateStepAboveIO();
+    updateStepBelowIO();
+    updateViewportAboveIO();
+    updateViewportBelowIO();
 
     if (progressMode) { updateStepProgressIO(); }
 
@@ -1061,11 +1153,11 @@ function scrollama() {
     } else if (!enable) {
       if (io.top) { io.top.disconnect(); }
       if (io.bottom) { io.bottom.disconnect(); }
-      if (io.stepTop) { io.stepTop.forEach(function (d) { return d.disconnect(); }); }
-      if (io.stepBottom) { io.stepBottom.forEach(function (d) { return d.disconnect(); }); }
+      if (io.stepAbove) { io.stepAbove.forEach(function (d) { return d.disconnect(); }); }
+      if (io.stepBelow) { io.stepBelow.forEach(function (d) { return d.disconnect(); }); }
       if (io.stepProgress) { io.stepProgress.forEach(function (d) { return d.disconnect(); }); }
-      if (io.viewportTop) { io.viewportTop.forEach(function (d) { return d.disconnect(); }); }
-      if (io.viewportBottom) { io.viewportBottom.forEach(function (d) { return d.disconnect(); }); }
+      if (io.viewportAbove) { io.viewportAbove.forEach(function (d) { return d.disconnect(); }); }
+      if (io.viewportBelow) { io.viewportBelow.forEach(function (d) { return d.disconnect(); }); }
       isEnabled = false;
     }
   }
@@ -1106,6 +1198,34 @@ function scrollama() {
     }
   }
 
+  function addDebugStep(ref) {
+    var label = ref.label;
+    var edge = ref.edge;
+    var marginTop = ref.marginTop;
+    var marginBottom = ref.marginBottom;
+
+    var el1 = document.createElement('div');
+    el1.setAttribute('id', ("scrollama__debug--" + edge + "-a-" + id));
+    el1.setAttribute('class', 'scrollama__debug--offset');
+    el1.style.position = 'fixed';
+    el1.style.top = (-marginTop) + "px";
+    el1.style.left = '0';
+    el1.style.width = '100%';
+    el1.style.height = '1px';
+    el1.style.borderBottom = "1px dashed " + edge;
+    document.body.appendChild(el1);
+
+    var el2 = document.createElement('div');
+    el2.setAttribute('id', ("scrollama__debug--" + edge + "-b-" + id));
+    el2.setAttribute('class', 'scrollama__debug--offset');
+    el2.style.position = 'fixed';
+    el2.style.bottom = (-marginBottom) + "px";
+    el2.style.left = '0';
+    el2.style.width = '100%';
+    el2.style.height = '1px';
+    el2.style.borderBottom = "1px dashed " + edge;
+    document.body.appendChild(el2);
+  }
   function setThreshold() {
     var count = 100;
     thresholdProgress = [];
