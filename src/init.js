@@ -24,37 +24,63 @@ function scrollama() {
   let debugMode = false;
   let progressMode = false;
 
-  // NOTIFY CALLBACKS
-  function notifyStepEnter(element, direction) {
-    const index = +element.getAttribute('data-scrollama-index');
-    const resp = { element, index, direction };
-    if (callback.stepEnter && typeof callback.stepEnter === 'function')
-      callback.stepEnter(resp);
-    if (progressMode) {
-      if (direction === 'up') notifyStepProgress(element, 1);
-      else notifyStepProgress(element, 0);
-    }
+  let stepStates = null;
+  let previousYOffset = 0;
+  let direction = 'up';
+
+  function getIndex(element) {
+    return +element.getAttribute('data-scrollama-index');
   }
 
-  function notifyStepExit(element, direction) {
-    const index = +element.getAttribute('data-scrollama-index');
+  function updateDirection() {
+    if (window.pageYOffset > previousYOffset) direction = 'down';
+    else if (window.pageYOffset < previousYOffset) direction = 'up';
+    previousYOffset = window.pageYOffset;
+  }
+
+  // NOTIFY CALLBACKS
+  function notifyStepEnter(element) {
+    const index = getIndex(element);
     const resp = { element, index, direction };
-    if (callback.stepExit && typeof callback.stepExit === 'function')
-      callback.stepExit(resp);
+
+    // store most recent trigger
+    stepStates[index].direction = direction;
+    stepStates[index].state = 'enter';
+
+    if (callback.stepEnter && typeof callback.stepEnter === 'function')
+      callback.stepEnter(resp);
+
     if (progressMode) {
-      if (direction === 'up') notifyStepProgress(element, 0);
+      if (direction === 'down') notifyStepProgress(element, 0);
       else notifyStepProgress(element, 1);
     }
   }
 
+  function notifyStepExit(element) {
+    const index = getIndex(element);
+    const resp = { element, index, direction };
+
+    // store most recent trigger
+    stepStates[index].direction = direction;
+    stepStates[index].state = 'exit';
+
+    if (callback.stepExit && typeof callback.stepExit === 'function')
+      callback.stepExit(resp);
+
+    if (progressMode) {
+      if (direction === 'down') notifyStepProgress(element, 1);
+      else notifyStepProgress(element, 0);
+    }
+  }
+
   function notifyStepProgress(element, progress) {
-    const index = +element.getAttribute('data-scrollama-index');
+    const index = getIndex(element);
     const resp = { element, index, progress };
     if (callback.stepProgress && typeof callback.stepProgress === 'function')
       callback.stepProgress(resp);
   }
 
-  function notifyContainerEnter(direction) {
+  function notifyContainerEnter() {
     const resp = { direction };
     if (
       callback.containerEnter &&
@@ -63,7 +89,7 @@ function scrollama() {
       callback.containerEnter(resp);
   }
 
-  function notifyContainerExit(direction) {
+  function notifyContainerExit() {
     const resp = { direction };
     if (callback.containerExit && typeof callback.containerExit === 'function')
       callback.containerExit(resp);
@@ -73,7 +99,8 @@ function scrollama() {
 
   // if TOP edge of step crosses threshold,
   // bottom must be > 0 which means it is on "screen" (shifted by offset)
-  function intersectStepTop(entries) {
+  function intersectStepAbove(entries) {
+    updateDirection();
     entries.forEach(entry => {
       const {
         isIntersecting,
@@ -81,17 +108,26 @@ function scrollama() {
         boundingClientRect,
         target
       } = entry;
+      // bottom is how far bottom edge of el is from top of viewport
       const { bottom } = boundingClientRect;
       const bottomAdjusted = bottom - offsetMargin;
+      const index = getIndex(target);
+
       if (bottomAdjusted >= -ZERO_MOE) {
-        const direction = isIntersecting ? 'down' : 'up';
-        if (isIntersecting) notifyStepEnter(target, direction);
-        else notifyStepExit(target, direction);
+        if (isIntersecting && direction === 'down')
+          notifyStepEnter(target, direction);
+        else if (direction === 'up') {
+          // we went from exit to exit, must have skipped an enter
+          if (stepStates[index].state === 'exit')
+            notifyStepEnter(target, direction);
+          notifyStepExit(target, direction);
+        }
       }
     });
   }
 
-  function intersectStepBottom(entries) {
+  function intersectStepBelow(entries) {
+    updateDirection();
     entries.forEach(entry => {
       const {
         isIntersecting,
@@ -101,21 +137,78 @@ function scrollama() {
       } = entry;
       const { bottom, height } = boundingClientRect;
       const bottomAdjusted = bottom - offsetMargin;
+      const index = getIndex(target);
+
       if (
         bottomAdjusted >= -ZERO_MOE &&
         bottomAdjusted < height &&
-        isIntersecting
+        isIntersecting &&
+        direction === 'up'
       ) {
-        const direction = 'up';
         notifyStepEnter(target, direction);
-      } else if (bottomAdjusted <= ZERO_MOE && !isIntersecting) {
-        const direction = 'down';
+      } else if (
+        bottomAdjusted <= ZERO_MOE &&
+        !isIntersecting &&
+        direction === 'down'
+      ) {
+        if (stepStates[index].state === 'exit')
+          notifyStepEnter(target, direction);
         notifyStepExit(target, direction);
       }
     });
   }
 
+  // if there is a scroll even that skips the entire enter/exit of a step,
+  // fallback to trigger the enter/exit if element lands in viewport
+  function intersectViewportAbove(entries) {
+    updateDirection();
+    entries.forEach(entry => {
+      const {
+        isIntersecting,
+        intersectionRatio,
+        boundingClientRect,
+        target
+      } = entry;
+
+      const index = getIndex(target);
+
+      if (isIntersecting && direction === 'down') {
+        if (
+          stepStates[index].state === 'exit' &&
+          stepStates[index].direction === 'up'
+        ) {
+          notifyStepEnter(target, 'down');
+          notifyStepExit(target, 'down');
+        }
+      }
+    });
+  }
+
+  function intersectViewportBelow(entries) {
+    updateDirection();
+    entries.forEach(entry => {
+      const {
+        isIntersecting,
+        intersectionRatio,
+        boundingClientRect,
+        target
+      } = entry;
+      const index = getIndex(target);
+
+      if (isIntersecting && direction === 'up') {
+        if (
+          stepStates[index].state === 'exit' &&
+          stepStates[index].direction === 'down'
+        ) {
+          notifyStepEnter(target, 'up');
+          notifyStepExit(target, 'up');
+        }
+      }
+    });
+  }
+
   function intersectStepProgress(entries) {
+    updateDirection();
     entries.forEach(entry => {
       const {
         isIntersecting,
@@ -133,20 +226,20 @@ function scrollama() {
   }
 
   function intersectTop(entries) {
+    updateDirection();
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top, bottom } = boundingClientRect;
     if (bottom > -ZERO_MOE) {
-      const direction = isIntersecting ? 'down' : 'up';
       if (isIntersecting) notifyContainerEnter(direction);
       else notifyContainerExit(direction);
     }
   }
 
   function intersectBottom(entries) {
+    updateDirection();
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top } = boundingClientRect;
     if (top < ZERO_MOE) {
-      const direction = isIntersecting ? 'up' : 'down';
       if (isIntersecting) notifyContainerEnter(direction);
       else notifyContainerExit(direction);
     }
@@ -179,10 +272,10 @@ function scrollama() {
   }
 
   // top edge
-  function updateStepTopIO() {
-    if (io.stepTop) io.stepTop.forEach(d => d.disconnect());
+  function updateStepAboveIO() {
+    if (io.stepAbove) io.stepAbove.forEach(d => d.disconnect());
 
-    io.stepTop = stepEl.map((el, i) => {
+    io.stepAbove = stepEl.map((el, i) => {
       const marginTop = stepHeights[i] - offsetMargin;
       const marginBottom = -vh + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
@@ -193,17 +286,17 @@ function scrollama() {
         threshold: 0
       };
 
-      const obs = new IntersectionObserver(intersectStepTop, options);
+      const obs = new IntersectionObserver(intersectStepAbove, options);
       obs.observe(el);
       return obs;
     });
   }
 
   // bottom edge
-  function updateStepBottomIO() {
-    if (io.stepBottom) io.stepBottom.forEach(d => d.disconnect());
+  function updateStepBelowIO() {
+    if (io.stepBelow) io.stepBelow.forEach(d => d.disconnect());
 
-    io.stepBottom = stepEl.map((el, i) => {
+    io.stepBelow = stepEl.map((el, i) => {
       const marginTop = -offsetMargin;
       const marginBottom = -vh + stepHeights[i] + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
@@ -214,7 +307,46 @@ function scrollama() {
         threshold: 0
       };
 
-      const obs = new IntersectionObserver(intersectStepBottom, options);
+      const obs = new IntersectionObserver(intersectStepBelow, options);
+      obs.observe(el);
+      return obs;
+    });
+  }
+
+  // jump into viewport
+  function updateViewportAboveIO() {
+    if (io.viewportAbove) io.viewportAbove.forEach(d => d.disconnect());
+    io.viewportAbove = stepEl.map((el, i) => {
+      const marginTop = 0;
+      const marginBottom = -(vh - offsetMargin + stepHeights[i]);
+      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+
+      const options = {
+        root: null,
+        rootMargin,
+        threshold: 0
+      };
+
+      const obs = new IntersectionObserver(intersectViewportAbove, options);
+      obs.observe(el);
+      return obs;
+    });
+  }
+
+  function updateViewportBelowIO() {
+    if (io.viewportBelow) io.viewportBelow.forEach(d => d.disconnect());
+    io.viewportBelow = stepEl.map((el, i) => {
+      const marginTop = -(offsetMargin + stepHeights[i]);
+      const marginBottom = 0;
+      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+
+      const options = {
+        root: null,
+        rootMargin,
+        threshold: 0
+      };
+
+      const obs = new IntersectionObserver(intersectViewportBelow, options);
       obs.observe(el);
       return obs;
     });
@@ -242,8 +374,10 @@ function scrollama() {
   }
 
   function updateIO() {
-    updateStepTopIO();
-    updateStepBottomIO();
+    updateStepAboveIO();
+    updateStepBelowIO();
+    updateViewportAboveIO();
+    updateViewportBelowIO();
 
     if (progressMode) updateStepProgressIO();
 
@@ -279,15 +413,25 @@ function scrollama() {
     } else if (!enable) {
       if (io.top) io.top.disconnect();
       if (io.bottom) io.bottom.disconnect();
-      if (io.stepTop) io.stepTop.forEach(d => d.disconnect());
-      if (io.stepBottom) io.stepBottom.forEach(d => d.disconnect());
+      if (io.stepAbove) io.stepAbove.forEach(d => d.disconnect());
+      if (io.stepBelow) io.stepBelow.forEach(d => d.disconnect());
       if (io.stepProgress) io.stepProgress.forEach(d => d.disconnect());
+      if (io.viewportAbove) io.viewportAbove.forEach(d => d.disconnect());
+      if (io.viewportBelow) io.viewportBelow.forEach(d => d.disconnect());
       isEnabled = false;
     }
   }
 
   function indexSteps() {
     stepEl.forEach((el, i) => el.setAttribute('data-scrollama-index', i));
+  }
+
+  function setupStepStates() {
+    stepStates = stepEl.map(() => ({
+      direction: null,
+      state: null,
+      bottom: -1
+    }));
   }
 
   function addDebug() {
@@ -344,6 +488,7 @@ function scrollama() {
 
       addDebug();
       indexSteps();
+      setupStepStates();
       if (progressMode) setThreshold();
       handleResize();
       handleEnable(true);
