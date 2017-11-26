@@ -71,7 +71,7 @@ look like:
 
 ```js
 // instantiate the scrollama
-const scroller = Scrollama();
+const scroller = scrollama();
 
 // setup the instance, pass callback functions
 scroller
@@ -107,7 +107,7 @@ three elements (container, graphic, steps). The structure should look like:
 
 ```js
 // instantiate the scrollama
-const scroller = Scrollama();
+const scroller = scrollama();
 
 // setup the instance, pass callback functions
 scroller
