@@ -773,6 +773,15 @@ function scrollama() {
     return +element.getAttribute('data-scrollama-index');
   }
 
+  function getDirection(ref) {
+    var index = ref.index;
+    var bottom = ref.bottom;
+
+    var prev = stepStates[index].bottom;
+    if (bottom === prev) { return stepStates[index].direction; }
+    return bottom < prev ? 'down' : 'up';
+  }
+
   // NOTIFY CALLBACKS
   function notifyStepEnter(element, direction) {
     var index = getIndex(element);
@@ -844,7 +853,9 @@ function scrollama() {
       var bottom = boundingClientRect.bottom;
       var bottomAdjusted = bottom - offsetMargin;
       var index = getIndex(target);
-      var direction = bottom < stepStates[index].bottom ? 'down' : 'up';
+      var direction = getDirection({ index: index, bottom: bottom });
+      if (debugMode === 'verbose')
+        { console.log({ index: index, entry: entry, direction: direction, bottomAdjusted: bottomAdjusted }); }
       if (bottomAdjusted >= -ZERO_MOE) {
         if (isIntersecting) { notifyStepEnter(target, direction); }
         else { notifyStepExit(target, direction); }
@@ -863,7 +874,9 @@ function scrollama() {
       var height = boundingClientRect.height;
       var bottomAdjusted = bottom - offsetMargin;
       var index = getIndex(target);
-      var direction = bottom < stepStates[index].bottom ? 'down' : 'up';
+      var direction = getDirection({ index: index, bottom: bottom });
+      if (debugMode === 'verbose')
+        { console.log({ index: index, entry: entry, direction: direction, bottomAdjusted: bottomAdjusted }); }
       if (
         bottomAdjusted >= -ZERO_MOE &&
         bottomAdjusted < height &&
@@ -877,6 +890,8 @@ function scrollama() {
     });
   }
 
+  // if there is a scroll even that skips the entire enter/exit of a step,
+  // fallback to trigger the enter/exit if element lands in viewport
   function intersectStepProgress(entries) {
     entries.forEach(function (entry) {
       var isIntersecting = entry.isIntersecting;
@@ -985,7 +1000,7 @@ function scrollama() {
     });
   }
 
-  // progress progress tracker
+  // jump into viewport
   function updateStepProgressIO() {
     if (io.stepProgress) { io.stepProgress.forEach(function (d) { return d.disconnect(); }); }
 
@@ -1009,6 +1024,8 @@ function scrollama() {
   function updateIO() {
     updateStepTopIO();
     updateStepBottomIO();
+    // updateViewportTopIO();
+    // updateViewportBottomIO();
 
     if (progressMode) { updateStepProgressIO(); }
 
@@ -1047,6 +1064,8 @@ function scrollama() {
       if (io.stepTop) { io.stepTop.forEach(function (d) { return d.disconnect(); }); }
       if (io.stepBottom) { io.stepBottom.forEach(function (d) { return d.disconnect(); }); }
       if (io.stepProgress) { io.stepProgress.forEach(function (d) { return d.disconnect(); }); }
+      if (io.viewportTop) { io.viewportTop.forEach(function (d) { return d.disconnect(); }); }
+      if (io.viewportBottom) { io.viewportBottom.forEach(function (d) { return d.disconnect(); }); }
       isEnabled = false;
     }
   }
