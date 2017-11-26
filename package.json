@@ -1,14 +1,12 @@
 {
   "name": "scrollama",
-  "version": "0.6.0",
-  "description":
-    "Lightweight scrollytelling library using IntersectionObserver",
+  "version": "0.6.1",
+  "description": "Lightweight scrollytelling library using IntersectionObserver",
   "main": "build/scrollama.js",
   "browser": "build/scrollama.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development rollup -w -c",
-    "build":
-      "npm run pretest && cross-env NODE_ENV=production rollup -c && npm run docs",
+    "build": "npm run pretest && cross-env NODE_ENV=production rollup -c && npm run docs",
     "pretest": "cross-env NODE_ENV=development rollup -c",
     "docs": "cp build/scrollama.min.js docs"
   },
