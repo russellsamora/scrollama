@@ -1,26 +1,16 @@
 // DOM helper functions
 
-// private
-function selectionToArray(selection) {
-	const len = selection.length;
-	const result = [];
-	for (let i = 0; i < len; i += 1) {
-		result.push(selection[i]);
-	}
-	return result;
-}
-
 // public
 function select(selector) {
 	return document.querySelector(selector);
 }
 
 function selectAll(selector, parent = document) {
-	return selectionToArray(parent.querySelectorAll(selector));
+	return Array.from(parent.querySelectorAll(selector));
 }
 
 function find(el, selector) {
-	return selectionToArray(el.querySelectorAll(selector));
+	return Array.from(el.querySelectorAll(selector));
 }
 
 function removeClass(el, className) {
