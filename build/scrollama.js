@@ -769,7 +769,7 @@ function scrollama() {
 
   var stepStates = null;
   var previousYOffset = 0;
-  var direction = 'up';
+  var direction = null;
 
   function getIndex(element) {
     return +element.getAttribute('data-scrollama-index');

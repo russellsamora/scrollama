@@ -26,7 +26,7 @@ function scrollama() {
 
   let stepStates = null;
   let previousYOffset = 0;
-  let direction = 'up';
+  let direction = null;
 
   function getIndex(element) {
     return +element.getAttribute('data-scrollama-index');
