@@ -844,11 +844,11 @@ function scrollama() {
   // bottom must be > 0 which means it is on "screen" (shifted by offset)
   function intersectStepAbove(entries) {
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var intersectionRatio = entry.intersectionRatio;
-      var boundingClientRect = entry.boundingClientRect;
-      var target = entry.target;
+    entries.forEach(function (ref) {
+      var isIntersecting = ref.isIntersecting;
+      var boundingClientRect = ref.boundingClientRect;
+      var target = ref.target;
+
       // bottom is how far bottom edge of el is from top of viewport
       var bottom = boundingClientRect.bottom;
       var bottomAdjusted = bottom - offsetMargin;
@@ -859,7 +859,7 @@ function scrollama() {
           { notifyStepEnter(target, direction); }
         else if (direction === 'up') {
           // we went from exit to exit, must have skipped an enter
-          if (stepStates[index].state === 'exit')
+          if (stepStates[index].state !== 'enter')
             { notifyStepEnter(target, direction); }
           notifyStepExit(target, direction);
         }
@@ -869,11 +869,11 @@ function scrollama() {
 
   function intersectStepBelow(entries) {
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var intersectionRatio = entry.intersectionRatio;
-      var boundingClientRect = entry.boundingClientRect;
-      var target = entry.target;
+    entries.forEach(function (ref) {
+      var isIntersecting = ref.isIntersecting;
+      var boundingClientRect = ref.boundingClientRect;
+      var target = ref.target;
+
       var bottom = boundingClientRect.bottom;
       var height = boundingClientRect.height;
       var bottomAdjusted = bottom - offsetMargin;
@@ -891,72 +891,76 @@ function scrollama() {
         !isIntersecting &&
         direction === 'down'
       ) {
-        if (stepStates[index].state === 'exit')
+        if (stepStates[index].state !== 'enter')
           { notifyStepEnter(target, direction); }
+
         notifyStepExit(target, direction);
       }
     });
   }
 
-  // if there is a scroll even that skips the entire enter/exit of a step,
-  // fallback to trigger the enter/exit if element lands in viewport
+  /*
+	if there is a scroll event where a step never intersects (therefore
+	skipping an enter/exit trigger), use this fallback to detect if it is
+	in view
+	*/
   function intersectViewportAbove(entries) {
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var intersectionRatio = entry.intersectionRatio;
-      var boundingClientRect = entry.boundingClientRect;
-      var target = entry.target;
+    entries.forEach(function (ref) {
+      var isIntersecting = ref.isIntersecting;
+      var target = ref.target;
 
       var index = getIndex(target);
 
-      if (isIntersecting && direction === 'down') {
-        if (
-          stepStates[index].state === 'exit' &&
-          stepStates[index].direction === 'up'
-        ) {
-          notifyStepEnter(target, 'down');
-          notifyStepExit(target, 'down');
-        }
+      if (
+        isIntersecting &&
+        direction === 'down' &&
+        stepStates[index].state !== 'enter' &&
+        stepStates[index].direction !== 'down'
+      ) {
+        notifyStepEnter(target, 'down');
+        notifyStepExit(target, 'down');
       }
     });
   }
 
   function intersectViewportBelow(entries) {
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var intersectionRatio = entry.intersectionRatio;
-      var boundingClientRect = entry.boundingClientRect;
-      var target = entry.target;
+    entries.forEach(function (ref) {
+      var isIntersecting = ref.isIntersecting;
+      var target = ref.target;
+
       var index = getIndex(target);
 
-      if (isIntersecting && direction === 'up') {
-        if (
-          stepStates[index].state === 'exit' &&
-          stepStates[index].direction === 'down'
-        ) {
-          notifyStepEnter(target, 'up');
-          notifyStepExit(target, 'up');
-        }
+      if (
+        isIntersecting &&
+        direction === 'up' &&
+        stepStates[index].state !== 'enter' &&
+        stepStates[index].direction !== 'up'
+      ) {
+        notifyStepEnter(target, 'up');
+        notifyStepExit(target, 'up');
       }
     });
   }
 
   function intersectStepProgress(entries) {
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var intersectionRatio = entry.intersectionRatio;
-      var boundingClientRect = entry.boundingClientRect;
-      var target = entry.target;
-      var bottom = boundingClientRect.bottom;
-      var bottomAdjusted = bottom - offsetMargin;
+    entries.forEach(
+      function (ref) {
+        var isIntersecting = ref.isIntersecting;
+        var intersectionRatio = ref.intersectionRatio;
+        var boundingClientRect = ref.boundingClientRect;
+        var target = ref.target;
 
-      if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
-        notifyStepProgress(target, +intersectionRatio.toFixed(3));
+        var bottom = boundingClientRect.bottom;
+        var bottomAdjusted = bottom - offsetMargin;
+
+        if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
+          notifyStepProgress(target, +intersectionRatio.toFixed(3));
+        }
       }
-    });
+    );
   }
 
   function intersectTop(entries) {
@@ -1113,10 +1117,10 @@ function scrollama() {
   }
 
   function updateIO() {
-    updateStepAboveIO();
-    updateStepBelowIO();
     updateViewportAboveIO();
     updateViewportBelowIO();
+    updateStepAboveIO();
+    updateStepBelowIO();
 
     if (progressMode) { updateStepProgressIO(); }
 
@@ -1168,8 +1172,7 @@ function scrollama() {
   function setupStepStates() {
     stepStates = stepEl.map(function () { return ({
       direction: null,
-      state: null,
-      bottom: -1
+      state: null
     }); });
   }
 

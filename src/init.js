@@ -101,13 +101,7 @@ function scrollama() {
   // bottom must be > 0 which means it is on "screen" (shifted by offset)
   function intersectStepAbove(entries) {
     updateDirection();
-    entries.forEach(entry => {
-      const {
-        isIntersecting,
-        intersectionRatio,
-        boundingClientRect,
-        target
-      } = entry;
+    entries.forEach(({ isIntersecting, boundingClientRect, target }) => {
       // bottom is how far bottom edge of el is from top of viewport
       const { bottom } = boundingClientRect;
       const bottomAdjusted = bottom - offsetMargin;
@@ -118,7 +112,7 @@ function scrollama() {
           notifyStepEnter(target, direction);
         else if (direction === 'up') {
           // we went from exit to exit, must have skipped an enter
-          if (stepStates[index].state === 'exit')
+          if (stepStates[index].state !== 'enter')
             notifyStepEnter(target, direction);
           notifyStepExit(target, direction);
         }
@@ -128,13 +122,7 @@ function scrollama() {
 
   function intersectStepBelow(entries) {
     updateDirection();
-    entries.forEach(entry => {
-      const {
-        isIntersecting,
-        intersectionRatio,
-        boundingClientRect,
-        target
-      } = entry;
+    entries.forEach(({ isIntersecting, boundingClientRect, target }) => {
       const { bottom, height } = boundingClientRect;
       const bottomAdjusted = bottom - offsetMargin;
       const index = getIndex(target);
@@ -151,78 +139,65 @@ function scrollama() {
         !isIntersecting &&
         direction === 'down'
       ) {
-        if (stepStates[index].state === 'exit')
+        if (stepStates[index].state !== 'enter')
           notifyStepEnter(target, direction);
+
         notifyStepExit(target, direction);
       }
     });
   }
 
-  // if there is a scroll even that skips the entire enter/exit of a step,
-  // fallback to trigger the enter/exit if element lands in viewport
+  /*
+	if there is a scroll event where a step never intersects (therefore
+	skipping an enter/exit trigger), use this fallback to detect if it is
+	in view
+	*/
   function intersectViewportAbove(entries) {
     updateDirection();
-    entries.forEach(entry => {
-      const {
-        isIntersecting,
-        intersectionRatio,
-        boundingClientRect,
-        target
-      } = entry;
-
+    entries.forEach(({ isIntersecting, target }) => {
       const index = getIndex(target);
 
-      if (isIntersecting && direction === 'down') {
-        if (
-          stepStates[index].state === 'exit' &&
-          stepStates[index].direction === 'up'
-        ) {
-          notifyStepEnter(target, 'down');
-          notifyStepExit(target, 'down');
-        }
+      if (
+        isIntersecting &&
+        direction === 'down' &&
+        stepStates[index].state !== 'enter' &&
+        stepStates[index].direction !== 'down'
+      ) {
+        notifyStepEnter(target, 'down');
+        notifyStepExit(target, 'down');
       }
     });
   }
 
   function intersectViewportBelow(entries) {
     updateDirection();
-    entries.forEach(entry => {
-      const {
-        isIntersecting,
-        intersectionRatio,
-        boundingClientRect,
-        target
-      } = entry;
+    entries.forEach(({ isIntersecting, target }) => {
       const index = getIndex(target);
 
-      if (isIntersecting && direction === 'up') {
-        if (
-          stepStates[index].state === 'exit' &&
-          stepStates[index].direction === 'down'
-        ) {
-          notifyStepEnter(target, 'up');
-          notifyStepExit(target, 'up');
-        }
+      if (
+        isIntersecting &&
+        direction === 'up' &&
+        stepStates[index].state !== 'enter' &&
+        stepStates[index].direction !== 'up'
+      ) {
+        notifyStepEnter(target, 'up');
+        notifyStepExit(target, 'up');
       }
     });
   }
 
   function intersectStepProgress(entries) {
     updateDirection();
-    entries.forEach(entry => {
-      const {
-        isIntersecting,
-        intersectionRatio,
-        boundingClientRect,
-        target
-      } = entry;
-      const { bottom } = boundingClientRect;
-      const bottomAdjusted = bottom - offsetMargin;
+    entries.forEach(
+      ({ isIntersecting, intersectionRatio, boundingClientRect, target }) => {
+        const { bottom } = boundingClientRect;
+        const bottomAdjusted = bottom - offsetMargin;
 
-      if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
-        notifyStepProgress(target, +intersectionRatio.toFixed(3));
+        if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
+          notifyStepProgress(target, +intersectionRatio.toFixed(3));
+        }
       }
-    });
+    );
   }
 
   function intersectTop(entries) {
@@ -374,10 +349,10 @@ function scrollama() {
   }
 
   function updateIO() {
-    updateStepAboveIO();
-    updateStepBelowIO();
     updateViewportAboveIO();
     updateViewportBelowIO();
+    updateStepAboveIO();
+    updateStepBelowIO();
 
     if (progressMode) updateStepProgressIO();
 
@@ -429,8 +404,7 @@ function scrollama() {
   function setupStepStates() {
     stepStates = stepEl.map(() => ({
       direction: null,
-      state: null,
-      bottom: -1
+      state: null
     }));
   }
 

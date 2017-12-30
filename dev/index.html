@@ -34,8 +34,8 @@
 		#scroll {
 			background-color: #cdcdcd;
 			position: relative;
-			margin-top: 2005vh;
-			margin-bottom: 2000vh;
+			margin-top: 205vh;
+			margin-bottom: 200vh;
 		}
 
 		.scroll__graphic {
@@ -68,7 +68,7 @@
 
 		.step {
 			max-width: 30rem;
-			margin: 3rem auto;
+			margin: 0 auto;
 			border: 2px solid #333;
 			background-color: #fff;
 		}
@@ -131,9 +131,7 @@
 
 		function handleStepEnter(resp) {
 			console.log('enter', resp)
-			step.classed('is-active', function (d, i) {
-				return i === resp.index
-			})
+			d3.select(resp.element).classed('is-active', true)
 			var val = d3.select(resp.element).attr('data-step')
 			graphic.style('background-color', val)
 		}
