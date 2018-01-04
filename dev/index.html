@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js">
-<!--<![endif]-->
+<html>
 
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Scrollama demo</title>
-	<meta name="description" content="">
+	<title>Scrollama Demo: Basic</title>
+	<meta name="description" content="Scrollama Demo: Basic">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
+		/* default / demo page */
+
 		* {
 			box-sizing: border-box;
 		}
@@ -21,56 +18,81 @@
 		body {
 			margin: 0;
 			padding: 0;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 		}
 
 		body {
-			min-height: 101vh;
+			min-height: 1280px;
+			font-weight: 300;
+			color: #2a2a2a;
 		}
 
-		p {
+		p,
+		h1,
+		h2,
+		h3,
+		h4,
+		a {
 			margin: 0;
+			font-weight: 300;
 		}
+
+		a,
+		a:visited,
+		a:hover {
+			color: #f30;
+			text-decoration: none;
+			border-bottom: 1px solid currentColor;
+		}
+
+		#intro {
+			max-width: 40rem;
+			margin: 1rem auto;
+			text-align: center;
+		}
+
+		.intro__overline {
+			font-size: 1.4rem;
+		}
+
+		.intro__hed {
+			font-size: 1.4rem;
+			margin: 1.5rem auto;
+			text-transform: uppercase;
+			font-weight: 900;
+			letter-spacing: 0.05em;
+		}
+
+		.intro__dek {
+			font-size: 1.4rem;
+		}
+
+		/* demo */
+
+		#intro {
+			margin-bottom: 320px;
+		}
+
+		#outro {
+			height: 640px;
+		}
+
+		/* scrollama */
 
 		#scroll {
-			background-color: #cdcdcd;
 			position: relative;
-			margin-top: 205vh;
-			margin-bottom: 200vh;
-		}
-
-		.scroll__graphic {
-			position: absolute;
-			top: 0;
-			left: 0;
-			bottom: auto;
-			background-color: #ccc;
-			-moz-transition: background-color 250ms ease-in-out;
-			-webkit-transition: background-color 250ms ease-in-out;
-			transition: background-color 250ms ease-in-out;
-			-webkit-transform: translate3d(0, 0, 0);
-			-moz-transform: translate3d(0, 0, 0);
-			transform: translate3d(0, 0, 0);
-		}
-
-		.scroll__graphic.is-fixed {
-			position: fixed;
-		}
-
-		.scroll__graphic.is-bottom {
-			bottom: 0;
-			top: auto;
 		}
 
 		.scroll__text {
-			padding: 1rem;
 			position: relative;
+			padding: 0 1rem;
+			margin: 0 auto;
+			width: 33%;
 		}
 
 		.step {
-			max-width: 30rem;
-			margin: 0 auto;
-			border: 2px solid #333;
-			background-color: #fff;
+			margin: 2rem auto 4rem auto;
+			border: 1px solid #333;
 		}
 
 		.step.is-active {
@@ -80,104 +102,86 @@
 		.step p {
 			text-align: center;
 			padding: 1rem;
+			font-size: 1.5rem;
 		}
 	</style>
 
 </head>
 
 <body>
+	<section id='intro'>
+		<p class='intro__overline'>
+			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
+		</p>
+		<h1 class='intro__hed'>Demo: Basic</h1>
+		<p class='intro__dek'>
+			Start scrolling to see how it works.
+		</p>
+	</section>
 	<section id='scroll'>
-		<div class='scroll__graphic'></div>
 		<div class='scroll__text'>
-			<div class='step' data-step='#ccc'>
-				<p>Step 1</p>
+			<div class='step' data-step='1'>
+				<p>STEP 1</p>
 			</div>
-			<div class='step' data-step='#aaa'>
-				<p>Step 2</p>
+			<!-- <div class='step' data-step='2'>
+				<p>STEP 2</p>
 			</div>
-			<div class='step' data-step='#888'>
-				<p>Step 3</p>
+			<div class='step' data-step='3'>
+				<p>STEP 3</p>
 			</div>
-			<div class='step' data-step='#666'>
-				<p>Step 4</p>
-			</div>
+			<div class='step' data-step='4'>
+				<p>STEP 4</p>
+			</div> -->
 		</div>
 	</section>
-	<div class='debug'></div>
-	<script src='d3.v4.min.js'></script>
+	<section id='outro'></section>
 	<script src='../build/scrollama.js'></script>
 	<script>
-		var container = d3.select('#scroll')
-		var graphic = container.select('.scroll__graphic')
-		var text = container.select('.scroll__text')
-		var step = text.selectAll('.step')
+		var container = document.querySelector('#scroll');
+		var text = container.querySelector('.scroll__text');
+		var steps = text.querySelectorAll('.step');
 
-		var scroller = scrollama()
+		// initialize the scrollama
+		var scroller = scrollama();
 
-		function handleResize() {
-			// var h = Math.floor(window.innerHeight * 0.75) + 'px'
-			step.each(function () {
-				var ran = Math.random * 0.35
-				var h = Math.floor(window.innerHeight * ran) + 'px'
-				d3.select(this).style('height', h)
-			})
-
-			graphic
-				.style('height', window.innerHeight + 'px')
-				.style('width', d3.select('body').node().offsetWidth + 'px')
-
-			scroller.resize()
+		// scrollama event handlers
+		function handleStepEnter(response) {
+			// response = { element, direction, index }
+			console.log('enter', response);
+			// add to color to current step
+			response.element.classList.add('is-active');
 		}
 
-		function handleStepEnter(resp) {
-			console.log('enter', resp)
-			d3.select(resp.element).classed('is-active', true)
-			var val = d3.select(resp.element).attr('data-step')
-			graphic.style('background-color', val)
-		}
-
-		function handleStepExit(resp) {
-			console.log('exit', resp)
-			d3.select(resp.element).classed('is-active', false)
-		}
-
-		function handleContainerEnter(resp) {
-			// console.log('enter', resp)
-			graphic.classed('is-fixed', true)
-			graphic.classed('is-bottom', false)
-		}
-
-		function handleContainerExit(resp) {
-			// console.log('exit', resp)
-			graphic.classed('is-fixed', false)
-			graphic.classed('is-bottom', resp.direction === 'down')
-		}
-
-		function handleProgress(resp) {
-			console.log('progress', resp)
+		function handleStepExit(response) {
+			// response = { element, direction, index }
+			console.log('exit', response);
+			// remove color from current step
+			response.element.classList.remove('is-active');
 		}
 
 		function init() {
-			handleResize()
+			// set random padding for different step heights (not required)
+			steps.forEach(function (step) {
+				var v = 100 + Math.floor(Math.random() * window.innerHeight / 4);
+				step.style.padding = v + 'px 0px';
+			});
 
+			// 1. setup the scroller with the bare-bones options
+			// this will also initialize trigger observations
+			// 3. bind scrollama event handlers (this can be chained like below)
 			scroller.setup({
-				container: '#scroll',
-				graphic: '.scroll__graphic',
 				step: '.scroll__text .step',
-				offset: 0.5,
 				debug: true,
-				progress: true,
 			})
 				.onStepEnter(handleStepEnter)
-				.onStepExit(handleStepExit)
-			// .onContainerEnter(handleContainerEnter)
-			// .onContainerExit(handleContainerExit)
-			// .onStepProgress(handleProgress)
+				.onStepExit(handleStepExit);
 
-			window.addEventListener('resize', handleResize)
+			// setup resize event
+			window.addEventListener('resize', scroller.resize);
 		}
 
-		init()
+		// kick things off
+		init();
 	</script>
 </body>
 
