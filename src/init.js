@@ -28,6 +28,7 @@ function scrollama() {
   let preserveOrder = false;
 
   let stepStates = null;
+  let containerState = null;
   let previousYOffset = -1;
   let direction = null;
 
@@ -71,7 +72,6 @@ function scrollama() {
     if (window.pageYOffset > previousYOffset) direction = 'down';
     else if (window.pageYOffset < previousYOffset) direction = 'up';
     previousYOffset = window.pageYOffset;
-    // console.log(window.pageYOffset, direction);
   }
 
   function handleResize() {
@@ -185,6 +185,8 @@ function scrollama() {
 
   function notifyContainerEnter() {
     const resp = { direction };
+    containerState.direction = direction;
+    containerState.state = 'enter';
     if (
       callback.containerEnter &&
       typeof callback.containerEnter === 'function'
@@ -194,6 +196,8 @@ function scrollama() {
 
   function notifyContainerExit() {
     const resp = { direction };
+    containerState.direction = direction;
+    containerState.state = 'exit';
     if (callback.containerExit && typeof callback.containerExit === 'function')
       callback.containerExit(resp);
   }
@@ -212,13 +216,7 @@ function scrollama() {
       const bottomAdjusted = bottom - offsetMargin;
       const index = getIndex(target);
       const ss = stepStates[index];
-      console.log({
-        direction,
-        isIntersecting,
-        bottomAdjusted,
-        height,
-        state: ss.state
-      });
+
       if (bottomAdjusted >= -ZERO_MOE) {
         if (isIntersecting && direction === 'down' && ss.state !== 'enter')
           notifyStepEnter(target, direction);
@@ -245,13 +243,7 @@ function scrollama() {
       const bottomAdjusted = bottom - offsetMargin;
       const index = getIndex(target);
       const ss = stepStates[index];
-      console.log({
-        direction,
-        isIntersecting,
-        bottomAdjusted,
-        height,
-        state: ss.state
-      });
+
       if (
         bottomAdjusted >= -ZERO_MOE &&
         bottomAdjusted < height &&
@@ -330,9 +322,10 @@ function scrollama() {
     updateDirection();
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top, bottom } = boundingClientRect;
+
     if (bottom > -ZERO_MOE) {
       if (isIntersecting) notifyContainerEnter(direction);
-      else notifyContainerExit(direction);
+      else if (containerState.state === 'enter') notifyContainerExit(direction);
     }
   }
 
@@ -340,9 +333,10 @@ function scrollama() {
     updateDirection();
     const { isIntersecting, boundingClientRect } = entries[0];
     const { top } = boundingClientRect;
+
     if (top < ZERO_MOE) {
       if (isIntersecting) notifyContainerEnter(direction);
-      else notifyContainerExit(direction);
+      else if (containerState.state === 'enter') notifyContainerExit(direction);
     }
   }
 
@@ -494,11 +488,13 @@ function scrollama() {
     stepEl.forEach((el, i) => el.setAttribute('data-scrollama-index', i));
   }
 
-  function setupStepStates() {
+  function setupStates() {
     stepStates = stepEl.map(() => ({
       direction: null,
       state: null
     }));
+
+    containerState = { direction: null, state: null };
   }
 
   function addDebug() {
@@ -557,7 +553,7 @@ function scrollama() {
 
       addDebug();
       indexSteps();
-      setupStepStates();
+      setupStates();
       if (progressMode) setThreshold();
       handleResize();
       handleEnable(true);
