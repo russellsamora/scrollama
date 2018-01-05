@@ -10,7 +10,7 @@
  * Licensed under the W3C SOFTWARE AND DOCUMENT NOTICE AND LICENSE.
  *
  *  https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
- * 
+ *
  */
 
 (function(window, document) {
@@ -125,6 +125,12 @@ IntersectionObserver.prototype.THROTTLE_TIMEOUT = 100;
  */
 IntersectionObserver.prototype.POLL_INTERVAL = null;
 
+/**
+ * Use a mutation observer on the root element
+ * to detect intersection changes.
+ */
+IntersectionObserver.prototype.USE_MUTATION_OBSERVER = true;
+
 
 /**
  * Starts observing a target element for intersection changes based on
@@ -132,10 +138,11 @@ IntersectionObserver.prototype.POLL_INTERVAL = null;
  * @param {Element} target The DOM element to observe.
  */
 IntersectionObserver.prototype.observe = function(target) {
-  // If the target is already being observed, do nothing.
-  if (this._observationTargets.some(function(item) {
+  var isTargetAlreadyObserved = this._observationTargets.some(function(item) {
     return item.element == target;
-  })) {
+  });
+
+  if (isTargetAlreadyObserved) {
     return;
   }
 
@@ -261,7 +268,7 @@ IntersectionObserver.prototype._monitorIntersections = function() {
       addEvent(window, 'resize', this._checkForIntersections, true);
       addEvent(document, 'scroll', this._checkForIntersections, true);
 
-      if ('MutationObserver' in window) {
+      if (this.USE_MUTATION_OBSERVER && 'MutationObserver' in window) {
         this._domObserver = new MutationObserver(this._checkForIntersections);
         this._domObserver.observe(document, {
           attributes: true,

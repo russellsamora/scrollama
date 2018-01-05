@@ -140,6 +140,7 @@ _options:_
   step. **(default: 0.5)**
 * `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
+* `order` (boolean): Whether to preserve step triggering order if they fire out of sync (eg. ensure step 2 enters after 1 exits). **(default: true)**
 * `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
 
@@ -148,8 +149,7 @@ _options:_
 Callback that fires when the top or bottom edge of a step element enters the
 offset threshold.
 
-The argument of the callback is an object: `{ element: DOMElement, index:
-number, direction: string }`
+The argument of the callback is an object: `{ element: DOMElement, index: number, direction: string }`
 
 `element`: The step element that triggered
 
@@ -162,8 +162,7 @@ number, direction: string }`
 Callback that fires when the top or bottom edge of a step element exits the
 offset threshold.
 
-The argument of the callback is an object: `{ element: DOMElement, index:
-number, direction: string }`
+The argument of the callback is an object: `{ element: DOMElement, index: number, direction: string }`
 
 `element`: The step element that triggered
 
@@ -175,8 +174,7 @@ number, direction: string }`
 
 Callback that fires the progress (0 - 1) a step has made through the threshold.
 
-The argument of the callback is an object: `{ element: DOMElement, index:
-number, progress: number }`
+The argument of the callback is an object: `{ element: DOMElement, index: number, progress: number }`
 
 `element`: The step element that triggered
 
@@ -251,7 +249,8 @@ with any library, or with no library at all._
 
 ### To do
 
-* Optionally suppress first trigger on page load
+* Fix for Safari address bar
+* Improve progress increments
 
 ### Alternatives
 
