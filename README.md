@@ -29,6 +29,27 @@ introduction.
 
 [![scrollytelling pattern](https://thumbs.gfycat.com/FearfulHotArabianoryx-size_restricted.gif)](https://pudding.cool/process/how-to-implement-scrollytelling)
 
+### Examples
+
+_Note: most of these demos use D3 to keep the code concise, but this can be used
+with any library, or with no library at all._
+
+* [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step
+  triggers
+* [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
+  incremental step progress callback
+* [Sticky Graphic v1a (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
+  using CSS vertically center chart, and position sticky (+ polyfill) for
+  sticking.
+* [Sticky Graphic v1b (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
+  using JS vertically center chart, and position sticky (+ polyfill) for
+  sticking. Added bonus ability to start chart at top of steps then vertically.
+* [Sticky Graphic v2a (CSS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-css) -
+  using CSS vertically center chart, and position fixed and absolute for
+  sticking.
+* [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-js) -
+  using read position fixed and absolute for sticking.
+
 ### Installation
 
 Old school (exposes the `scrollama` global):
@@ -218,27 +239,6 @@ if you have previously disabled.
 #### scrollama.disable()
 
 Tell scrollama to stop observing for trigger changes.
-
-### Examples
-
-_Note: most of these demos use D3 to keep the code concise, but this can be used
-with any library, or with no library at all._
-
-* [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step
-  triggers
-* [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
-  incremental step progress callback
-* [Sticky Graphic v1a (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
-  using CSS vertically center chart, and position sticky (+ polyfill) for
-  sticking.
-* [Sticky Graphic v1b (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
-  using JS vertically center chart, and position sticky (+ polyfill) for
-  sticking. Added bonus ability to start chart at top of steps then vertically.
-* [Sticky Graphic v2a (CSS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-css) -
-  using CSS vertically center chart, and position fixed and absolute for
-  sticking.
-* [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-js) -
-  using read position fixed and absolute for sticking.
 
 ### Tips
 
