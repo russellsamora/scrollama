@@ -586,6 +586,12 @@ function scrollama() {
     return S;
   };
 
+  S.destroy = () => {
+    handleEnable(false);
+    Object.keys(callback).forEach(c => (callback[c] = null));
+    Object.keys(io).forEach(i => (io[i] = null));
+  };
+
   S.offsetTrigger = x => {
     if (x && typeof !isNaN(x)) {
       offsetVal = Math.min(Math.max(0, x), 1);
