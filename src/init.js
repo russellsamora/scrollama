@@ -522,11 +522,13 @@ function scrollama() {
   }
 
   function setThreshold() {
-    const count = 100;
-    thresholdProgress = [];
-    const ratio = 1 / count;
-    for (let i = 0; i < count; i++) {
-      thresholdProgress.push(i * ratio);
+    if (progressMode) {
+      const count = 100;
+      thresholdProgress = [];
+      const ratio = 1 / count;
+      for (let i = 0; i < count; i++) {
+        thresholdProgress.push(i * ratio);
+      }
     }
   }
 
@@ -541,23 +543,31 @@ function scrollama() {
     debug = false,
     order = true
   }) => {
-    if (step) {
-      stepEl = selectAll(step);
-      containerEl = container ? select(container) : null;
-      graphicEl = graphic ? select(graphic) : null;
-      S.offsetTrigger(offset);
-      debugMode = debug;
-      progressMode = progress;
-      preserveOrder = order;
-      isReady = true;
+    // elements
+    stepEl = selectAll(step);
+    containerEl = container ? select(container) : null;
+    graphicEl = graphic ? select(graphic) : null;
 
-      addDebug();
-      indexSteps();
-      setupStates();
-      if (progressMode) setThreshold();
-      handleResize();
-      handleEnable(true);
-    } else console.error('scrollama error: missing step element');
+    // error if no step selected
+    if (!stepEl.length) {
+      console.error('scrollama error: no step elements');
+      return S;
+    }
+
+    // options
+    debugMode = debug;
+    progressMode = progress;
+    preserveOrder = order;
+    isReady = true;
+
+    // customize
+    S.offsetTrigger(offset);
+    addDebug();
+    indexSteps();
+    setupStates();
+    setThreshold();
+    handleResize();
+    handleEnable(true);
     return S;
   };
 

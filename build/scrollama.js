@@ -732,32 +732,33 @@ window.IntersectionObserverEntry = IntersectionObserverEntry;
 
 // private
 function selectionToArray(selection) {
-	var len = selection.length;
-	var result = [];
-	for (var i = 0; i < len; i += 1) {
-		result.push(selection[i]);
-	}
-	return result;
+  var len = selection.length;
+  var result = [];
+  for (var i = 0; i < len; i += 1) {
+    result.push(selection[i]);
+  }
+  return result;
 }
 
 // public
 function select(selector) {
-	if(selector instanceof Element)
-		{ return selector }
-	else if(typeof selector === 'string')
-		{ return document.querySelector(selector) }
+  if (selector instanceof Element) { return selector; }
+  else if (typeof selector === 'string')
+    { return document.querySelector(selector); }
+  return null;
 }
 
 function selectAll(selector, parent) {
-	if ( parent === void 0 ) parent = document;
+  if ( parent === void 0 ) parent = document;
 
-	if(typeof selector === 'string'){
-	  return selectionToArray(parent.querySelectorAll(selector));
-	} else if(selector instanceof NodeList){
-	  return selectionToArray(selector)
-	} else if(selector instanceof Array){
-	  return selector
-	}
+  if (typeof selector === 'string') {
+    return selectionToArray(parent.querySelectorAll(selector));
+  } else if (selector instanceof NodeList) {
+    return selectionToArray(selector);
+  } else if (selector instanceof Array) {
+    return selector;
+  }
+  return [];
 }
 
 function scrollama() {
@@ -1301,11 +1302,13 @@ function scrollama() {
   }
 
   function setThreshold() {
-    var count = 100;
-    thresholdProgress = [];
-    var ratio = 1 / count;
-    for (var i = 0; i < count; i++) {
-      thresholdProgress.push(i * ratio);
+    if (progressMode) {
+      var count = 100;
+      thresholdProgress = [];
+      var ratio = 1 / count;
+      for (var i = 0; i < count; i++) {
+        thresholdProgress.push(i * ratio);
+      }
     }
   }
 
@@ -1320,23 +1323,31 @@ function scrollama() {
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
     var order = ref.order; if ( order === void 0 ) order = true;
 
-    if (step) {
-      stepEl = selectAll(step);
-      containerEl = container ? select(container) : null;
-      graphicEl = graphic ? select(graphic) : null;
-      S.offsetTrigger(offset);
-      debugMode = debug;
-      progressMode = progress;
-      preserveOrder = order;
-      isReady = true;
+    // elements
+    stepEl = selectAll(step);
+    containerEl = container ? select(container) : null;
+    graphicEl = graphic ? select(graphic) : null;
 
-      addDebug();
-      indexSteps();
-      setupStates();
-      if (progressMode) { setThreshold(); }
-      handleResize();
-      handleEnable(true);
-    } else { console.error('scrollama error: missing step element'); }
+    // error if no step selected
+    if (!stepEl.length) {
+      console.error('scrollama error: no step elements');
+      return S;
+    }
+
+    // options
+    debugMode = debug;
+    progressMode = progress;
+    preserveOrder = order;
+    isReady = true;
+
+    // customize
+    S.offsetTrigger(offset);
+    addDebug();
+    indexSteps();
+    setupStates();
+    setThreshold();
+    handleResize();
+    handleEnable(true);
     return S;
   };
 
