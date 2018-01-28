@@ -742,13 +742,22 @@ function selectionToArray(selection) {
 
 // public
 function select(selector) {
-	return document.querySelector(selector);
+	if(selector instanceof Element)
+		{ return selector }
+	else if(typeof selector === 'string')
+		{ return document.querySelector(selector) }
 }
 
 function selectAll(selector, parent) {
 	if ( parent === void 0 ) parent = document;
 
-	return selectionToArray(parent.querySelectorAll(selector));
+	if(typeof selector === 'string'){
+	  return selectionToArray(parent.querySelectorAll(selector));
+	} else if(selector instanceof NodeList){
+	  return selectionToArray(selector)
+	} else if(selector instanceof Array){
+	  return selector
+	}
 }
 
 function scrollama() {

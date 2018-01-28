@@ -151,11 +151,11 @@ scroller
 
 _options:_
 
-* `step` (string): Selector for the step elements that will trigger changes.
+* `step` (string): Selector (or array of elements) for the step elements that will trigger changes.
   **required**
-* `container` (string): Selector for the element that contains everything for
+* `container` (string): Selector (or array of elements) for the element that contains everything for
   the scroller. **optional**
-* `graphic` (string): Selector for the graphic element that will become fixed.
+* `graphic` (string): Selector (or array of elements) for the graphic element that will become fixed.
   **optional**
 * `offset` (number, 0 - 1): How far from the top of the viewport to trigger a
   step. **(default: 0.5)**
