@@ -929,13 +929,13 @@ function scrollama() {
     stepStates[index].direction = direction;
     stepStates[index].state = 'exit';
 
-    if (callback.stepExit && typeof callback.stepExit === 'function')
-      { callback.stepExit(resp, stepStates); }
-
     if (progressMode) {
       if (direction === 'down') { notifyStepProgress(element, 1); }
       else { notifyStepProgress(element, 0); }
     }
+
+    if (callback.stepExit && typeof callback.stepExit === 'function')
+      { callback.stepExit(resp, stepStates); }
   }
 
   function notifyStepProgress(element, progress) {
