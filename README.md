@@ -240,6 +240,10 @@ if you have previously disabled.
 
 Tell scrollama to stop observing for trigger changes.
 
+#### scrollama.destroy()
+
+Removes all observers and callback functions.
+
 ### Tips
 
 * Always call `scrollama.resize()` after a window resize event to ensure scroll
