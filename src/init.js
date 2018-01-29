@@ -557,12 +557,14 @@ function scrollama() {
     // options
     debugMode = debug;
     progressMode = progress;
-    progressThreshold = Math.max(1, +threshold);
     preserveOrder = order;
+
+    offsetVal = Math.min(Math.max(0, offset), 1);
+    progressThreshold = Math.max(1, +threshold);
+
     isReady = true;
 
     // customize
-    S.offsetTrigger(offset);
     addDebug();
     indexSteps();
     setupStates();
@@ -590,14 +592,6 @@ function scrollama() {
     handleEnable(false);
     Object.keys(callback).forEach(c => (callback[c] = null));
     Object.keys(io).forEach(i => (io[i] = null));
-  };
-
-  S.offsetTrigger = x => {
-    if (x && typeof !isNaN(x)) {
-      offsetVal = Math.min(Math.max(0, x), 1);
-      return S;
-    }
-    return offsetVal;
   };
 
   S.onStepEnter = cb => {
