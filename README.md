@@ -161,6 +161,7 @@ _options:_
   step. **(default: 0.5)**
 * `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
+* `treshold` (number, 1+): The granularity of the progress interval, in pixels (smaller = more granular updates). **(default: 4)**
 * `order` (boolean): Whether to preserve step triggering order if they fire out of sync (eg. ensure step 2 enters after 1 exits). **(default: true)**
 * `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
@@ -220,10 +221,6 @@ graphic becomes not full in view leaving the bottom of the container.
 The argument of the callback is an object: `{ direction: string }`
 
 `direction`: 'up' or 'down'
-
-#### scrollama.offsetTrigger([number])
-
-Get or set the offset percentage. Value must be between 0-1.
 
 #### scrollama.resize()
 

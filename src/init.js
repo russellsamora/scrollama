@@ -19,12 +19,11 @@ function scrollama() {
   let stepOffsetTop = null;
   let bboxGraphic = null;
 
-  let thresholdProgress = 0;
-
   let isReady = false;
   let isEnabled = false;
   let debugMode = false;
   let progressMode = false;
+  let progressThreshold = 0;
   let preserveOrder = false;
 
   let stepStates = null;
@@ -108,6 +107,16 @@ function scrollama() {
       if (io.viewportBelow) io.viewportBelow.forEach(d => d.disconnect());
       isEnabled = false;
     }
+  }
+
+  function createThreshold(height) {
+    const count = Math.ceil(height / progressThreshold);
+    const t = [];
+    const ratio = 1 / count;
+    for (let i = 0; i < count; i++) {
+      t.push(i * ratio);
+    }
+    return t;
   }
 
   // NOTIFY CALLBACKS
@@ -456,10 +465,11 @@ function scrollama() {
       const marginBottom = -vh + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
+      const threshold = createThreshold(stepOffsetHeight[i]);
       const options = {
         root: null,
         rootMargin,
-        threshold: thresholdProgress
+        threshold
       };
 
       const obs = new IntersectionObserver(intersectStepProgress, options);
@@ -521,17 +531,6 @@ function scrollama() {
     }
   }
 
-  function setThreshold() {
-    if (progressMode) {
-      const count = 100;
-      thresholdProgress = [];
-      const ratio = 1 / count;
-      for (let i = 0; i < count; i++) {
-        thresholdProgress.push(i * ratio);
-      }
-    }
-  }
-
   const S = {};
 
   S.setup = ({
@@ -540,6 +539,7 @@ function scrollama() {
     step,
     offset = 0.5,
     progress = false,
+    threshold = 4,
     debug = false,
     order = true
   }) => {
@@ -557,6 +557,7 @@ function scrollama() {
     // options
     debugMode = debug;
     progressMode = progress;
+    progressThreshold = Math.max(1, +threshold);
     preserveOrder = order;
     isReady = true;
 
@@ -565,7 +566,6 @@ function scrollama() {
     addDebug();
     indexSteps();
     setupStates();
-    setThreshold();
     handleResize();
     handleEnable(true);
     return S;

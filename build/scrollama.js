@@ -779,12 +779,11 @@ function scrollama() {
   var stepOffsetTop = null;
   var bboxGraphic = null;
 
-  var thresholdProgress = 0;
-
   var isReady = false;
   var isEnabled = false;
   var debugMode = false;
   var progressMode = false;
+  var progressThreshold = 0;
   var preserveOrder = false;
 
   var stepStates = null;
@@ -868,6 +867,16 @@ function scrollama() {
       if (io.viewportBelow) { io.viewportBelow.forEach(function (d) { return d.disconnect(); }); }
       isEnabled = false;
     }
+  }
+
+  function createThreshold(height) {
+    var count = Math.ceil(height / progressThreshold);
+    var t = [];
+    var ratio = 1 / count;
+    for (var i = 0; i < count; i++) {
+      t.push(i * ratio);
+    }
+    return t;
   }
 
   // NOTIFY CALLBACKS
@@ -1236,10 +1245,11 @@ function scrollama() {
       var marginBottom = -vh + offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
 
+      var threshold = createThreshold(stepOffsetHeight[i]);
       var options = {
         root: null,
         rootMargin: rootMargin,
-        threshold: thresholdProgress
+        threshold: threshold
       };
 
       var obs = new IntersectionObserver(intersectStepProgress, options);
@@ -1301,17 +1311,6 @@ function scrollama() {
     }
   }
 
-  function setThreshold() {
-    if (progressMode) {
-      var count = 100;
-      thresholdProgress = [];
-      var ratio = 1 / count;
-      for (var i = 0; i < count; i++) {
-        thresholdProgress.push(i * ratio);
-      }
-    }
-  }
-
   var S = {};
 
   S.setup = function (ref) {
@@ -1320,6 +1319,7 @@ function scrollama() {
     var step = ref.step;
     var offset = ref.offset; if ( offset === void 0 ) offset = 0.5;
     var progress = ref.progress; if ( progress === void 0 ) progress = false;
+    var threshold = ref.threshold; if ( threshold === void 0 ) threshold = 4;
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
     var order = ref.order; if ( order === void 0 ) order = true;
 
@@ -1337,6 +1337,7 @@ function scrollama() {
     // options
     debugMode = debug;
     progressMode = progress;
+    progressThreshold = threshold;
     preserveOrder = order;
     isReady = true;
 
@@ -1345,7 +1346,6 @@ function scrollama() {
     addDebug();
     indexSteps();
     setupStates();
-    setThreshold();
     handleResize();
     handleEnable(true);
     return S;
