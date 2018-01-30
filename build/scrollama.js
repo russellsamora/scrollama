@@ -1339,7 +1339,7 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
 
-    offsetVal = Math.min(Math.max(0, offset), 1);
+    S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
 
     isReady = true;
@@ -1372,6 +1372,14 @@ function scrollama() {
     handleEnable(false);
     Object.keys(callback).forEach(function (c) { return (callback[c] = null); });
     Object.keys(io).forEach(function (i) { return (io[i] = null); });
+  };
+
+  S.offsetTrigger = function(x) {
+    if (x && typeof !isNaN(x)) {
+      offsetVal = Math.min(Math.max(0, x), 1);
+      return S;
+    }
+    return offsetVal;
   };
 
   S.onStepEnter = function (cb) {
