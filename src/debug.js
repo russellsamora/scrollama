@@ -16,9 +16,14 @@ function setupStep({ id, i }) {
   elA.style.position = 'fixed';
   elA.style.left = '0';
   elA.style.width = '100%';
-  elA.style.backgroundColor = 'green';
-  elA.style.opacity = '0.25';
+  // elA.style.backgroundColor = 'green';
+  elA.style.backgroundImage =
+    'repeating-linear-gradient(45deg, green 0, green 2px, white 0, white 40px)';
+  elA.style.border = '2px solid green';
+  elA.style.opacity = '0.33';
+  elA.style.zIndex = '9999';
   elA.style.display = 'none';
+
   document.body.appendChild(elA);
 
   const elB = document.createElement('div');
@@ -27,8 +32,12 @@ function setupStep({ id, i }) {
   elB.style.position = 'fixed';
   elB.style.left = '0';
   elB.style.width = '100%';
-  elB.style.backgroundColor = 'orange';
-  elB.style.opacity = '0.25';
+  // elB.style.backgroundColor = 'orange';
+  elB.style.backgroundImage =
+    'repeating-linear-gradient(135deg, orange 0, orange 2px, white 0, white 40px)';
+  elB.style.border = '2px solid orange';
+  elB.style.opacity = '0.33';
+  elB.style.zIndex = '9999';
   elB.style.display = 'none';
   document.body.appendChild(elB);
 }
@@ -41,14 +50,15 @@ function setupOffset({ id, offsetVal, stepClass }) {
   el.style.position = 'fixed';
   el.style.left = '0';
   el.style.width = '100%';
-  el.style.height = '1px';
-  el.style.borderTop = '1px dashed red';
+  el.style.height = '0px';
+  el.style.borderTop = '2px dashed black';
+  el.style.zIndex = '9999';
 
   const text = document.createElement('p');
   text.innerText = `".${stepClass}" trigger: ${offsetVal}`;
   text.style.fontSize = '12px';
   text.style.fontFamily = 'monospace';
-  text.style.color = 'red';
+  text.style.color = 'black';
   text.style.margin = '0';
   text.style.padding = '6px';
   el.appendChild(text);
