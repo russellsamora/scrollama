@@ -1,7 +1,7 @@
 import { select, selectAll } from './dom';
+import * as bug from './debug';
 
 function scrollama() {
-  const id = Math.floor(Math.random() * 100000);
   const ZERO_MOE = 1; // zero with some rounding margin of error
   const margin = {};
   const callback = {};
@@ -11,6 +11,7 @@ function scrollama() {
   let graphicEl = null;
   let stepEl = null;
 
+  let id = null;
   let offsetVal = 0;
   let offsetMargin = 0;
   let vh = 0;
@@ -32,6 +33,13 @@ function scrollama() {
   let direction = null;
 
   // HELPERS
+  function generateId() {
+    const a = 'abcdefghijklmnopqrstuv';
+    const l = a.length;
+    const t = new Date().getTime();
+    const r = [0, 0, 0].map(d => a[Math.floor(Math.random() * l)]).join('');
+    return `${r}${t}`;
+  }
 
   //www.gomakethings.com/how-to-get-an-elements-distance-from-the-top-of-the-page-with-vanilla-javascript/
   function getOffsetTop(el) {
@@ -87,10 +95,8 @@ function scrollama() {
 
     if (isEnabled && isReady) updateIO();
 
-    if (debugMode) {
-      const debugEl = document.querySelector(`#scrollama__debug--offset-${id}`);
-      debugEl.style.top = `${offsetMargin}px`;
-    }
+    if (debugMode)
+      bug.update({ id, stepOffsetHeight, offsetMargin, offsetVal });
   }
 
   function handleEnable(enable) {
@@ -159,8 +165,10 @@ function scrollama() {
     if (preserveOrder && check && direction === 'up')
       notifyOthers(index, 'below');
 
-    if (callback.stepEnter && typeof callback.stepEnter === 'function')
+    if (callback.stepEnter && typeof callback.stepEnter === 'function') {
       callback.stepEnter(resp, stepStates);
+      if (debugMode) bug.notifyStep({ id, index, state: 'enter' });
+    }
 
     if (progressMode) {
       if (direction === 'down') notifyStepProgress(element, 0);
@@ -181,8 +189,10 @@ function scrollama() {
       else notifyStepProgress(element, 0);
     }
 
-    if (callback.stepExit && typeof callback.stepExit === 'function')
+    if (callback.stepExit && typeof callback.stepExit === 'function') {
       callback.stepExit(resp, stepStates);
+      if (debugMode) bug.notifyStep({ id, index, state: 'exit' });
+    }
   }
 
   function notifyStepProgress(element, progress) {
@@ -508,27 +518,7 @@ function scrollama() {
   }
 
   function addDebug() {
-    if (debugMode) {
-      const el = document.createElement('div');
-      el.setAttribute('id', `scrollama__debug--offset-${id}`);
-      el.setAttribute('class', 'scrollama__debug--offset');
-      el.style.position = 'fixed';
-      el.style.top = '0';
-      el.style.left = '0';
-      el.style.width = '100%';
-      el.style.height = '1px';
-      el.style.borderBottom = '1px dashed red';
-      const text = document.createElement('p');
-      const textClass = stepEl[0].getAttribute('class');
-      text.innerText = `".${textClass}" trigger: ${offsetVal}`;
-      text.style.fontSize = '12px';
-      text.style.fontFamily = 'monospace';
-      text.style.color = 'red';
-      text.style.margin = '0';
-      text.style.padding = '6px';
-      el.appendChild(text);
-      document.body.appendChild(el);
-    }
+    if (debugMode) bug.setup({ id, stepEl, offsetVal });
   }
 
   const S = {};
@@ -543,6 +533,7 @@ function scrollama() {
     debug = false,
     order = true
   }) => {
+    id = generateId();
     // elements
     stepEl = selectAll(step);
     containerEl = container ? select(container) : null;

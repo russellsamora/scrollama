@@ -761,8 +761,147 @@ function selectAll(selector, parent) {
   return [];
 }
 
+function getStepId(ref) {
+  var id = ref.id;
+  var i = ref.i;
+
+  return ("scrollama__debug-step--" + id + "-" + i);
+}
+
+function getOffsetId(ref) {
+  var id = ref.id;
+
+  return ("scrollama__debug-offset--" + id);
+}
+
+// SETUP
+function setupStep(ref) {
+  var id = ref.id;
+  var i = ref.i;
+
+  var idVal = getStepId({ id: id, i: i });
+
+  var elA = document.createElement('div');
+  elA.setAttribute('id', (idVal + "_above"));
+  elA.setAttribute('class', 'scrollama__debug-step');
+  elA.style.position = 'fixed';
+  elA.style.left = '0';
+  elA.style.width = '100%';
+  // elA.style.backgroundColor = 'green';
+  elA.style.backgroundImage =
+    'repeating-linear-gradient(45deg, green 0, green 2px, white 0, white 40px)';
+  elA.style.border = '2px solid green';
+  elA.style.opacity = '0.33';
+  elA.style.zIndex = '9999';
+  elA.style.display = 'none';
+
+  document.body.appendChild(elA);
+
+  var elB = document.createElement('div');
+  elB.setAttribute('id', (idVal + "_below"));
+  elB.setAttribute('class', 'scrollama__debug-step');
+  elB.style.position = 'fixed';
+  elB.style.left = '0';
+  elB.style.width = '100%';
+  // elB.style.backgroundColor = 'orange';
+  elB.style.backgroundImage =
+    'repeating-linear-gradient(135deg, orange 0, orange 2px, white 0, white 40px)';
+  elB.style.border = '2px solid orange';
+  elB.style.opacity = '0.33';
+  elB.style.zIndex = '9999';
+  elB.style.display = 'none';
+  document.body.appendChild(elB);
+}
+
+function setupOffset(ref) {
+  var id = ref.id;
+  var offsetVal = ref.offsetVal;
+  var stepClass = ref.stepClass;
+
+  var el = document.createElement('div');
+  el.setAttribute('id', getOffsetId({ id: id }));
+  el.setAttribute('class', 'scrollama__debug-offset');
+
+  el.style.position = 'fixed';
+  el.style.left = '0';
+  el.style.width = '100%';
+  el.style.height = '0px';
+  el.style.borderTop = '2px dashed black';
+  el.style.zIndex = '9999';
+
+  var text = document.createElement('p');
+  text.innerText = "\"." + stepClass + "\" trigger: " + offsetVal;
+  text.style.fontSize = '12px';
+  text.style.fontFamily = 'monospace';
+  text.style.color = 'black';
+  text.style.margin = '0';
+  text.style.padding = '6px';
+  el.appendChild(text);
+  document.body.appendChild(el);
+}
+
+function setup(ref) {
+  var id = ref.id;
+  var offsetVal = ref.offsetVal;
+  var stepEl = ref.stepEl;
+
+  var stepClass = stepEl[0].getAttribute('class');
+  stepEl.forEach(function (s, i) { return setupStep({ id: id, i: i }); });
+  setupOffset({ id: id, offsetVal: offsetVal, stepClass: stepClass });
+}
+
+// UPDATE
+function updateOffset(ref) {
+  var id = ref.id;
+  var offsetMargin = ref.offsetMargin;
+  var offsetVal = ref.offsetVal;
+
+  var idVal = getOffsetId({ id: id });
+  var el = document.querySelector(("#" + idVal));
+  el.style.top = offsetMargin + "px";
+}
+
+function updateStep(ref) {
+  var id = ref.id;
+  var h = ref.h;
+  var i = ref.i;
+  var offsetMargin = ref.offsetMargin;
+
+  var idVal = getStepId({ id: id, i: i });
+  var elA = document.querySelector(("#" + idVal + "_above"));
+  elA.style.height = h + "px";
+  elA.style.top = (offsetMargin - h) + "px";
+
+  var elB = document.querySelector(("#" + idVal + "_below"));
+  elB.style.height = h + "px";
+  elB.style.top = offsetMargin + "px";
+}
+
+function update(ref) {
+  var id = ref.id;
+  var stepOffsetHeight = ref.stepOffsetHeight;
+  var offsetMargin = ref.offsetMargin;
+  var offsetVal = ref.offsetVal;
+
+  stepOffsetHeight.forEach(function (h, i) { return updateStep({ id: id, h: h, i: i, offsetMargin: offsetMargin }); });
+  updateOffset({ id: id, offsetMargin: offsetMargin });
+}
+
+function notifyStep(ref) {
+  var id = ref.id;
+  var index = ref.index;
+  var state = ref.state;
+
+  var idVal = getStepId({ id: id, i: index });
+  var elA = document.querySelector(("#" + idVal + "_above"));
+  var elB = document.querySelector(("#" + idVal + "_below"));
+  var display = state === 'enter' ? 'block' : 'none';
+
+  if (elA) { elA.style.display = display; }
+  if (elB) { elB.style.display = display; }
+}
+
 function scrollama() {
-  var id = Math.floor(Math.random() * 100000);
   var ZERO_MOE = 1; // zero with some rounding margin of error
   var callback = {};
   var io = {};
@@ -771,6 +910,7 @@ function scrollama() {
   var graphicEl = null;
   var stepEl = null;
 
+  var id = null;
   var offsetVal = 0;
   var offsetMargin = 0;
   var vh = 0;
@@ -792,6 +932,13 @@ function scrollama() {
   var direction = null;
 
   // HELPERS
+  function generateId() {
+    var a = 'abcdefghijklmnopqrstuv';
+    var l = a.length;
+    var t = new Date().getTime();
+    var r = [0, 0, 0].map(function (d) { return a[Math.floor(Math.random() * l)]; }).join('');
+    return ("" + r + t);
+  }
 
   //www.gomakethings.com/how-to-get-an-elements-distance-from-the-top-of-the-page-with-vanilla-javascript/
   function getOffsetTop(el) {
@@ -847,10 +994,8 @@ function scrollama() {
 
     if (isEnabled && isReady) { updateIO(); }
 
-    if (debugMode) {
-      var debugEl = document.querySelector(("#scrollama__debug--offset-" + id));
-      debugEl.style.top = offsetMargin + "px";
-    }
+    if (debugMode)
+      { update({ id: id, stepOffsetHeight: stepOffsetHeight, offsetMargin: offsetMargin, offsetVal: offsetVal }); }
   }
 
   function handleEnable(enable) {
@@ -921,8 +1066,10 @@ function scrollama() {
     if (preserveOrder && check && direction === 'up')
       { notifyOthers(index, 'below'); }
 
-    if (callback.stepEnter && typeof callback.stepEnter === 'function')
-      { callback.stepEnter(resp, stepStates); }
+    if (callback.stepEnter && typeof callback.stepEnter === 'function') {
+      callback.stepEnter(resp, stepStates);
+      if (debugMode) { notifyStep({ id: id, index: index, state: 'enter' }); }
+    }
 
     if (progressMode) {
       if (direction === 'down') { notifyStepProgress(element, 0); }
@@ -943,8 +1090,10 @@ function scrollama() {
       else { notifyStepProgress(element, 0); }
     }
 
-    if (callback.stepExit && typeof callback.stepExit === 'function')
-      { callback.stepExit(resp, stepStates); }
+    if (callback.stepExit && typeof callback.stepExit === 'function') {
+      callback.stepExit(resp, stepStates);
+      if (debugMode) { notifyStep({ id: id, index: index, state: 'exit' }); }
+    }
   }
 
   function notifyStepProgress(element, progress) {
@@ -1288,27 +1437,7 @@ function scrollama() {
   }
 
   function addDebug() {
-    if (debugMode) {
-      var el = document.createElement('div');
-      el.setAttribute('id', ("scrollama__debug--offset-" + id));
-      el.setAttribute('class', 'scrollama__debug--offset');
-      el.style.position = 'fixed';
-      el.style.top = '0';
-      el.style.left = '0';
-      el.style.width = '100%';
-      el.style.height = '1px';
-      el.style.borderBottom = '1px dashed red';
-      var text = document.createElement('p');
-      var textClass = stepEl[0].getAttribute('class');
-      text.innerText = "\"." + textClass + "\" trigger: " + offsetVal;
-      text.style.fontSize = '12px';
-      text.style.fontFamily = 'monospace';
-      text.style.color = 'red';
-      text.style.margin = '0';
-      text.style.padding = '6px';
-      el.appendChild(text);
-      document.body.appendChild(el);
-    }
+    if (debugMode) { setup({ id: id, stepEl: stepEl, offsetVal: offsetVal }); }
   }
 
   var S = {};
@@ -1323,6 +1452,7 @@ function scrollama() {
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
     var order = ref.order; if ( order === void 0 ) order = true;
 
+    id = generateId();
     // elements
     stepEl = selectAll(step);
     containerEl = container ? select(container) : null;
