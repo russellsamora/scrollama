@@ -26,11 +26,14 @@ function scrollama() {
   let progressMode = false;
   let progressThreshold = 0;
   let preserveOrder = false;
+  let triggerOnce = false;
 
   let stepStates = null;
   let containerState = null;
   let previousYOffset = -1;
   let direction = null;
+
+  const exclude = [];
 
   // HELPERS
   function generateId() {
@@ -165,9 +168,14 @@ function scrollama() {
     if (preserveOrder && check && direction === 'up')
       notifyOthers(index, 'below');
 
-    if (callback.stepEnter && typeof callback.stepEnter === 'function') {
+    if (
+      callback.stepEnter &&
+      typeof callback.stepEnter === 'function' &&
+      !exclude[index]
+    ) {
       callback.stepEnter(resp, stepStates);
       if (debugMode) bug.notifyStep({ id, index, state: 'enter' });
+      if (triggerOnce) exclude[index] = true;
     }
 
     if (progressMode) {
@@ -531,7 +539,8 @@ function scrollama() {
     progress = false,
     threshold = 4,
     debug = false,
-    order = true
+    order = true,
+    once = false
   }) => {
     id = generateId();
     // elements
@@ -549,6 +558,7 @@ function scrollama() {
     debugMode = debug;
     progressMode = progress;
     preserveOrder = order;
+    triggerOnce = once;
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
