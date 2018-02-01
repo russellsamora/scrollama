@@ -9,25 +9,25 @@ const isProd = process.env.NODE_ENV === 'production';
 const file = `build/scrollama${isProd ? '.min' : ''}.js`;
 
 const plugins = [
-	resolve({
-		jsnext: true,
-		main: true,
-	}),
-	commonjs({
-		sourceMap: false,
-	}),
-	buble(),
-	filesize(),
+  resolve({
+    jsnext: true,
+    main: true
+  }),
+  commonjs({
+    sourceMap: false
+  }),
+  buble(),
+  filesize()
 ];
 
 isProd && plugins.push(uglify());
 
 export default {
-	input: 'index.js',
-	output: {
-		file,
-		format: 'umd',
-	},
-	name: 'scrollama',
-	plugins,
+  input: 'index.js',
+  output: {
+    file,
+    format: 'umd',
+    name: 'scrollama'
+  },
+  plugins
 };
