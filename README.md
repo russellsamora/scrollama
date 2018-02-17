@@ -97,9 +97,7 @@ const scroller = scrollama();
 // setup the instance, pass callback functions
 scroller
   .setup({
-    step: '.step', // required
-    offset: 0.5, // optional, default = 0.5
-    debug: false // optional, default = false
+    step: '.step' // required - class name of trigger steps
   })
   .onStepEnter(handleStepEnter)
   .onStepExit(handleStepExit);
@@ -135,9 +133,7 @@ scroller
   .setup({
     step: '.scroll__text .step', // required
     container: '.scroll', // required (for sticky)
-    graphic: '.scroll__graphic', // required (for sticky)
-    offset: 0.5, // optional, default = 0.5
-    debug: false // optional, default = false
+    graphic: '.scroll__graphic' // required (for sticky)
   })
   .onStepEnter(handleStepEnter)
   .onStepExit(handleStepExit)
@@ -161,8 +157,9 @@ _options:_
   step. **(default: 0.5)**
 * `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
-* `treshold` (number, 1+): The granularity of the progress interval, in pixels (smaller = more granular updates). **(default: 4)**
+* `threshold` (number, 1+): The granularity of the progress interval, in pixels (smaller = more granular updates). **(default: 4)**
 * `order` (boolean): Whether to preserve step triggering order if they fire out of sync (eg. ensure step 2 enters after 1 exits). **(default: true)**
+* `once` (boolean): Only trigger the step to enter once then remove listener. **default: false**
 * `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
 
