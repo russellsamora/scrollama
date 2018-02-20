@@ -7,6 +7,8 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events.
 
+**Note: As of version 1.4.0, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.**
+
 As seen on [The Pudding](https://pudding.cool/):
 
 * [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
