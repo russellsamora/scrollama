@@ -53,21 +53,25 @@ with any library, or with no library at all._
 
 ### Installation
 
+**Note: As of version 1.4.0, the IntersectionObserver polyfill has been removed from the build. You must include it yourself for cross-browser support.**
+
 Old school (exposes the `scrollama` global):
 
 ```html
+<script src='https://unpkg.com/intersection-observer'></sript>
 <script src='https://unpkg.com/scrollama'></script>
 ```
 
 New school:
 
 ```sh
-npm install scrollama
+npm install scrollama intersection-observer
 ```
 
 And then import/require it:
 
 ```js
+import 'intersection-observer'
 import scrollama from 'scrollama'; // or...
 const scrollama = require('scrollama');
 ```
