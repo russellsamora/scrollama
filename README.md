@@ -11,7 +11,6 @@ As seen on [The Pudding](https://pudding.cool/):
 
 * [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
 * [What City is the Microbrew Capital of the US?](https://pudding.cool/2017/04/beer/)
-  <!-- * [2017-18 NBA Top Plays](https://russellgoldenberg.github.io/reddit-nba-top-plays) -->
 
 [Jump to examples.](https://github.com/russellgoldenberg/scrollama#examples)
 
