@@ -58,7 +58,7 @@ with any library, or with no library at all._
 Old school (exposes the `scrollama` global):
 
 ```html
-<script src='https://unpkg.com/intersection-observer'></sript>
+<script src='https://unpkg.com/intersection-observer'></script>
 <script src='https://unpkg.com/scrollama'></script>
 ```
 
