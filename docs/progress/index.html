@@ -92,7 +92,7 @@
 
 		.step {
 			margin: 2rem auto 4rem auto;
-			padding: 10rem 1rem;
+			padding: 1rem;
 			border: 1px solid #333;
 		}
 
@@ -141,11 +141,20 @@
 		var scroller = scrollama();
 
 		function handleStepProgress(response) {
+			console.log(response)
 			var el = d3.select(response.element);
+			
 			var val = el.attr('data-step');
 			var rgba = 'rgba(' + val + ', ' + response.progress + ')';
 			el.style('background-color', rgba);
 			el.select('.progress').text(d3.format('.1%')(response.progress))
+		}
+
+		function resize() {
+			var min = 100
+			var h = min + Math.random() * window.innerHeight / 2
+			step.style('height', Math.floor(h) + 'px')
+			scroller.resize()
 		}
 
 		function init() {
@@ -160,7 +169,8 @@
 				.onStepProgress(handleStepProgress);
 
 			// setup resize event
-			window.addEventListener('resize', scroller.resize);
+			resize()
+			window.addEventListener('resize', resize);
 		}
 
 		// kick things off
