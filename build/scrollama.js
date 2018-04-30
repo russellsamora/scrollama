@@ -51,43 +51,6 @@ function getOffsetId(ref) {
 }
 
 // SETUP
-function setupStep(ref) {
-  var id = ref.id;
-  var i = ref.i;
-
-  var idVal = getStepId({ id: id, i: i });
-
-  var elA = document.createElement('div');
-  elA.setAttribute('id', (idVal + "_above"));
-  elA.setAttribute('class', 'scrollama__debug-step');
-  elA.style.position = 'fixed';
-  elA.style.left = '0';
-  elA.style.width = '100%';
-  // elA.style.backgroundColor = 'green';
-  elA.style.backgroundImage =
-    'repeating-linear-gradient(45deg, green 0, green 2px, white 0, white 40px)';
-  elA.style.border = '2px solid green';
-  elA.style.opacity = '0.33';
-  elA.style.zIndex = '9999';
-  elA.style.display = 'none';
-
-  document.body.appendChild(elA);
-
-  var elB = document.createElement('div');
-  elB.setAttribute('id', (idVal + "_below"));
-  elB.setAttribute('class', 'scrollama__debug-step');
-  elB.style.position = 'fixed';
-  elB.style.left = '0';
-  elB.style.width = '100%';
-  // elB.style.backgroundColor = 'orange';
-  elB.style.backgroundImage =
-    'repeating-linear-gradient(135deg, orange 0, orange 2px, white 0, white 40px)';
-  elB.style.border = '2px solid orange';
-  elB.style.opacity = '0.33';
-  elB.style.zIndex = '9999';
-  elB.style.display = 'none';
-  document.body.appendChild(elB);
-}
 
 function setupOffset(ref) {
   var id = ref.id;
@@ -122,7 +85,6 @@ function setup(ref) {
   var stepEl = ref.stepEl;
 
   var stepClass = stepEl[0].getAttribute('class');
-  stepEl.forEach(function (s, i) { return setupStep({ id: id, i: i }); });
   setupOffset({ id: id, offsetVal: offsetVal, stepClass: stepClass });
 }
 
@@ -137,29 +99,12 @@ function updateOffset(ref) {
   el.style.top = offsetMargin + "px";
 }
 
-function updateStep(ref) {
-  var id = ref.id;
-  var h = ref.h;
-  var i = ref.i;
-  var offsetMargin = ref.offsetMargin;
-
-  var idVal = getStepId({ id: id, i: i });
-  var elA = document.querySelector(("#" + idVal + "_above"));
-  elA.style.height = h + "px";
-  elA.style.top = (offsetMargin - h) + "px";
-
-  var elB = document.querySelector(("#" + idVal + "_below"));
-  elB.style.height = h + "px";
-  elB.style.top = offsetMargin + "px";
-}
-
 function update(ref) {
   var id = ref.id;
   var stepOffsetHeight = ref.stepOffsetHeight;
   var offsetMargin = ref.offsetMargin;
   var offsetVal = ref.offsetVal;
 
-  stepOffsetHeight.forEach(function (h, i) { return updateStep({ id: id, h: h, i: i, offsetMargin: offsetMargin }); });
   updateOffset({ id: id, offsetMargin: offsetMargin });
 }
 

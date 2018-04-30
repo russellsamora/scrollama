@@ -7,40 +7,6 @@ function getOffsetId({ id }) {
 }
 
 // SETUP
-function setupStep({ id, i }) {
-  const idVal = getStepId({ id, i });
-
-  const elA = document.createElement('div');
-  elA.setAttribute('id', `${idVal}_above`);
-  elA.setAttribute('class', 'scrollama__debug-step');
-  elA.style.position = 'fixed';
-  elA.style.left = '0';
-  elA.style.width = '100%';
-  // elA.style.backgroundColor = 'green';
-  elA.style.backgroundImage =
-    'repeating-linear-gradient(45deg, green 0, green 2px, white 0, white 40px)';
-  elA.style.border = '2px solid green';
-  elA.style.opacity = '0.33';
-  elA.style.zIndex = '9999';
-  elA.style.display = 'none';
-
-  document.body.appendChild(elA);
-
-  const elB = document.createElement('div');
-  elB.setAttribute('id', `${idVal}_below`);
-  elB.setAttribute('class', 'scrollama__debug-step');
-  elB.style.position = 'fixed';
-  elB.style.left = '0';
-  elB.style.width = '100%';
-  // elB.style.backgroundColor = 'orange';
-  elB.style.backgroundImage =
-    'repeating-linear-gradient(135deg, orange 0, orange 2px, white 0, white 40px)';
-  elB.style.border = '2px solid orange';
-  elB.style.opacity = '0.33';
-  elB.style.zIndex = '9999';
-  elB.style.display = 'none';
-  document.body.appendChild(elB);
-}
 
 function setupOffset({ id, offsetVal, stepClass }) {
   const el = document.createElement('div');
@@ -67,7 +33,6 @@ function setupOffset({ id, offsetVal, stepClass }) {
 
 function setup({ id, offsetVal, stepEl }) {
   const stepClass = stepEl[0].getAttribute('class');
-  stepEl.forEach((s, i) => setupStep({ id, i }));
   setupOffset({ id, offsetVal, stepClass });
 }
 
@@ -78,19 +43,7 @@ function updateOffset({ id, offsetMargin, offsetVal }) {
   el.style.top = `${offsetMargin}px`;
 }
 
-function updateStep({ id, h, i, offsetMargin }) {
-  const idVal = getStepId({ id, i });
-  const elA = document.querySelector(`#${idVal}_above`);
-  elA.style.height = `${h}px`;
-  elA.style.top = `${offsetMargin - h}px`;
-
-  const elB = document.querySelector(`#${idVal}_below`);
-  elB.style.height = `${h}px`;
-  elB.style.top = `${offsetMargin}px`;
-}
-
 function update({ id, stepOffsetHeight, offsetMargin, offsetVal }) {
-  stepOffsetHeight.forEach((h, i) => updateStep({ id, h, i, offsetMargin }));
   updateOffset({ id, offsetMargin });
 }
 
