@@ -110,6 +110,8 @@ scroller
 
 #### Sticky Graphic
 
+**Update:** I recommend using the CSS property `position:sticky;`. You can simply use the triggers like above, and let the CSS handle everything else. [Full blog post here](https://pudding.cool/process/scrollytelling-sticky/).
+
 To implement the sticky graphic scrollytelling pattern, you need the following
 three elements (container, graphic, steps). The structure should look like:
 
