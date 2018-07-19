@@ -154,7 +154,7 @@ function scrollama() {
     }
   }
 
-  function notifyStepEnter(element, check = true) {
+  function notifyStepEnter(element, direction, check = true) {
     const index = getIndex(element);
     const resp = { element, index, direction };
 
@@ -184,7 +184,7 @@ function scrollama() {
     }
   }
 
-  function notifyStepExit(element) {
+  function notifyStepExit(element, direction) {
     const index = getIndex(element);
     const resp = { element, index, direction };
 

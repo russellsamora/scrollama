@@ -274,7 +274,7 @@ function scrollama() {
     }
   }
 
-  function notifyStepEnter(element, check) {
+  function notifyStepEnter(element, direction, check) {
     if ( check === void 0 ) check = true;
 
     var index = getIndex(element);
@@ -306,7 +306,7 @@ function scrollama() {
     }
   }
 
-  function notifyStepExit(element) {
+  function notifyStepExit(element, direction) {
     var index = getIndex(element);
     var resp = { element: element, index: index, direction: direction };
 

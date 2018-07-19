@@ -74,7 +74,7 @@
 		}
 
 		#outro {
-			height: 640px;
+			height: 1200px;
 		}
 
 		/* scrollama */
@@ -83,13 +83,16 @@
 			position: relative;
 			border-top: 2px dashed #000;
 			border-bottom: 2px dashed #000;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
 		}
 
-		.scroll__graphic {
-			position: absolute;
+		figure {
+			position: sticky;
+			width: 100%;
 			top: 0;
 			right: 2rem;
-			bottom: auto;
 			-webkit-transform: translate3d(0, 0, 0);
 			-moz-transform: translate3d(0, 0, 0);
 			transform: translate3d(0, 0, 0);
@@ -97,16 +100,7 @@
 			border: 1px solid #000;
 		}
 
-		.scroll__graphic.is-fixed {
-			position: fixed;
-		}
-
-		.scroll__graphic.is-bottom {
-			bottom: 0;
-			top: auto;
-		}
-
-		.scroll__graphic p {
+		article p {
 			text-align: center;
 			padding: 1rem;
 			position: absolute;
@@ -120,16 +114,16 @@
 			color: #666;
 		}
 
-		.scroll__text {
+		article {
 			position: relative;
 			padding: 0 1rem;
-			max-width: 30rem;
-			width: 33%;
+			width: 30rem;
 		}
 
 		.step {
 			margin: 0 auto 2rem auto;
 			border: 1px solid #333;
+			position: relative;
 			/* border-bottom: none; */
 		}
 
@@ -161,10 +155,7 @@
 		</p>
 	</section>
 	<section id='scroll'>
-		<div class='scroll__graphic'>
-			<p>0</p>
-		</div>
-		<div class='scroll__text'>
+		<article>
 			<div class='step' data-step='1'>
 				<p>STEP 1</p>
 			</div>
@@ -177,19 +168,21 @@
 			<div class='step' data-step='4'>
 				<p>STEP 4</p>
 			</div>
-		</div>
+		</article>
+			<figure>
+				<p>0</p>
+			</figure>
 	</section>
 	<section id='outro'></section>
-	<div class='debug'></div>
 	<script src='d3.v4.min.js'></script>
-	<script src='https://unpkg.com/intersection-observer'></script>
+	<!-- <script src='https://unpkg.com/intersection-observer'></script> -->
 	<script src='../build/scrollama.js'></script>
 	<script>
 		// using d3 for convenience
 		var container = d3.select('#scroll');
-		var graphic = container.select('.scroll__graphic');
-		var text = container.select('.scroll__text');
-		var step = text.selectAll('.step');
+		var figure = container.select('figure');
+		var article = container.select('article');
+		var step = article.selectAll('.step');
 
 		// initialize the scrollama
 		var scroller = scrollama();
@@ -203,23 +196,15 @@
 			// 2. update width/height of graphic element
 			var bodyWidth = d3.select('body').node().offsetWidth;
 
-			var graphicMargin = 16 * 4;
-			var textWidth = text.node().offsetWidth;
-			var graphicWidth = container.node().offsetWidth - textWidth - graphicMargin;
-			var graphicHeight = Math.floor(window.innerHeight / 2)
-			var graphicMarginTop = Math.floor(graphicHeight / 2)
-
-			graphic
-				.style('width', graphicWidth + 'px')
-				.style('height', graphicHeight + 'px')
-
-
+			var figureHeight = Math.floor(window.innerHeight * 0.5)
+			figure.style('height', figureHeight + 'px')
 			// 3. tell scrollama to update new element dimensions
 			scroller.resize();
 		}
 
 		// scrollama event handlers
 		function handleStepEnter(response) {
+			console.log(response)
 			// response = { element, direction, index }
 
 			// add color to current step only
@@ -228,26 +213,7 @@
 			})
 
 			// update graphic based on step
-			graphic.select('p').text(response.index + 1);
-		}
-
-		function handleContainerEnter(response) {
-			// response = { direction }
-
-			// old school
-			// sticky the graphic
-			graphic.classed('is-fixed', true);
-			graphic.classed('is-bottom', false);
-		}
-
-		function handleContainerExit(response) {
-			console.log(response)
-			// response = { direction }
-
-			// old school
-			// un-sticky the graphic, and pin to top/bottom of container
-			graphic.classed('is-fixed', false);
-			graphic.classed('is-bottom', response.direction === 'down');
+			figure.select('p').text(response.index + 1);
 		}
 
 		function init() {
@@ -258,16 +224,11 @@
 			// this will also initialize trigger observations
 			// 3. bind scrollama event handlers (this can be chained like below)
 			scroller.setup({
-				container: '#scroll',
-				graphic: '.scroll__graphic',
-				text: '.scroll__text',
-				step: '.scroll__text .step',
+				step: 'article .step',
 				debug: true,
-				offset: 0.33,
+				offset: 0.75,
 			})
 				.onStepEnter(handleStepEnter)
-				.onContainerEnter(handleContainerEnter)
-				.onContainerExit(handleContainerExit);
 
 			// setup resize event
 			window.addEventListener('resize', handleResize);
