@@ -11,8 +11,8 @@ in favor of scroll events.
 
 As seen on [The Pudding](https://pudding.cool/):
 
-* [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
-* [What City is the Microbrew Capital of the US?](https://pudding.cool/2017/04/beer/)
+- [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
+- [What City is the Microbrew Capital of the US?](https://pudding.cool/2017/04/beer/)
 
 [Jump to examples.](https://github.com/russellgoldenberg/scrollama#examples)
 
@@ -35,20 +35,20 @@ introduction.
 _Note: most of these demos use D3 to keep the code concise, but this can be used
 with any library, or with no library at all._
 
-* [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step
+- [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step
   triggers
-* [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
+- [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
   incremental step progress callback
-* [Sticky Graphic v1a (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
+- [Sticky Graphic v1a (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
   using CSS vertically center chart, and position sticky (+ polyfill) for
   sticking.
-* [Sticky Graphic v1b (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
+- [Sticky Graphic v1b (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
   using JS vertically center chart, and position sticky (+ polyfill) for
   sticking. Added bonus ability to start chart at top of steps then vertically.
-* [Sticky Graphic v2a (CSS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-css) -
+- [Sticky Graphic v2a (CSS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-css) -
   using CSS vertically center chart, and position fixed and absolute for
   sticking.
-* [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-js) -
+- [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-js) -
   using read position fixed and absolute for sticking.
 
 ### Installation
@@ -58,7 +58,7 @@ with any library, or with no library at all._
 Old school (exposes the `scrollama` global):
 
 ```html
-<script src='https://unpkg.com/intersection-observer'></script>
+<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
 <script src='https://unpkg.com/scrollama'></script>
 ```
 
@@ -71,7 +71,7 @@ npm install scrollama intersection-observer
 And then import/require it:
 
 ```js
-import 'intersection-observer'
+import 'intersection-observer';
 import scrollama from 'scrollama'; // or...
 const scrollama = require('scrollama');
 ```
@@ -154,20 +154,20 @@ scroller
 
 _options:_
 
-* `step` (string): Selector (or array of elements) for the step elements that will trigger changes.
+- `step` (string): Selector (or array of elements) for the step elements that will trigger changes.
   **required**
-* `container` (string): Selector (or element) for the element that contains everything for
+- `container` (string): Selector (or element) for the element that contains everything for
   the scroller. **optional**
-* `graphic` (string): Selector (or element) for the graphic element that will become fixed.
+- `graphic` (string): Selector (or element) for the graphic element that will become fixed.
   **optional**
-* `offset` (number, 0 - 1): How far from the top of the viewport to trigger a
+- `offset` (number, 0 - 1): How far from the top of the viewport to trigger a
   step. **(default: 0.5)**
-* `progress` (boolean): Whether to fire incremental step progress updates or
+- `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
-* `threshold` (number, 1+): The granularity of the progress interval, in pixels (smaller = more granular updates). **(default: 4)**
-* `order` (boolean): Whether to preserve step triggering order if they fire out of sync (eg. ensure step 2 enters after 1 exits). **(default: true)**
-* `once` (boolean): Only trigger the step to enter once then remove listener. **default: false**
-* `debug` (boolean): Whether to show visual debugging tools or not. **(default:
+- `threshold` (number, 1+): The granularity of the progress interval, in pixels (smaller = more granular updates). **(default: 4)**
+- `order` (boolean): Whether to preserve step triggering order if they fire out of sync (eg. ensure step 2 enters after 1 exits). **(default: true)**
+- `once` (boolean): Only trigger the step to enter once then remove listener. **default: false**
+- `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
 
 #### scrollama.onStepEnter(callback)
@@ -251,22 +251,22 @@ Removes all observers and callback functions.
 
 ### Tips
 
-* Always call `scrollama.resize()` after a window resize event to ensure scroll
+- Always call `scrollama.resize()` after a window resize event to ensure scroll
   triggers update with new dimensions.
-* Avoid using `viewport height` (vh) in your CSS because scrolling up and down
+- Avoid using `viewport height` (vh) in your CSS because scrolling up and down
   constantly triggers vh to change, which will also trigger a window resize.
 
 ### To do
 
-* Fix for Safari address bar
-* Improve progress increments
+- Fix for Safari address bar
+- Improve progress increments
 
 ### Alternatives
 
-* [Waypoints](http://imakewebthings.com/waypoints/)
-* [ScrollMagic](http://scrollmagic.io/)
-* [graph-scroll.js](https://1wheel.github.io/graph-scroll/)
-* [ScrollStory](https://sjwilliams.github.io/scrollstory/)
+- [Waypoints](http://imakewebthings.com/waypoints/)
+- [ScrollMagic](http://scrollmagic.io/)
+- [graph-scroll.js](https://1wheel.github.io/graph-scroll/)
+- [ScrollStory](https://sjwilliams.github.io/scrollstory/)
 
 ### Logo
 
