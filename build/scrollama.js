@@ -736,7 +736,7 @@ function scrollama() {
   };
 
   S.offsetTrigger = function(x) {
-    if (x && typeof !isNaN(x)) {
+    if (x && !isNaN(x)) {
       offsetVal = Math.min(Math.max(0, x), 1);
       return S;
     }
