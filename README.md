@@ -7,7 +7,7 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events.
 
-**Notes: As of version 1.4.0, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details. Although it remains in the API (for now), it is recommended to use the CSS property `position: sticky;` instead of `.onContainerEnter` and `scrollama.onContainerExit`. [Full blog post here](https://pudding.cool/process/scrollytelling-sticky/).**
+**Notes: As of version 1.4.0, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details. Although it remains in the API (for now), it is recommended to use the CSS property `position: sticky;` instead of `.onContainerEnter` and `.onContainerExit`. [Full blog post here](https://pudding.cool/process/scrollytelling-sticky/).**
 
 As seen on [The Pudding](https://pudding.cool/):
 
