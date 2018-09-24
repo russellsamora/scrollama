@@ -21,6 +21,8 @@ function select(selector) {
 function selectAll(selector, parent = document) {
   if (typeof selector === 'string') {
     return selectionToArray(parent.querySelectorAll(selector));
+  } else if (selector instanceof Element) {
+    return selectionToArray([selector]);
   } else if (selector instanceof NodeList) {
     return selectionToArray(selector);
   } else if (selector instanceof Array) {
