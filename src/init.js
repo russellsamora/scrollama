@@ -2,44 +2,50 @@ import { select, selectAll } from './dom';
 import * as bug from './debug';
 
 function scrollama() {
+  const OBSERVER_NAMES = [
+    'stepAbove',
+    'stepBelow',
+    'stepProgress',
+    'viewportAbove',
+    'viewportBelow'
+  ];
   const ZERO_MOE = 1; // zero with some rounding margin of error
-  const margin = {};
-  const callback = {};
+  const callback = {
+    stepEnter: () => {},
+    stepExit: () => {},
+    stepProgress: () => {}
+  };
   const io = {};
 
-  let containerEl = null;
-  let graphicEl = null;
-  let stepEl = null;
-
   let id = null;
+  let stepEl = [];
   let offsetVal = 0;
   let offsetMargin = 0;
   let vh = 0;
   let ph = 0;
-  let stepOffsetHeight = null;
-  let stepOffsetTop = null;
-  let bboxGraphic = null;
+  let stepOffsetHeight = 0;
+  let stepOffsetTop = 0;
+  let previousYOffset = -1;
+  let progressThreshold = 0;
 
   let isReady = false;
   let isEnabled = false;
   let debugMode = false;
+
   let progressMode = false;
-  let progressThreshold = 0;
   let preserveOrder = false;
   let triggerOnce = false;
 
   let stepStates = null;
-  let containerState = null;
-  let previousYOffset = -1;
   let direction = null;
 
   const exclude = [];
 
   // HELPERS
-  function generateId() {
+  function generateInstanceID() {
     const a = 'abcdefghijklmnopqrstuv';
     const l = a.length;
-    const t = new Date().getTime();
+    const t = Date.now();
     const r = [0, 0, 0].map(d => a[Math.floor(Math.random() * l)]).join('');
     return `${r}${t}`;
   }
@@ -84,19 +90,21 @@ function scrollama() {
     previousYOffset = window.pageYOffset;
   }
 
+  function disconnectObserver(name) {
+    if (io[name]) io[name].forEach(d => d.disconnect());
+  }
+
   function handleResize() {
     vh = window.innerHeight;
     ph = getPageHeight();
 
-    bboxGraphic = graphicEl ? graphicEl.getBoundingClientRect() : null;
-
     offsetMargin = offsetVal * vh;
 
-    stepOffsetHeight = stepEl ? stepEl.map(el => el.offsetHeight) : [];
-
-    stepOffsetTop = stepEl ? stepEl.map(getOffsetTop) : [];
-
-    if (isEnabled && isReady) updateIO();
+    if (isReady) {
+      stepOffsetHeight = stepEl.map(el => el.offsetHeight);
+      stepOffsetTop = stepEl.map(getOffsetTop);
+      if (isEnabled) updateIO();
+    }
 
     if (debugMode)
       bug.update({ id, stepOffsetHeight, offsetMargin, offsetVal });
@@ -106,16 +114,10 @@ function scrollama() {
     if (enable && !isEnabled) {
       if (isReady) updateIO();
       isEnabled = true;
-    } else if (!enable) {
-      if (io.top) io.top.disconnect();
-      if (io.bottom) io.bottom.disconnect();
-      if (io.stepAbove) io.stepAbove.forEach(d => d.disconnect());
-      if (io.stepBelow) io.stepBelow.forEach(d => d.disconnect());
-      if (io.stepProgress) io.stepProgress.forEach(d => d.disconnect());
-      if (io.viewportAbove) io.viewportAbove.forEach(d => d.disconnect());
-      if (io.viewportBelow) io.viewportBelow.forEach(d => d.disconnect());
-      isEnabled = false;
+      return true;
     }
+    OBSERVER_NAMES.forEach(disconnectObserver);
+    isEnabled = false;
   }
 
   function createThreshold(height) {
@@ -168,11 +170,7 @@ function scrollama() {
     if (preserveOrder && check && direction === 'up')
       notifyOthers(index, 'below');
 
-    if (
-      callback.stepEnter &&
-      typeof callback.stepEnter === 'function' &&
-      !exclude[index]
-    ) {
+    if (callback.stepEnter && !exclude[index]) {
       callback.stepEnter(resp, stepStates);
       if (debugMode) bug.notifyStep({ id, index, state: 'enter' });
       if (triggerOnce) exclude[index] = true;
@@ -197,36 +195,14 @@ function scrollama() {
       else notifyStepProgress(element, 0);
     }
 
-    if (callback.stepExit && typeof callback.stepExit === 'function') {
-      callback.stepExit(resp, stepStates);
-      if (debugMode) bug.notifyStep({ id, index, state: 'exit' });
-    }
+    callback.stepExit(resp, stepStates);
+    if (debugMode) bug.notifyStep({ id, index, state: 'exit' });
   }
 
   function notifyStepProgress(element, progress) {
     const index = getIndex(element);
     const resp = { element, index, progress };
-    if (callback.stepProgress && typeof callback.stepProgress === 'function')
-      callback.stepProgress(resp);
-  }
-
-  function notifyContainerEnter() {
-    const resp = { direction };
-    containerState.direction = direction;
-    containerState.state = 'enter';
-    if (
-      callback.containerEnter &&
-      typeof callback.containerEnter === 'function'
-    )
-      callback.containerEnter(resp);
-  }
-
-  function notifyContainerExit() {
-    const resp = { direction };
-    containerState.direction = direction;
-    containerState.state = 'exit';
-    if (callback.containerExit && typeof callback.containerExit === 'function')
-      callback.containerExit(resp);
+    callback.stepProgress(resp);
   }
 
   // OBSERVER - INTERSECT HANDLING
@@ -345,69 +321,43 @@ function scrollama() {
     );
   }
 
-  function intersectTop(entries) {
-    updateDirection();
-    const { isIntersecting, boundingClientRect } = entries[0];
-    const { top, bottom } = boundingClientRect;
-
-    if (bottom > -ZERO_MOE) {
-      if (isIntersecting) notifyContainerEnter(direction);
-      else if (containerState.state === 'enter') notifyContainerExit(direction);
-    }
-  }
-
-  function intersectBottom(entries) {
-    updateDirection();
-    const { isIntersecting, boundingClientRect } = entries[0];
-    const { top } = boundingClientRect;
-
-    if (top < ZERO_MOE) {
-      if (isIntersecting) notifyContainerEnter(direction);
-      else if (containerState.state === 'enter') notifyContainerExit(direction);
-    }
-  }
-
   // OBSERVER - CREATION
+  // jump into viewport
+  function updateViewportAboveIO() {
+    io.viewportAbove = stepEl.map((el, i) => {
+      const marginTop = stepOffsetTop[i];
+      const marginBottom = -(vh - offsetMargin + stepOffsetHeight[i]);
+      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+      const options = { rootMargin };
 
-  function updateTopIO() {
-    if (io.top) io.top.unobserve(containerEl);
-
-    const options = {
-      root: null,
-      rootMargin: `${vh}px 0px -${vh}px 0px`,
-      threshold: 0
-    };
-
-    io.top = new IntersectionObserver(intersectTop, options);
-    io.top.observe(containerEl);
+      const obs = new IntersectionObserver(intersectViewportAbove, options);
+      obs.observe(el);
+      return obs;
+    });
   }
 
-  function updateBottomIO() {
-    if (io.bottom) io.bottom.unobserve(containerEl);
-    const options = {
-      root: null,
-      rootMargin: `-${bboxGraphic.height}px 0px ${bboxGraphic.height}px 0px`,
-      threshold: 0
-    };
+  function updateViewportBelowIO() {
+    io.viewportBelow = stepEl.map((el, i) => {
+      const marginTop = -(offsetMargin + stepOffsetHeight[i]);
+      const marginBottom =
+        ph - stepOffsetTop[i] - stepOffsetHeight[i] - offsetMargin;
+      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+      const options = { rootMargin };
 
-    io.bottom = new IntersectionObserver(intersectBottom, options);
-    io.bottom.observe(containerEl);
+      const obs = new IntersectionObserver(intersectViewportBelow, options);
+      obs.observe(el);
+      return obs;
+    });
   }
 
   // top edge
   function updateStepAboveIO() {
-    if (io.stepAbove) io.stepAbove.forEach(d => d.disconnect());
-
     io.stepAbove = stepEl.map((el, i) => {
       const marginTop = stepOffsetHeight[i];
       const marginBottom = -vh + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
-      const options = {
-        root: null,
-        rootMargin,
-        threshold: 0
-      };
+      const options = { rootMargin };
 
       const obs = new IntersectionObserver(intersectStepAbove, options);
       obs.observe(el);
@@ -417,18 +367,12 @@ function scrollama() {
 
   // bottom edge
   function updateStepBelowIO() {
-    if (io.stepBelow) io.stepBelow.forEach(d => d.disconnect());
-
     io.stepBelow = stepEl.map((el, i) => {
       const marginTop = -offsetMargin;
       const marginBottom = ph - vh + stepOffsetHeight[i] + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
-      const options = {
-        root: null,
-        rootMargin,
-        threshold: 0
-      };
+      const options = { rootMargin };
 
       const obs = new IntersectionObserver(intersectStepBelow, options);
       obs.observe(el);
@@ -436,59 +380,15 @@ function scrollama() {
     });
   }
 
-  // jump into viewport
-  function updateViewportAboveIO() {
-    if (io.viewportAbove) io.viewportAbove.forEach(d => d.disconnect());
-    io.viewportAbove = stepEl.map((el, i) => {
-      const marginTop = stepOffsetTop[i];
-      const marginBottom = -(vh - offsetMargin + stepOffsetHeight[i]);
-      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
-      const options = {
-        root: null,
-        rootMargin,
-        threshold: 0
-      };
-
-      const obs = new IntersectionObserver(intersectViewportAbove, options);
-      obs.observe(el);
-      return obs;
-    });
-  }
-
-  function updateViewportBelowIO() {
-    if (io.viewportBelow) io.viewportBelow.forEach(d => d.disconnect());
-    io.viewportBelow = stepEl.map((el, i) => {
-      const marginTop = -(offsetMargin + stepOffsetHeight[i]);
-      const marginBottom =
-        ph - stepOffsetTop[i] - stepOffsetHeight[i] - offsetMargin;
-      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
-      const options = {
-        root: null,
-        rootMargin,
-        threshold: 0
-      };
-
-      const obs = new IntersectionObserver(intersectViewportBelow, options);
-      obs.observe(el);
-      return obs;
-    });
-  }
-
   // progress progress tracker
   function updateStepProgressIO() {
-    if (io.stepProgress) io.stepProgress.forEach(d => d.disconnect());
-
     io.stepProgress = stepEl.map((el, i) => {
       const marginTop = stepOffsetHeight[i] - offsetMargin;
       const marginBottom = -vh + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
       const threshold = createThreshold(stepOffsetHeight[i]);
-      const options = {
-        root: null,
-        rootMargin,
-        threshold
-      };
+      const options = { rootMargin, threshold };
 
       const obs = new IntersectionObserver(intersectStepProgress, options);
       obs.observe(el);
@@ -497,17 +397,14 @@ function scrollama() {
   }
 
   function updateIO() {
+    OBSERVER_NAMES.forEach(disconnectObserver);
+
     updateViewportAboveIO();
     updateViewportBelowIO();
     updateStepAboveIO();
     updateStepBelowIO();
 
     if (progressMode) updateStepProgressIO();
-
-    if (containerEl && graphicEl) {
-      updateTopIO();
-      updateBottomIO();
-    }
   }
 
   // SETUP FUNCTIONS
@@ -521,8 +418,6 @@ function scrollama() {
       direction: null,
       state: null
     }));
-
-    containerState = { direction: null, state: null };
   }
 
   function addDebug() {
@@ -532,8 +427,6 @@ function scrollama() {
   const S = {};
 
   S.setup = ({
-    container,
-    graphic,
     step,
     offset = 0.5,
     progress = false,
@@ -542,13 +435,11 @@ function scrollama() {
     order = true,
     once = false
   }) => {
-    id = generateId();
-    // elements
-    stepEl = selectAll(step);
-    containerEl = container ? select(container) : null;
-    graphicEl = graphic ? select(graphic) : null;
+    // create id unique to this scrollama instance
+    id = generateInstanceID();
 
-    // error if no step selected
+    stepEl = selectAll(step);
+
     if (!stepEl.length) {
       console.error('scrollama error: no step elements');
       return S;
@@ -570,7 +461,7 @@ function scrollama() {
     indexSteps();
     setupStates();
     handleResize();
-    handleEnable(true);
+    S.enable();
     return S;
   };
 
@@ -604,27 +495,20 @@ function scrollama() {
   };
 
   S.onStepEnter = cb => {
-    callback.stepEnter = cb;
+    if (typeof cb === 'function') callback.stepEnter = cb;
+    else console.error('scrollama error: onStepEnter requires a function');
     return S;
   };
 
   S.onStepExit = cb => {
-    callback.stepExit = cb;
+    if (typeof cb === 'function') callback.stepExit = cb;
+    else console.error('scrollama error: onStepExit requires a function');
     return S;
   };
 
   S.onStepProgress = cb => {
-    callback.stepProgress = cb;
-    return S;
-  };
-
-  S.onContainerEnter = cb => {
-    callback.containerEnter = cb;
-    return S;
-  };
-
-  S.onContainerExit = cb => {
-    callback.containerExit = cb;
+    if (typeof cb === 'function') callback.stepProgress = cb;
+    else console.error('scrollama error: onStepProgress requires a function');
     return S;
   };
 

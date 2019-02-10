@@ -146,17 +146,19 @@
 		// initialize the scrollama
 		var scroller = scrollama();
 
+		scroller.resize()
+
 		// scrollama event handlers
 		function handleStepEnter(response) {
 			// response = { element, direction, index }
-			console.log('enter', response);
+			// console.log('enter', response);
 			// add to color to current step
 			response.element.classList.add('is-active');
 		}
 
 		function handleStepExit(response) {
 			// response = { element, direction, index }
-			console.log('exit', response);
+			// console.log('exit', response);
 			// remove color from current step
 			response.element.classList.remove('is-active');
 		}
@@ -173,7 +175,7 @@
 			// 3. bind scrollama event handlers (this can be chained like below)
 			scroller.setup({
 				step: '.scroll__text .step',
-				debug: false,
+				debug: true,
 			})
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit);
