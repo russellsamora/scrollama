@@ -126,7 +126,7 @@ function scrollama() {
     'viewportBelow'
   ];
   var ZERO_MOE = 1; // zero with some rounding margin of error
-  var callback = {
+  var cb = {
     stepEnter: function () {},
     stepExit: function () {},
     stepProgress: function () {}
@@ -141,12 +141,12 @@ function scrollama() {
   var ph = 0;
   var stepOffsetHeight = 0;
   var stepOffsetTop = 0;
-  var previousYOffset = -1;
+  var previousYOffset = 0;
   var progressThreshold = 0;
 
   var isReady = false;
   var isEnabled = false;
-  var debugMode = false;
+  var isDebug = false;
 
   var progressMode = false;
   var preserveOrder = false;
@@ -222,8 +222,7 @@ function scrollama() {
       if (isEnabled) { updateIO(); }
     }
 
-    if (debugMode)
-      { update({ id: id, stepOffsetHeight: stepOffsetHeight, offsetMargin: offsetMargin, offsetVal: offsetVal }); }
+    if (isDebug) { update({ id: id, stepOffsetHeight: stepOffsetHeight, offsetMargin: offsetMargin, offsetVal: offsetVal }); }
   }
 
   function handleEnable(enable) {
@@ -252,11 +251,14 @@ function scrollama() {
       // check if steps above/below were skipped and should be notified first
       for (var i = 0; i < index; i++) {
         var ss = stepStates[i];
-        if (ss.state === 'enter') { notifyStepExit(stepEl[i], 'down'); }
-        if (ss.direction === 'up') {
+        if (!ss.state) {
           notifyStepEnter(stepEl[i], 'down', false);
           notifyStepExit(stepEl[i], 'down');
-        }
+        } else if (ss.state === 'enter') { notifyStepExit(stepEl[i], 'down'); }
+        // else if (ss.direction === 'up') {
+        //   notifyStepEnter(stepEl[i], 'down', false);
+        //   notifyStepExit(stepEl[i], 'down');
+        // }
       }
     } else if (location === 'below') {
       for (var i$1 = stepStates.length - 1; i$1 > index; i$1--) {
@@ -281,16 +283,15 @@ function scrollama() {
     // store most recent trigger
     stepStates[index].direction = direction;
     stepStates[index].state = 'enter';
-
     if (preserveOrder && check && direction === 'down')
       { notifyOthers(index, 'above'); }
 
     if (preserveOrder && check && direction === 'up')
       { notifyOthers(index, 'below'); }
 
-    if (callback.stepEnter && !exclude[index]) {
-      callback.stepEnter(resp, stepStates);
-      if (debugMode) { notifyStep({ id: id, index: index, state: 'enter' }); }
+    if (cb.stepEnter && !exclude[index]) {
+      cb.stepEnter(resp, stepStates);
+      if (isDebug) { notifyStep({ id: id, index: index, state: 'enter' }); }
       if (triggerOnce) { exclude[index] = true; }
     }
 
@@ -313,81 +314,108 @@ function scrollama() {
       else { notifyStepProgress(element, 0); }
     }
 
-    callback.stepExit(resp, stepStates);
-    if (debugMode) { notifyStep({ id: id, index: index, state: 'exit' }); }
+    cb.stepExit(resp, stepStates);
+    if (isDebug) { notifyStep({ id: id, index: index, state: 'exit' }); }
   }
 
   function notifyStepProgress(element, progress) {
     var index = getIndex(element);
     var resp = { element: element, index: index, progress: progress };
-    callback.stepProgress(resp);
+    cb.stepProgress(resp);
   }
 
   // OBSERVER - INTERSECT HANDLING
 
-  // if TOP edge of step crosses threshold,
-  // bottom must be > 0 which means it is on "screen" (shifted by offset)
-  function intersectStepAbove(entries) {
+  // this is good for entering while scrolling down + leaving while scrolling up
+  function intersectStepAbove(ref) {
+    var entry = ref[0];
+
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var boundingClientRect = entry.boundingClientRect;
-      var target = entry.target;
+    var isIntersecting = entry.isIntersecting;
+    var boundingClientRect = entry.boundingClientRect;
+    var target = entry.target;
 
-      // bottom is how far bottom edge of el is from top of viewport
-      var bottom = boundingClientRect.bottom;
-      var height = boundingClientRect.height;
-      var bottomAdjusted = bottom - offsetMargin;
-      var index = getIndex(target);
-      var ss = stepStates[index];
+    // bottom = bottom edge of element from top of viewport
+    // bottomAdjusted = bottom edge of element from trigger
+    var top = boundingClientRect.top;
+    var bottom = boundingClientRect.bottom;
+    var topAdjusted = top - offsetMargin;
+    var bottomAdjusted = bottom - offsetMargin;
+    var index = getIndex(target);
+    var ss = stepStates[index];
 
-      if (bottomAdjusted >= -ZERO_MOE) {
-        if (isIntersecting && direction === 'down' && ss.state !== 'enter')
-          { notifyStepEnter(target, direction); }
-        else if (!isIntersecting && direction === 'up' && ss.state === 'enter')
-          { notifyStepExit(target, direction); }
-        else if (
-          !isIntersecting &&
-          bottomAdjusted >= height &&
-          direction === 'down' &&
-          ss.state === 'enter'
-        ) {
-          notifyStepExit(target, direction);
-        }
-      }
-    });
+    // console.log({
+    //   index,
+    //   isIntersecting,
+    //   bottomAdjusted,
+    //   topAdjusted,
+    //   direction
+    // });
+
+    // entering above is only when topAdjusted is negative
+    // and bottomAdjusted is positive
+    if (
+      isIntersecting &&
+      topAdjusted <= 0 &&
+      bottomAdjusted >= 0 &&
+      direction === 'down' &&
+      ss.state !== 'enter'
+    )
+      { notifyStepEnter(target, direction); }
+
+    // exiting from above is when topAdjusted is positive and not intersecting
+    if (
+      !isIntersecting &&
+      topAdjusted > 0 &&
+      direction === 'up' &&
+      ss.state === 'enter'
+    )
+      { notifyStepExit(target, direction); }
   }
+  // this is good for entering while scrolling up + leaving while scrolling down
+  function intersectStepBelow(ref) {
+    var entry = ref[0];
 
-  function intersectStepBelow(entries) {
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var boundingClientRect = entry.boundingClientRect;
-      var target = entry.target;
+    var isIntersecting = entry.isIntersecting;
+    var boundingClientRect = entry.boundingClientRect;
+    var target = entry.target;
 
-      var bottom = boundingClientRect.bottom;
-      var height = boundingClientRect.height;
-      var bottomAdjusted = bottom - offsetMargin;
-      var index = getIndex(target);
-      var ss = stepStates[index];
+    // bottom = bottom edge of element from top of viewport
+    // bottomAdjusted = bottom edge of element from trigger
+    var top = boundingClientRect.top;
+    var bottom = boundingClientRect.bottom;
+    var topAdjusted = top - offsetMargin;
+    var bottomAdjusted = bottom - offsetMargin;
+    var index = getIndex(target);
+    var ss = stepStates[index];
 
-      if (
-        bottomAdjusted >= -ZERO_MOE &&
-        bottomAdjusted < height &&
-        isIntersecting &&
-        direction === 'up' &&
-        ss.state !== 'enter'
-      ) {
-        notifyStepEnter(target, direction);
-      } else if (
-        bottomAdjusted <= ZERO_MOE &&
-        !isIntersecting &&
-        direction === 'down' &&
-        ss.state === 'enter'
-      ) {
-        notifyStepExit(target, direction);
-      }
-    });
+    // console.log({
+    //   isIntersecting,
+    //   bottomAdjusted,
+    //   topAdjusted,
+    //   direction
+    // });
+
+    // entering below is only when bottomAdjusted is positive
+    // and topAdjusted is positive
+    if (
+      isIntersecting &&
+      topAdjusted <= 0 &&
+      bottomAdjusted >= 0 &&
+      direction === 'up' &&
+      ss.state !== 'enter'
+    )
+      { notifyStepEnter(target, direction); }
+
+    // exiting from above is when bottomAdjusted is negative and not intersecting
+    if (
+      !isIntersecting &&
+      bottomAdjusted < 0 &&
+      direction === 'down' &&
+      ss.state === 'enter'
+    )
+      { notifyStepExit(target, direction); }
   }
 
   /*
@@ -395,72 +423,84 @@ function scrollama() {
 	skipping an enter/exit trigger), use this fallback to detect if it is
 	in view
 	*/
-  function intersectViewportAbove(entries) {
+  function intersectViewportAbove(ref) {
+    var entry = ref[0];
+
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var target = entry.target;
-      var index = getIndex(target);
-      var ss = stepStates[index];
-      if (
-        isIntersecting &&
-        direction === 'down' &&
-        ss.state !== 'enter' &&
-        ss.direction !== 'down'
-      ) {
-        notifyStepEnter(target, 'down');
-        notifyStepExit(target, 'down');
-      }
-    });
+    var isIntersecting = entry.isIntersecting;
+    var target = entry.target;
+    var index = getIndex(target);
+    var ss = stepStates[index];
+    console.log({ index: index, ss: ss, isIntersecting: isIntersecting });
+    console.log(entry);
+    // if (
+    //   isIntersecting &&
+    //   direction === 'down' &&
+    //   ss.state !== 'enter' &&
+    //   ss.direction !== 'down'
+    // ) {
+    //   notifyStepEnter(target, 'down');
+    //   notifyStepExit(target, 'down');
+    // }
   }
 
-  function intersectViewportBelow(entries) {
+  function intersectViewportBelow(ref) {
+    var entry = ref[0];
+
     updateDirection();
-    entries.forEach(function (entry) {
-      var isIntersecting = entry.isIntersecting;
-      var target = entry.target;
-      var index = getIndex(target);
-      var ss = stepStates[index];
-      if (
-        isIntersecting &&
-        direction === 'up' &&
-        ss.state !== 'enter' &&
-        ss.direction !== 'up'
-      ) {
-        notifyStepEnter(target, 'up');
-        notifyStepExit(target, 'up');
-      }
-    });
+
+    var isIntersecting = entry.isIntersecting;
+    var target = entry.target;
+    var index = getIndex(target);
+    var ss = stepStates[index];
+    // console.log({ index, ss, isIntersecting });
+
+    // if (
+    //   isIntersecting &&
+    //   direction === 'up' &&
+    //   ss.state !== 'enter' &&
+    //   ss.direction !== 'up'
+    // ) {
+    //   notifyStepEnter(target, 'up');
+    //   notifyStepExit(target, 'up');
+    // }
   }
 
-  function intersectStepProgress(entries) {
+  function intersectStepProgress(ref) {
+    var entry = ref[0];
+
     updateDirection();
-    entries.forEach(
-      function (ref) {
-        var isIntersecting = ref.isIntersecting;
-        var intersectionRatio = ref.intersectionRatio;
-        var boundingClientRect = ref.boundingClientRect;
-        var target = ref.target;
+    var isIntersecting = entry.isIntersecting;
+    var intersectionRatio = entry.intersectionRatio;
+    var boundingClientRect = entry.boundingClientRect;
+    var target = entry.target;
+    var bottom = boundingClientRect.bottom;
+    var bottomAdjusted = bottom - offsetMargin;
 
-        var bottom = boundingClientRect.bottom;
-        var bottomAdjusted = bottom - offsetMargin;
-
-        if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
-          notifyStepProgress(target, +intersectionRatio.toFixed(3));
-        }
-      }
-    );
+    if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
+      notifyStepProgress(target, +intersectionRatio.toFixed(3));
+    }
   }
 
   // OBSERVER - CREATION
   // jump into viewport
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map(function (el, i) {
-      var marginTop = stepOffsetTop[i];
-      var marginBottom = -(vh - offsetMargin + stepOffsetHeight[i]);
+      console.log('updateViewportAboveIO', i);
+      var marginTop =
+        -offsetMargin * 3 - stepOffsetHeight[i] - stepOffsetTop[i] + ph;
+      var marginBottom = -offsetMargin - stepOffsetHeight[i];
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
       var options = { rootMargin: rootMargin };
-
+      console.log({
+        ph: ph,
+        vh: vh,
+        sot: stepOffsetTop[i],
+        offsetMargin: offsetMargin,
+        marginTop: marginTop,
+        marginBottom: marginBottom,
+        rootMargin: rootMargin
+      });
       var obs = new IntersectionObserver(intersectViewportAbove, options);
       obs.observe(el);
       return obs;
@@ -469,23 +509,31 @@ function scrollama() {
 
   function updateViewportBelowIO() {
     io.viewportBelow = stepEl.map(function (el, i) {
-      var marginTop = -(offsetMargin + stepOffsetHeight[i]);
-      var marginBottom =
-        ph - stepOffsetTop[i] - stepOffsetHeight[i] - offsetMargin;
+      // console.log('updateViewportBelowIO', i);
+      var marginTop = -offsetMargin - stepOffsetHeight[i];
+      var marginBottom = -offsetMargin + stepOffsetTop[i];
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
       var options = { rootMargin: rootMargin };
-
+      // console.log({
+      //   vh,
+      //   ph,
+      //   sot: stepOffsetTop[i],
+      //   offsetMargin,
+      //   marginTop,
+      //   marginBottom,
+      //   rootMargin
+      // });
       var obs = new IntersectionObserver(intersectViewportBelow, options);
       obs.observe(el);
       return obs;
     });
   }
 
-  // top edge
+  // look above for intersection
   function updateStepAboveIO() {
     io.stepAbove = stepEl.map(function (el, i) {
-      var marginTop = stepOffsetHeight[i];
-      var marginBottom = -vh + offsetMargin;
+      var marginTop = -offsetMargin + stepOffsetHeight[i];
+      var marginBottom = -offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
 
       var options = { rootMargin: rootMargin };
@@ -496,11 +544,11 @@ function scrollama() {
     });
   }
 
-  // bottom edge
+  // look below for intersection
   function updateStepBelowIO() {
-    io.stepBelow = stepEl.map(function (el, i) {
+    io.stepAbove = stepEl.map(function (el, i) {
       var marginTop = -offsetMargin;
-      var marginBottom = ph - vh + stepOffsetHeight[i] + offsetMargin;
+      var marginBottom = -offsetMargin + stepOffsetHeight[i];
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
 
       var options = { rootMargin: rootMargin };
@@ -552,7 +600,7 @@ function scrollama() {
   }
 
   function addDebug() {
-    if (debugMode) { setup({ id: id, stepEl: stepEl, offsetVal: offsetVal }); }
+    if (isDebug) { setup({ id: id, stepEl: stepEl, offsetVal: offsetVal }); }
   }
 
   var S = {};
@@ -577,7 +625,7 @@ function scrollama() {
     }
 
     // options
-    debugMode = debug;
+    isDebug = debug;
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
@@ -613,7 +661,7 @@ function scrollama() {
 
   S.destroy = function () {
     handleEnable(false);
-    Object.keys(callback).forEach(function (c) { return (callback[c] = null); });
+    Object.keys(cb).forEach(function (c) { return (cb[c] = null); });
     Object.keys(io).forEach(function (i) { return (io[i] = null); });
   };
 
@@ -625,20 +673,20 @@ function scrollama() {
     return offsetVal;
   };
 
-  S.onStepEnter = function (cb) {
-    if (typeof cb === 'function') { callback.stepEnter = cb; }
+  S.onStepEnter = function (f) {
+    if (typeof f === 'function') { cb.stepEnter = f; }
     else { console.error('scrollama error: onStepEnter requires a function'); }
     return S;
   };
 
-  S.onStepExit = function (cb) {
-    if (typeof cb === 'function') { callback.stepExit = cb; }
+  S.onStepExit = function (f) {
+    if (typeof f === 'function') { cb.stepExit = f; }
     else { console.error('scrollama error: onStepExit requires a function'); }
     return S;
   };
 
-  S.onStepProgress = function (cb) {
-    if (typeof cb === 'function') { callback.stepProgress = cb; }
+  S.onStepProgress = function (f) {
+    if (typeof f === 'function') { cb.stepProgress = f; }
     else { console.error('scrollama error: onStepProgress requires a function'); }
     return S;
   };

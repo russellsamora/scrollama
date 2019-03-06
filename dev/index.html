@@ -70,11 +70,11 @@
 		/* demo */
 
 		#intro {
-			margin-bottom: 320px;
+			margin-bottom: 600px;
 		}
 
 		#outro {
-			height: 640px;
+			height: 4400px;
 		}
 
 		/* scrollama */
@@ -104,11 +104,30 @@
 			padding: 1rem;
 			font-size: 1.5rem;
 		}
+
+		nav {
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 1000;
+			background: white;
+			padding: 1rem;
+		}
 	</style>
 
 </head>
 
 <body>
+	<nav>
+		<a href='#anchor-1'>Jump to 1</a>
+		<a href='#anchor-2'>Jump to 2</a>
+		<a href='#anchor-3'>Jump to 3</a>
+		<a href='#anchor-4'>Jump to 4</a>
+		<a href='#anchor-5'>Jump to 5</a>
+	</nav>
+
+	<div id='anchor-1'></div>
+
 	<section id='intro'>
 		<p class='intro__overline'>
 			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
@@ -118,23 +137,33 @@
 			Start scrolling to see how it works.
 		</p>
 	</section>
+	
+	<div id='anchor-2'></div>
 	<section id='scroll'>
 		<div class='scroll__text'>
 			<div class='step' data-step='1'>
 				<p>STEP 1</p>
 			</div>
-			<div class='step' data-step='2'>
+			<!-- <div class='step' data-step='2'>
 				<p>STEP 2</p>
 			</div>
+			
 			<div class='step' data-step='3'>
+				
 				<p>STEP 3</p>
+				<div id='anchor-3'></div>
 			</div>
 			<div class='step' data-step='4'>
+				
 				<p>STEP 4</p>
-			</div>
+				
+			</div> -->
+			
 		</div>
 	</section>
+	<div id='anchor-4'></div>
 	<section id='outro'></section>
+	<div id='anchor-5'></div>
 
 	<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
 	<script src='../build/scrollama.js'></script>
@@ -146,19 +175,17 @@
 		// initialize the scrollama
 		var scroller = scrollama();
 
-		scroller.resize()
-
 		// scrollama event handlers
 		function handleStepEnter(response) {
 			// response = { element, direction, index }
-			// console.log('enter', response);
+			console.log('enter', response);
 			// add to color to current step
 			response.element.classList.add('is-active');
 		}
 
 		function handleStepExit(response) {
 			// response = { element, direction, index }
-			// console.log('exit', response);
+			console.log('exit', response);
 			// remove color from current step
 			response.element.classList.remove('is-active');
 		}
@@ -167,7 +194,8 @@
 			// set random padding for different step heights (not required)
 			steps.forEach(function (step) {
 				var v = 100 + Math.floor(Math.random() * window.innerHeight / 4);
-				step.style.padding = v + 'px 0px';
+				// step.style.padding = v + 'px 0px';
+				step.style.height = '300px';
 			});
 
 			// 1. setup the scroller with the bare-bones options
