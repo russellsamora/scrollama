@@ -21,8 +21,8 @@ function scrollama() {
   let stepEl = [];
   let offsetVal = 0;
   let offsetMargin = 0;
-  let vh = 0;
-  let ph = 0;
+  let viewH = 0;
+  let pageH = 0;
   let stepOffsetHeight = 0;
   let stepOffsetTop = 0;
   let previousYOffset = 0;
@@ -95,10 +95,10 @@ function scrollama() {
   }
 
   function handleResize() {
-    vh = window.innerHeight;
-    ph = getPageHeight();
+    viewH = window.innerHeight;
+    pageH = getPageHeight();
 
-    offsetMargin = offsetVal * vh;
+    offsetMargin = offsetVal * viewH;
 
     if (isReady) {
       stepOffsetHeight = stepEl.map(el => el.offsetHeight);
@@ -221,13 +221,15 @@ function scrollama() {
     const index = getIndex(target);
     const ss = stepStates[index];
 
-    // console.log({
-    //   index,
-    //   isIntersecting,
-    //   bottomAdjusted,
-    //   topAdjusted,
-    //   direction
-    // });
+    // TODO jump to intersecting but not triggered
+    console.log({
+      id: 'step - above',
+      index,
+      isIntersecting,
+      bottomAdjusted,
+      topAdjusted,
+      direction
+    });
 
     // entering above is only when topAdjusted is negative
     // and bottomAdjusted is positive
@@ -262,12 +264,15 @@ function scrollama() {
     const index = getIndex(target);
     const ss = stepStates[index];
 
-    // console.log({
-    //   isIntersecting,
-    //   bottomAdjusted,
-    //   topAdjusted,
-    //   direction
-    // });
+    // TODO jump to intersecting but not triggered
+    console.log({
+      id: 'step - below',
+      index,
+      isIntersecting,
+      bottomAdjusted,
+      topAdjusted,
+      direction
+    });
 
     // entering below is only when bottomAdjusted is positive
     // and topAdjusted is positive
@@ -300,36 +305,31 @@ function scrollama() {
     const { isIntersecting, target } = entry;
     const index = getIndex(target);
     const ss = stepStates[index];
-    console.log({ index, ss, isIntersecting });
-    console.log(entry);
-    // if (
-    //   isIntersecting &&
-    //   direction === 'down' &&
-    //   ss.state !== 'enter' &&
-    //   ss.direction !== 'down'
-    // ) {
-    //   notifyStepEnter(target, 'down');
-    //   notifyStepExit(target, 'down');
-    // }
+    if (
+      isIntersecting &&
+      direction === 'down' &&
+      ss.direction !== 'down' &&
+      ss.state !== 'enter'
+    ) {
+      notifyStepEnter(target, 'down');
+      notifyStepExit(target, 'down');
+    }
   }
 
   function intersectViewportBelow([entry]) {
     updateDirection();
-
     const { isIntersecting, target } = entry;
     const index = getIndex(target);
     const ss = stepStates[index];
-    // console.log({ index, ss, isIntersecting });
-
-    // if (
-    //   isIntersecting &&
-    //   direction === 'up' &&
-    //   ss.state !== 'enter' &&
-    //   ss.direction !== 'up'
-    // ) {
-    //   notifyStepEnter(target, 'up');
-    //   notifyStepExit(target, 'up');
-    // }
+    if (
+      isIntersecting &&
+      direction === 'up' &&
+      ss.direction !== 'up' &&
+      ss.state !== 'enter'
+    ) {
+      notifyStepEnter(target, 'up');
+      notifyStepExit(target, 'up');
+    }
   }
 
   function intersectStepProgress([entry]) {
@@ -352,21 +352,22 @@ function scrollama() {
   // jump into viewport
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map((el, i) => {
-      console.log('updateViewportAboveIO', i);
-      const marginTop =
-        -offsetMargin * 3 - stepOffsetHeight[i] - stepOffsetTop[i] + ph;
-      const marginBottom = -offsetMargin - stepOffsetHeight[i];
+      // console.log('updateViewportAboveIO', i);
+      // possibly add extra height to margin bottom
+      const marginTop = pageH - stepOffsetTop[i];
+      const marginBottom = -offsetMargin - stepOffsetHeight[i] * 2;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-      console.log({
-        ph,
-        vh,
-        sot: stepOffsetTop[i],
-        offsetMargin,
-        marginTop,
-        marginBottom,
-        rootMargin
-      });
+      // console.log(options);
+      // console.log({
+      //   pageH,
+      //   viewH,
+      //   sot: stepOffsetTop[i],
+      //   offsetMargin,
+      //   marginTop,
+      //   marginBottom,
+      //   rootMargin
+      // });
       const obs = new IntersectionObserver(intersectViewportAbove, options);
       obs.observe(el);
       return obs;
@@ -376,13 +377,13 @@ function scrollama() {
   function updateViewportBelowIO() {
     io.viewportBelow = stepEl.map((el, i) => {
       // console.log('updateViewportBelowIO', i);
-      const marginTop = -offsetMargin - stepOffsetHeight[i];
-      const marginBottom = -offsetMargin + stepOffsetTop[i];
+      const marginTop = -offsetMargin - stepOffsetHeight[i] * 2;
+      const marginBottom = -offsetMargin - stepOffsetHeight[i] + pageH;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
       // console.log({
-      //   vh,
-      //   ph,
+      //   viewH,
+      //   pageH,
       //   sot: stepOffsetTop[i],
       //   offsetMargin,
       //   marginTop,
@@ -429,7 +430,7 @@ function scrollama() {
   function updateStepProgressIO() {
     io.stepProgress = stepEl.map((el, i) => {
       const marginTop = stepOffsetHeight[i] - offsetMargin;
-      const marginBottom = -vh + offsetMargin;
+      const marginBottom = -viewH + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
       const threshold = createThreshold(stepOffsetHeight[i]);

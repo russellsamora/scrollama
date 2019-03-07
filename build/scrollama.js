@@ -137,8 +137,8 @@ function scrollama() {
   var stepEl = [];
   var offsetVal = 0;
   var offsetMargin = 0;
-  var vh = 0;
-  var ph = 0;
+  var viewH = 0;
+  var pageH = 0;
   var stepOffsetHeight = 0;
   var stepOffsetTop = 0;
   var previousYOffset = 0;
@@ -211,10 +211,10 @@ function scrollama() {
   }
 
   function handleResize() {
-    vh = window.innerHeight;
-    ph = getPageHeight();
+    viewH = window.innerHeight;
+    pageH = getPageHeight();
 
-    offsetMargin = offsetVal * vh;
+    offsetMargin = offsetVal * viewH;
 
     if (isReady) {
       stepOffsetHeight = stepEl.map(function (el) { return el.offsetHeight; });
@@ -344,13 +344,15 @@ function scrollama() {
     var index = getIndex(target);
     var ss = stepStates[index];
 
-    // console.log({
-    //   index,
-    //   isIntersecting,
-    //   bottomAdjusted,
-    //   topAdjusted,
-    //   direction
-    // });
+    // TODO jump to intersecting but not triggered
+    console.log({
+      id: 'step - above',
+      index: index,
+      isIntersecting: isIntersecting,
+      bottomAdjusted: bottomAdjusted,
+      topAdjusted: topAdjusted,
+      direction: direction
+    });
 
     // entering above is only when topAdjusted is negative
     // and bottomAdjusted is positive
@@ -390,12 +392,15 @@ function scrollama() {
     var index = getIndex(target);
     var ss = stepStates[index];
 
-    // console.log({
-    //   isIntersecting,
-    //   bottomAdjusted,
-    //   topAdjusted,
-    //   direction
-    // });
+    // TODO jump to intersecting but not triggered
+    console.log({
+      id: 'step - below',
+      index: index,
+      isIntersecting: isIntersecting,
+      bottomAdjusted: bottomAdjusted,
+      topAdjusted: topAdjusted,
+      direction: direction
+    });
 
     // entering below is only when bottomAdjusted is positive
     // and topAdjusted is positive
@@ -431,39 +436,34 @@ function scrollama() {
     var target = entry.target;
     var index = getIndex(target);
     var ss = stepStates[index];
-    console.log({ index: index, ss: ss, isIntersecting: isIntersecting });
-    console.log(entry);
-    // if (
-    //   isIntersecting &&
-    //   direction === 'down' &&
-    //   ss.state !== 'enter' &&
-    //   ss.direction !== 'down'
-    // ) {
-    //   notifyStepEnter(target, 'down');
-    //   notifyStepExit(target, 'down');
-    // }
+    if (
+      isIntersecting &&
+      direction === 'down' &&
+      ss.direction !== 'down' &&
+      ss.state !== 'enter'
+    ) {
+      notifyStepEnter(target, 'down');
+      notifyStepExit(target, 'down');
+    }
   }
 
   function intersectViewportBelow(ref) {
     var entry = ref[0];
 
     updateDirection();
-
     var isIntersecting = entry.isIntersecting;
     var target = entry.target;
     var index = getIndex(target);
     var ss = stepStates[index];
-    // console.log({ index, ss, isIntersecting });
-
-    // if (
-    //   isIntersecting &&
-    //   direction === 'up' &&
-    //   ss.state !== 'enter' &&
-    //   ss.direction !== 'up'
-    // ) {
-    //   notifyStepEnter(target, 'up');
-    //   notifyStepExit(target, 'up');
-    // }
+    if (
+      isIntersecting &&
+      direction === 'up' &&
+      ss.direction !== 'up' &&
+      ss.state !== 'enter'
+    ) {
+      notifyStepEnter(target, 'up');
+      notifyStepExit(target, 'up');
+    }
   }
 
   function intersectStepProgress(ref) {
@@ -486,21 +486,22 @@ function scrollama() {
   // jump into viewport
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map(function (el, i) {
-      console.log('updateViewportAboveIO', i);
-      var marginTop =
-        -offsetMargin * 3 - stepOffsetHeight[i] - stepOffsetTop[i] + ph;
-      var marginBottom = -offsetMargin - stepOffsetHeight[i];
+      // console.log('updateViewportAboveIO', i);
+      // possibly add extra height to margin bottom
+      var marginTop = pageH - stepOffsetTop[i];
+      var marginBottom = -offsetMargin - stepOffsetHeight[i] * 2;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
       var options = { rootMargin: rootMargin };
-      console.log({
-        ph: ph,
-        vh: vh,
-        sot: stepOffsetTop[i],
-        offsetMargin: offsetMargin,
-        marginTop: marginTop,
-        marginBottom: marginBottom,
-        rootMargin: rootMargin
-      });
+      // console.log(options);
+      // console.log({
+      //   pageH,
+      //   viewH,
+      //   sot: stepOffsetTop[i],
+      //   offsetMargin,
+      //   marginTop,
+      //   marginBottom,
+      //   rootMargin
+      // });
       var obs = new IntersectionObserver(intersectViewportAbove, options);
       obs.observe(el);
       return obs;
@@ -510,13 +511,13 @@ function scrollama() {
   function updateViewportBelowIO() {
     io.viewportBelow = stepEl.map(function (el, i) {
       // console.log('updateViewportBelowIO', i);
-      var marginTop = -offsetMargin - stepOffsetHeight[i];
-      var marginBottom = -offsetMargin + stepOffsetTop[i];
+      var marginTop = -offsetMargin - stepOffsetHeight[i] * 2;
+      var marginBottom = -offsetMargin - stepOffsetHeight[i] + pageH;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
       var options = { rootMargin: rootMargin };
       // console.log({
-      //   vh,
-      //   ph,
+      //   viewH,
+      //   pageH,
       //   sot: stepOffsetTop[i],
       //   offsetMargin,
       //   marginTop,
@@ -563,7 +564,7 @@ function scrollama() {
   function updateStepProgressIO() {
     io.stepProgress = stepEl.map(function (el, i) {
       var marginTop = stepOffsetHeight[i] - offsetMargin;
-      var marginBottom = -vh + offsetMargin;
+      var marginBottom = -viewH + offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
 
       var threshold = createThreshold(stepOffsetHeight[i]);
