@@ -9,8 +9,8 @@ in favor of scroll events.
 
 #### Important Changes
 
-- Version `2.0.0`+: `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/).
-- Version `1.4.0`+, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
+- **Version 2.0.0**: `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/).
+- **Version 1.4.0+**, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
 
 [Jump to examples.](https://github.com/russellgoldenberg/scrollama#examples)
 
