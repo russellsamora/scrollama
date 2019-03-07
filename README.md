@@ -114,7 +114,7 @@ _options:_
 - `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
 - `threshold` (number, 1+): The granularity of the progress interval in pixels (smaller = more granular). **(default: 4)**
-- `order` (boolean): Whether to preserve step triggering order if they fire out of sync (eg. ensure step 2 enters after 1 exits). **(default: true)**
+- `order` (boolean): Fire previous step triggers if they were jumped. **(default: true)**
 - `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
 - `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
