@@ -16,7 +16,6 @@ function selectionToArray(selection) {
   return result;
 }
 
-// public
 function selectAll(selector, parent) {
   if ( parent === void 0 ) parent = document;
 
