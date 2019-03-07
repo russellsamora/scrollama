@@ -7,12 +7,10 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events.
 
-**Notes: As of version 1.4.0, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details. Although it remains in the API (for now), it is recommended to use the CSS property `position: sticky;` instead of `.onContainerEnter` and `.onContainerExit`. [Full blog post here](https://pudding.cool/process/scrollytelling-sticky/).**
+#### Important Changes
 
-As seen on [The Pudding](https://pudding.cool/):
-
-- [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
-- [What City is the Microbrew Capital of the US?](https://pudding.cool/2017/04/beer/)
+- Version 2.0.0, `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/).
+- Version 1.4.0, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
 
 [Jump to examples.](https://github.com/russellgoldenberg/scrollama#examples)
 
@@ -58,8 +56,8 @@ with any library, or with no library at all._
 Old school (exposes the `scrollama` global):
 
 ```html
-<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
-<script src='https://unpkg.com/scrollama'></script>
+<script src="https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js"></script>
+<script src="https://unpkg.com/scrollama"></script>
 ```
 
 New school:
@@ -90,9 +88,9 @@ look like:
 
 ```html
 <!--you don't need the "data-step" attr, but can be useful for storing instructions for JS -->
-<div class='step' data-step='a'></div>
-<div class='step' data-step='b'></div>
-<div class='step' data-step='c'></div>
+<div class="step" data-step="a"></div>
+<div class="step" data-step="b"></div>
+<div class="step" data-step="c"></div>
 ```
 
 ```js
@@ -117,16 +115,16 @@ three elements (container, graphic, steps). The structure should look like:
 
 ```html
 <!-- container = ".scroll" -->
-<div class='scroll'>
+<div class="scroll">
   <!-- graphic = ".scroll__graphic" -->
-  <div class='scroll__graphic'>
+  <div class="scroll__graphic">
     <!--graphic / chart code here-->
   </div>
-  <div class='scroll__text'>
+  <div class="scroll__text">
     <!-- steps = ".step" -->
-    <div class='step' data-step='a'></div>
-    <div class='step' data-step='b'></div>
-    <div class='step' data-step='c'></div>
+    <div class="step" data-step="a"></div>
+    <div class="step" data-step="b"></div>
+    <div class="step" data-step="c"></div>
   </div>
 </div>
 ```
