@@ -339,7 +339,7 @@ function scrollama() {
       const marginBottom = offsetMargin - viewH - stepOffsetHeight[i];
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-      console.log(options);
+      // console.log(options);
       const obs = new IntersectionObserver(intersectViewportAbove, options);
       obs.observe(el);
       return obs;
@@ -349,10 +349,10 @@ function scrollama() {
   function updateViewportBelowIO() {
     io.viewportBelow = stepEl.map((el, i) => {
       const marginTop = -offsetMargin - stepOffsetHeight[i];
-      const marginBottom = -offsetMargin - stepOffsetHeight[i] + pageH;
+      const marginBottom = offsetMargin - viewH + stepOffsetHeight[i] + pageH;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-      console.log(options);
+      // console.log(options);
       const obs = new IntersectionObserver(intersectViewportBelow, options);
       obs.observe(el);
       return obs;
@@ -366,7 +366,7 @@ function scrollama() {
       const marginBottom = offsetMargin - viewH;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-
+      // console.log(options);
       const obs = new IntersectionObserver(intersectStepAbove, options);
       obs.observe(el);
       return obs;
@@ -377,10 +377,10 @@ function scrollama() {
   function updateStepBelowIO() {
     io.stepAbove = stepEl.map((el, i) => {
       const marginTop = -offsetMargin;
-      const marginBottom = -offsetMargin + stepOffsetHeight[i];
+      const marginBottom = offsetMargin - viewH + stepOffsetHeight[i];
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-
+      // console.log(options);
       const obs = new IntersectionObserver(intersectStepBelow, options);
       obs.observe(el);
       return obs;
@@ -395,7 +395,7 @@ function scrollama() {
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const threshold = createThreshold(stepOffsetHeight[i]);
       const options = { rootMargin, threshold };
-
+      // console.log(options);
       const obs = new IntersectionObserver(intersectStepProgress, options);
       obs.observe(el);
       return obs;
