@@ -136,7 +136,7 @@
 	</section>
 	<section id='outro'></section>
 	<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
-	<script src='../../build/scrollama.js'></script>
+	<script src='../scrollama.min.js'></script>
 	<script>
 		var container = document.querySelector('#scroll');
 		var text = container.querySelector('.scroll__text');
@@ -168,8 +168,8 @@
 			});
 
 			// 1. setup the scroller with the bare-bones options
-			// this will also initialize trigger observations
-			// 3. bind scrollama event handlers (this can be chained like below)
+			// 		this will also initialize trigger observations
+			// 2. bind scrollama event handlers (this can be chained like below)
 			scroller.setup({
 				step: '.scroll__text .step',
 				debug: true,
@@ -177,7 +177,7 @@
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit);
 
-			// setup resize event
+			// 3. setup resize event
 			window.addEventListener('resize', scroller.resize);
 		}
 

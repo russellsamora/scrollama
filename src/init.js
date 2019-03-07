@@ -336,10 +336,10 @@ function scrollama() {
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map((el, i) => {
       const marginTop = pageH - stepOffsetTop[i];
-      const marginBottom = -offsetMargin - stepOffsetHeight[i];
+      const marginBottom = offsetMargin - viewH - stepOffsetHeight[i];
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-
+      console.log(options);
       const obs = new IntersectionObserver(intersectViewportAbove, options);
       obs.observe(el);
       return obs;
@@ -352,7 +352,7 @@ function scrollama() {
       const marginBottom = -offsetMargin - stepOffsetHeight[i] + pageH;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-
+      console.log(options);
       const obs = new IntersectionObserver(intersectViewportBelow, options);
       obs.observe(el);
       return obs;
@@ -363,9 +363,8 @@ function scrollama() {
   function updateStepAboveIO() {
     io.stepAbove = stepEl.map((el, i) => {
       const marginTop = -offsetMargin + stepOffsetHeight[i];
-      const marginBottom = -offsetMargin;
+      const marginBottom = offsetMargin - viewH;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
-
       const options = { rootMargin };
 
       const obs = new IntersectionObserver(intersectStepAbove, options);
@@ -380,7 +379,6 @@ function scrollama() {
       const marginTop = -offsetMargin;
       const marginBottom = -offsetMargin + stepOffsetHeight[i];
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
-
       const options = { rootMargin };
 
       const obs = new IntersectionObserver(intersectStepBelow, options);
@@ -395,7 +393,6 @@ function scrollama() {
       const marginTop = stepOffsetHeight[i] - offsetMargin;
       const marginBottom = -viewH + offsetMargin;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
-
       const threshold = createThreshold(stepOffsetHeight[i]);
       const options = { rootMargin, threshold };
 

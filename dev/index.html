@@ -209,11 +209,12 @@
 			scroller.setup({
 				step: '.scroll__text .step',
 				debug: true,
-				progress: true,
+				offset: 0.25,
+				// progress: true,
 			})
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit)
-				.onStepProgress(handleStepProgress)
+				// .onStepProgress(handleStepProgress)
 
 			// setup resize event
 			window.addEventListener('resize', scroller.resize);

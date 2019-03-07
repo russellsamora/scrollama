@@ -470,10 +470,10 @@ function scrollama() {
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map(function (el, i) {
       var marginTop = pageH - stepOffsetTop[i];
-      var marginBottom = -offsetMargin - stepOffsetHeight[i];
+      var marginBottom = offsetMargin - viewH - stepOffsetHeight[i];
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
       var options = { rootMargin: rootMargin };
-
+      console.log(options);
       var obs = new IntersectionObserver(intersectViewportAbove, options);
       obs.observe(el);
       return obs;
@@ -486,7 +486,7 @@ function scrollama() {
       var marginBottom = -offsetMargin - stepOffsetHeight[i] + pageH;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
       var options = { rootMargin: rootMargin };
-
+      console.log(options);
       var obs = new IntersectionObserver(intersectViewportBelow, options);
       obs.observe(el);
       return obs;
@@ -497,9 +497,8 @@ function scrollama() {
   function updateStepAboveIO() {
     io.stepAbove = stepEl.map(function (el, i) {
       var marginTop = -offsetMargin + stepOffsetHeight[i];
-      var marginBottom = -offsetMargin;
+      var marginBottom = offsetMargin - viewH;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-
       var options = { rootMargin: rootMargin };
 
       var obs = new IntersectionObserver(intersectStepAbove, options);
@@ -514,7 +513,6 @@ function scrollama() {
       var marginTop = -offsetMargin;
       var marginBottom = -offsetMargin + stepOffsetHeight[i];
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-
       var options = { rootMargin: rootMargin };
 
       var obs = new IntersectionObserver(intersectStepBelow, options);
@@ -529,7 +527,6 @@ function scrollama() {
       var marginTop = stepOffsetHeight[i] - offsetMargin;
       var marginBottom = -viewH + offsetMargin;
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
-
       var threshold = createThreshold(stepOffsetHeight[i]);
       var options = { rootMargin: rootMargin, threshold: threshold };
 
