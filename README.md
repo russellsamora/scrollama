@@ -37,17 +37,12 @@ with any library, or with no library at all._
   triggers
 - [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
   incremental step progress callback
-- [Sticky Graphic v1a (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
+- [Sticky Graphic v1 (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
   using CSS vertically center chart, and position sticky (+ polyfill) for
   sticking.
-- [Sticky Graphic v1b (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
+- [Sticky Graphic v2 (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
   using JS vertically center chart, and position sticky (+ polyfill) for
   sticking. Added bonus ability to start chart at top of steps then vertically.
-- [Sticky Graphic v2a (CSS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-css) -
-  using CSS vertically center chart, and position fixed and absolute for
-  sticking.
-- [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-js) -
-  using read position fixed and absolute for sticking.
 
 ### Installation
 
@@ -56,7 +51,7 @@ with any library, or with no library at all._
 Old school (exposes the `scrollama` global):
 
 ```html
-<script src="https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js"></script>
+<script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
 <script src="https://unpkg.com/scrollama"></script>
 ```
 
@@ -106,46 +101,6 @@ scroller
   .onStepExit(handleStepExit);
 ```
 
-#### Sticky Graphic
-
-**Update:** I recommend using the CSS property `position:sticky;`. You can simply use the triggers like above, and let the CSS handle everything else. [Full blog post here](https://pudding.cool/process/scrollytelling-sticky/).
-
-To implement the sticky graphic scrollytelling pattern, you need the following
-three elements (container, graphic, steps). The structure should look like:
-
-```html
-<!-- container = ".scroll" -->
-<div class="scroll">
-  <!-- graphic = ".scroll__graphic" -->
-  <div class="scroll__graphic">
-    <!--graphic / chart code here-->
-  </div>
-  <div class="scroll__text">
-    <!-- steps = ".step" -->
-    <div class="step" data-step="a"></div>
-    <div class="step" data-step="b"></div>
-    <div class="step" data-step="c"></div>
-  </div>
-</div>
-```
-
-```js
-// instantiate the scrollama
-const scroller = scrollama();
-
-// setup the instance, pass callback functions
-scroller
-  .setup({
-    step: '.scroll__text .step', // required
-    container: '.scroll', // required (for sticky)
-    graphic: '.scroll__graphic' // required (for sticky)
-  })
-  .onStepEnter(handleStepEnter)
-  .onStepExit(handleStepExit)
-  .onContainerEnter(handleContainerEnter)
-  .onContainerExit(handleContainerExit);
-```
-
 ### API
 
 #### scrollama.setup([options])
@@ -154,10 +109,6 @@ _options:_
 
 - `step` (string): Selector (or array of elements) for the step elements that will trigger changes.
   **required**
-- `container` (string): Selector (or element) for the element that contains everything for
-  the scroller. **optional**
-- `graphic` (string): Selector (or element) for the graphic element that will become fixed.
-  **optional**
 - `offset` (number, 0 - 1): How far from the top of the viewport to trigger a
   step. **(default: 0.5)**
 - `progress` (boolean): Whether to fire incremental step progress updates or
@@ -205,24 +156,6 @@ The argument of the callback is an object: `{ element: DOMElement, index: number
 `index`: The index of the step of all steps
 
 `progress`: The percent of completion of the step (0 - 1)
-
-#### scrollama.onContainerEnter(callback)
-
-Callback that fires when the top of container becomes flush with viewport _or_
-the graphic becomes fully in view coming from the bottom of the container.
-
-The argument of the callback is an object: `{ direction: string }`
-
-`direction`: 'up' or 'down'
-
-#### scrollama.onContainerExit(callback)
-
-Callback that fires when the top of container goes below viewport _or_ the
-graphic becomes not full in view leaving the bottom of the container.
-
-The argument of the callback is an object: `{ direction: string }`
-
-`direction`: 'up' or 'down'
 
 #### scrollama.offsetTrigger([number])
 
