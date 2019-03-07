@@ -144,7 +144,7 @@
 			<div class='step' data-step='1'>
 				<p>STEP 1</p>
 			</div>
-			<!-- <div class='step' data-step='2'>
+			<div class='step' data-step='2'>
 				<p>STEP 2</p>
 			</div>
 			
@@ -157,7 +157,7 @@
 				
 				<p>STEP 4</p>
 				
-			</div> -->
+			</div>
 			
 		</div>
 	</section>
@@ -178,14 +178,14 @@
 		// scrollama event handlers
 		function handleStepEnter(response) {
 			// response = { element, direction, index }
-			console.log('enter', response);
+			console.log(response.index, '-------- enter');
 			// add to color to current step
 			response.element.classList.add('is-active');
 		}
 
 		function handleStepExit(response) {
 			// response = { element, direction, index }
-			console.log('exit', response);
+			console.log(response.index, '-------- exit');
 			// remove color from current step
 			response.element.classList.remove('is-active');
 		}

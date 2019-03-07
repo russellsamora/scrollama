@@ -9,7 +9,7 @@ function scrollama() {
     'viewportAbove',
     'viewportBelow'
   ];
-  const ZERO_MOE = 1; // zero with some rounding margin of error
+
   const cb = {
     stepEnter: () => {},
     stepExit: () => {},
@@ -135,7 +135,7 @@ function scrollama() {
       // check if steps above/below were skipped and should be notified first
       for (let i = 0; i < index; i++) {
         const ss = stepStates[i];
-        if (!ss.state) {
+        if (ss.state !== 'enter' && ss.direction !== 'down') {
           notifyStepEnter(stepEl[i], 'down', false);
           notifyStepExit(stepEl[i], 'down');
         } else if (ss.state === 'enter') notifyStepExit(stepEl[i], 'down');
@@ -221,16 +221,6 @@ function scrollama() {
     const index = getIndex(target);
     const ss = stepStates[index];
 
-    // TODO jump to intersecting but not triggered
-    console.log({
-      id: 'step - above',
-      index,
-      isIntersecting,
-      bottomAdjusted,
-      topAdjusted,
-      direction
-    });
-
     // entering above is only when topAdjusted is negative
     // and bottomAdjusted is positive
     if (
@@ -250,6 +240,17 @@ function scrollama() {
       ss.state === 'enter'
     )
       notifyStepExit(target, direction);
+
+    // case: jumped past triggered (page refresh or anchor)
+    if (
+      isIntersecting &&
+      bottomAdjusted < 0 &&
+      direction === 'down' &&
+      ss.state !== 'enter'
+    ) {
+      notifyStepEnter(target, direction);
+      notifyStepExit(target, direction);
+    }
   }
   // this is good for entering while scrolling up + leaving while scrolling down
   function intersectStepBelow([entry]) {
@@ -263,16 +264,6 @@ function scrollama() {
     const bottomAdjusted = bottom - offsetMargin;
     const index = getIndex(target);
     const ss = stepStates[index];
-
-    // TODO jump to intersecting but not triggered
-    console.log({
-      id: 'step - below',
-      index,
-      isIntersecting,
-      bottomAdjusted,
-      topAdjusted,
-      direction
-    });
 
     // entering below is only when bottomAdjusted is positive
     // and topAdjusted is positive
@@ -293,6 +284,17 @@ function scrollama() {
       ss.state === 'enter'
     )
       notifyStepExit(target, direction);
+
+    // case: jumped past triggered (had already been exited)
+    if (
+      isIntersecting &&
+      top > 0 &&
+      direction === 'up' &&
+      ss.state === 'exit'
+    ) {
+      notifyStepEnter(target, direction);
+      notifyStepExit(target, direction);
+    }
   }
 
   /*
@@ -305,6 +307,7 @@ function scrollama() {
     const { isIntersecting, target } = entry;
     const index = getIndex(target);
     const ss = stepStates[index];
+
     if (
       isIntersecting &&
       direction === 'down' &&
@@ -343,7 +346,7 @@ function scrollama() {
     const { bottom } = boundingClientRect;
     const bottomAdjusted = bottom - offsetMargin;
 
-    if (isIntersecting && bottomAdjusted >= -ZERO_MOE) {
+    if (isIntersecting && bottomAdjusted >= 0) {
       notifyStepProgress(target, +intersectionRatio.toFixed(3));
     }
   }
@@ -352,22 +355,11 @@ function scrollama() {
   // jump into viewport
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map((el, i) => {
-      // console.log('updateViewportAboveIO', i);
-      // possibly add extra height to margin bottom
       const marginTop = pageH - stepOffsetTop[i];
       const marginBottom = -offsetMargin - stepOffsetHeight[i] * 2;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-      // console.log(options);
-      // console.log({
-      //   pageH,
-      //   viewH,
-      //   sot: stepOffsetTop[i],
-      //   offsetMargin,
-      //   marginTop,
-      //   marginBottom,
-      //   rootMargin
-      // });
+
       const obs = new IntersectionObserver(intersectViewportAbove, options);
       obs.observe(el);
       return obs;
@@ -376,20 +368,11 @@ function scrollama() {
 
   function updateViewportBelowIO() {
     io.viewportBelow = stepEl.map((el, i) => {
-      // console.log('updateViewportBelowIO', i);
       const marginTop = -offsetMargin - stepOffsetHeight[i] * 2;
       const marginBottom = -offsetMargin - stepOffsetHeight[i] + pageH;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
-      // console.log({
-      //   viewH,
-      //   pageH,
-      //   sot: stepOffsetTop[i],
-      //   offsetMargin,
-      //   marginTop,
-      //   marginBottom,
-      //   rootMargin
-      // });
+
       const obs = new IntersectionObserver(intersectViewportBelow, options);
       obs.observe(el);
       return obs;
