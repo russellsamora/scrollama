@@ -148,7 +148,7 @@
 				<p>STEP 2</p>
 			</div>
 			
-			<div class='step' data-step='3'>
+			<!-- <div class='step' data-step='3'>
 				
 				<p>STEP 3</p>
 				<div id='anchor-3'></div>
@@ -157,7 +157,7 @@
 				
 				<p>STEP 4</p>
 				
-			</div>
+			</div> -->
 			
 		</div>
 	</section>
@@ -190,6 +190,11 @@
 			response.element.classList.remove('is-active');
 		}
 
+		function handleStepProgress(response) {
+			// response = { element, progress, index }
+			console.log(response.index, '-------- progress -', response.progress);
+		}
+
 		function init() {
 			// set random padding for different step heights (not required)
 			steps.forEach(function (step) {
@@ -204,9 +209,11 @@
 			scroller.setup({
 				step: '.scroll__text .step',
 				debug: true,
+				progress: true,
 			})
 				.onStepEnter(handleStepEnter)
-				.onStepExit(handleStepExit);
+				.onStepExit(handleStepExit)
+				.onStepProgress(handleStepProgress)
 
 			// setup resize event
 			window.addEventListener('resize', scroller.resize);

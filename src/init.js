@@ -41,7 +41,7 @@ function scrollama() {
 
   const exclude = [];
 
-  // HELPERS
+  /*** HELPERS ***/
   function generateInstanceID() {
     const a = 'abcdefghijklmnopqrstuv';
     const l = a.length;
@@ -129,7 +129,16 @@ function scrollama() {
     return t;
   }
 
-  // NOTIFY CALLBACKS
+  /*** NOTIFY CALLBACKS ***/
+
+  function notifyStepProgress(element, progress) {
+    const index = getIndex(element);
+    if (progress !== undefined) stepStates[index].progress = progress;
+    const resp = { element, index, progress: stepStates[index].progress };
+
+    if (stepStates[index].state === 'enter') cb.stepProgress(resp);
+  }
+
   function notifyOthers(index, location) {
     if (location === 'above') {
       // check if steps above/below were skipped and should be notified first
@@ -177,37 +186,29 @@ function scrollama() {
       if (triggerOnce) exclude[index] = true;
     }
 
-    if (progressMode) {
-      if (direction === 'down') notifyStepProgress(element, 0);
-      else notifyStepProgress(element, 1);
-    }
+    if (progressMode) notifyStepProgress(element);
   }
 
   function notifyStepExit(element, direction) {
     const index = getIndex(element);
     const resp = { element, index, direction };
 
+    if (progressMode) {
+      if (direction === 'down' && stepStates[index].progress < 1)
+        notifyStepProgress(element, 1);
+      else if (direction === 'up' && stepStates[index].progress > 0)
+        notifyStepProgress(element, 0);
+    }
+
     // store most recent trigger
     stepStates[index].direction = direction;
     stepStates[index].state = 'exit';
-
-    if (progressMode) {
-      if (direction === 'down') notifyStepProgress(element, 1);
-      else notifyStepProgress(element, 0);
-    }
 
     cb.stepExit(resp, stepStates);
     if (isDebug) bug.notifyStep({ id, index, state: 'exit' });
   }
 
-  function notifyStepProgress(element, progress) {
-    const index = getIndex(element);
-    const resp = { element, index, progress };
-    cb.stepProgress(resp);
-  }
-
-  // OBSERVER - INTERSECT HANDLING
-
+  /*** OBSERVER - INTERSECT HANDLING ***/
   // this is good for entering while scrolling down + leaving while scrolling up
   function intersectStepAbove([entry]) {
     updateDirection();
@@ -240,18 +241,8 @@ function scrollama() {
       ss.state === 'enter'
     )
       notifyStepExit(target, direction);
-
-    // case: jumped past triggered (page refresh or anchor)
-    if (
-      isIntersecting &&
-      bottomAdjusted < 0 &&
-      direction === 'down' &&
-      ss.state !== 'enter'
-    ) {
-      notifyStepEnter(target, direction);
-      notifyStepExit(target, direction);
-    }
   }
+
   // this is good for entering while scrolling up + leaving while scrolling down
   function intersectStepBelow([entry]) {
     updateDirection();
@@ -284,17 +275,6 @@ function scrollama() {
       ss.state === 'enter'
     )
       notifyStepExit(target, direction);
-
-    // case: jumped past triggered (had already been exited)
-    if (
-      isIntersecting &&
-      top > 0 &&
-      direction === 'up' &&
-      ss.state === 'exit'
-    ) {
-      notifyStepEnter(target, direction);
-      notifyStepExit(target, direction);
-    }
   }
 
   /*
@@ -327,7 +307,7 @@ function scrollama() {
     if (
       isIntersecting &&
       direction === 'up' &&
-      ss.direction !== 'up' &&
+      ss.direction === 'down' &&
       ss.state !== 'enter'
     ) {
       notifyStepEnter(target, 'up');
@@ -345,18 +325,17 @@ function scrollama() {
     } = entry;
     const { bottom } = boundingClientRect;
     const bottomAdjusted = bottom - offsetMargin;
-
     if (isIntersecting && bottomAdjusted >= 0) {
       notifyStepProgress(target, +intersectionRatio.toFixed(3));
     }
   }
 
-  // OBSERVER - CREATION
+  /***  OBSERVER - CREATION ***/
   // jump into viewport
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map((el, i) => {
       const marginTop = pageH - stepOffsetTop[i];
-      const marginBottom = -offsetMargin - stepOffsetHeight[i] * 2;
+      const marginBottom = -offsetMargin - stepOffsetHeight[i];
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
 
@@ -368,7 +347,7 @@ function scrollama() {
 
   function updateViewportBelowIO() {
     io.viewportBelow = stepEl.map((el, i) => {
-      const marginTop = -offsetMargin - stepOffsetHeight[i] * 2;
+      const marginTop = -offsetMargin - stepOffsetHeight[i];
       const marginBottom = -offsetMargin - stepOffsetHeight[i] + pageH;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
       const options = { rootMargin };
@@ -436,7 +415,7 @@ function scrollama() {
     if (progressMode) updateStepProgressIO();
   }
 
-  // SETUP FUNCTIONS
+  /*** SETUP FUNCTIONS ***/
 
   function indexSteps() {
     stepEl.forEach((el, i) => el.setAttribute('data-scrollama-index', i));
@@ -445,7 +424,8 @@ function scrollama() {
   function setupStates() {
     stepStates = stepEl.map(() => ({
       direction: null,
-      state: null
+      state: null,
+      progress: 0
     }));
   }
 
