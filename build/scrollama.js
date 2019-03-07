@@ -16,6 +16,7 @@ function selectionToArray(selection) {
   return result;
 }
 
+// public
 function selectAll(selector, parent) {
   if ( parent === void 0 ) parent = document;
 
@@ -134,12 +135,14 @@ function scrollama() {
 
   var id = null;
   var stepEl = [];
+  var stepOffsetHeight = [];
+  var stepOffsetTop = [];
+  var stepStates = [];
+
   var offsetVal = 0;
   var offsetMargin = 0;
   var viewH = 0;
   var pageH = 0;
-  var stepOffsetHeight = 0;
-  var stepOffsetTop = 0;
   var previousYOffset = 0;
   var progressThreshold = 0;
 
@@ -151,8 +154,7 @@ function scrollama() {
   var preserveOrder = false;
   var triggerOnce = false;
 
-  var stepStates = null;
-  var direction = null;
+  var direction = 'down';
 
   var exclude = [];
 

@@ -19,12 +19,14 @@ function scrollama() {
 
   let id = null;
   let stepEl = [];
+  let stepOffsetHeight = [];
+  let stepOffsetTop = [];
+  let stepStates = [];
+
   let offsetVal = 0;
   let offsetMargin = 0;
   let viewH = 0;
   let pageH = 0;
-  let stepOffsetHeight = 0;
-  let stepOffsetTop = 0;
   let previousYOffset = 0;
   let progressThreshold = 0;
 
@@ -36,8 +38,7 @@ function scrollama() {
   let preserveOrder = false;
   let triggerOnce = false;
 
-  let stepStates = null;
-  let direction = null;
+  let direction = 'down';
 
   const exclude = [];
 
