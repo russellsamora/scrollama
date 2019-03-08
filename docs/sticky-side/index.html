@@ -4,8 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Scrollama Demo: Sticky CSS</title>
-	<meta name="description" content="Scrollama Demo: Sticky CSS">
+	<title>Scrollama Demo: Sticky</title>
+	<meta name="description" content="Scrollama Demo: Sticky">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		/* default / demo page */
@@ -40,7 +40,7 @@
 		a,
 		a:visited,
 		a:hover {
-			color: #f30;
+			color: goldenrod;
 			text-decoration: none;
 			border-bottom: 1px solid currentColor;
 		}
@@ -79,35 +79,40 @@
 
 		/* scrollama */
 
-		#scroll {
+		#scrolly {
 			position: relative;
-			border-top: 1px dashed #000;
-			border-bottom: 1px dashed #000;
+			display: -webkit-box;
+    	display: -ms-flexbox;
+    	display: flex;
+			background-color: #f4f4f4;
+			padding: 1rem;
 		}
 
-		.scroll__graphic {
+		#scrolly > * {
+			-webkit-box-flex: 1;
+    	-ms-flex: 1;
+    	flex: 1;
+		}
+
+
+		article {
+			position: relative;
+			padding: 0 1rem;
+			max-width: 20rem;
+		}
+
+		figure {
 			position: -webkit-sticky;
 			position: sticky;
-			float: right;
-			top: 0;
-			right: 0;
+			width: 100%;
+			margin: 0;
 			-webkit-transform: translate3d(0, 0, 0);
 			-moz-transform: translate3d(0, 0, 0);
 			transform: translate3d(0, 0, 0);
+			background-color: #8a8a8a;
 		}
 
-		.chart {
-			position: absolute;
-			right: 1rem;
-			top: 50%;
-			-moz-transform: translateY(-50%);
-			-webkit-transform: translateY(-50%);
-			transform: translateY(-50%);
-			background-color: #ddd;
-			border: 1px solid #000;
-		}
-
-		.chart p {
+		figure p {
 			text-align: center;
 			padding: 1rem;
 			position: absolute;
@@ -118,23 +123,22 @@
 			transform: translate(-50%, -50%);
 			font-size: 8rem;
 			font-weight: 900;
-			color: #666;
+			color: #fff;
 		}
 
-		.scroll__text {
-			position: relative;
-			padding: 0 1rem;
-			max-width: 30rem;
-			width: 33%;
-		}
 
 		.step {
-			margin: 2rem auto;
-			border: 1px solid #333;
+			margin: 0 auto 2rem auto;
+			background-color: #3b3b3b;
+			color: #fff;
+		}
+
+		.step:last-child {
+			margin-bottom: 0;
 		}
 
 		.step.is-active {
-			background-color: lightgoldenrodyellow;
+			background-color: teal;
 		}
 
 		.step p {
@@ -147,49 +151,54 @@
 </head>
 
 <body>
-	<section id='intro'>
-		<p class='intro__overline'>
-			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
-		</p>
-		<h1 class='intro__hed'>Demo: Sticky Graphic</h1>
-		<p class='intro__dek'>
-			Start scrolling to see how it works.
-		</p>
-	</section>
-	<section id='scroll'>
-		<div class='scroll__graphic sticky'>
-			<div class='chart'>
+	<main>
+		<section id='intro'>
+			<p class='intro__overline'>
+				<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
+			</p>
+			<h1 class='intro__hed'>Demo: Sticky Graphic Position</h1>
+			<p class='intro__dek'>
+				Start scrolling to see how it works.
+			</p>
+		</section>
+
+		<section id='scrolly'>
+			
+			<article>
+				<div class='step' data-step='1'>
+					<p>STEP 1</p>
+				</div>
+				<div class='step' data-step='2'>
+					<p>STEP 2</p>
+				</div>
+				<div class='step' data-step='3'>
+					<p>STEP 3</p>
+				</div>
+				<div class='step' data-step='4'>
+					<p>STEP 4</p>
+				</div>
+			</article>
+
+			<figure>
 				<p>0</p>
-			</div>
-		</div>
-		<div class='scroll__text'>
-			<div class='step' data-step='1'>
-				<p>STEP 1</p>
-			</div>
-			<div class='step' data-step='2'>
-				<p>STEP 2</p>
-			</div>
-			<div class='step' data-step='3'>
-				<p>STEP 3</p>
-			</div>
-			<div class='step' data-step='4'>
-				<p>STEP 4</p>
-			</div>
-		</div>
-	</section>
-	<section id='outro'></section>
-	<div class='debug'></div>
+			</figure>
+		</section>
+
+		<section id='outro'></section>
+	</main>
+	
+	<!-- <div class='debug'></div> -->
 	<script src='https://unpkg.com/d3@5.9.1/dist/d3.min.js'></script>
 	<script src='https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js'></script>
 	<script src='../stickyfill.min.js'></script>
 	<script src='../scrollama.min.js'></script>
 	<script>
 		// using d3 for convenience
-		var container = d3.select('#scroll');
-		var graphic = container.select('.scroll__graphic');
-		var chart = graphic.select('.chart');
-		var text = container.select('.scroll__text');
-		var step = text.selectAll('.step');
+		var main = d3.select('main')
+		var scrolly = main.select('#scrolly');
+		var figure = scrolly.select('figure');
+		var article = scrolly.select('article');
+		var step = article.selectAll('.step');
 
 		// initialize the scrollama
 		var scroller = scrollama();
@@ -197,25 +206,15 @@
 		// generic window resize listener event
 		function handleResize() {
 			// 1. update height of step elements
-			var stepHeight = Math.floor(window.innerHeight * 0.75);
-			step.style('height', stepHeight + 'px');
+			var stepH = Math.floor(window.innerHeight * 0.75);
+			step.style('height', stepH + 'px');
 
-			// 2. update width/height of graphic element
-			var bodyWidth = d3.select('body').node().offsetWidth;
-			var textWidth = text.node().offsetWidth;
+			var figureHeight = window.innerHeight / 2
+			var figureMarginTop = (window.innerHeight - figureHeight) / 2  
 
-			var graphicWidth = bodyWidth - textWidth;
-
-			graphic
-				.style('width', graphicWidth + 'px')
-				.style('height', window.innerHeight + 'px');
-
-			var chartMargin = 32;
-			var chartWidth = graphic.node().offsetWidth - chartMargin;
-
-			chart
-				.style('width', chartWidth + 'px')
-				.style('height', Math.floor(window.innerHeight / 2) + 'px');
+			figure
+				.style('height', figureHeight + 'px')
+				.style('top', figureMarginTop + 'px');
 
 
 			// 3. tell scrollama to update new element dimensions
@@ -224,6 +223,7 @@
 
 		// scrollama event handlers
 		function handleStepEnter(response) {
+			console.log(response)
 			// response = { element, direction, index }
 
 			// add color to current step only
@@ -232,7 +232,7 @@
 			})
 
 			// update graphic based on step
-			chart.select('p').text(response.index + 1)
+			figure.select('p').text(response.index + 1);
 		}
 
 		function setupStickyfill() {
@@ -251,12 +251,12 @@
 			// 		this will also initialize trigger observations
 			// 3. bind scrollama event handlers (this can be chained like below)
 			scroller.setup({
-				step: '.scroll__text .step',
+				step: '#scrolly article .step',
 				offset: 0.33,
 				debug: true,
-				
 			})
 				.onStepEnter(handleStepEnter)
+
 
 			// setup resize event
 			window.addEventListener('resize', handleResize);

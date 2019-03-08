@@ -40,7 +40,7 @@
 		a,
 		a:visited,
 		a:hover {
-			color: #f30;
+			color: goldenrod;
 			text-decoration: none;
 			border-bottom: 1px solid currentColor;
 		}
@@ -93,7 +93,6 @@
 		.step {
 			margin: 2rem auto 4rem auto;
 			padding: 1rem;
-			border: 1px solid #333;
 		}
 
 		.step p {
@@ -106,36 +105,39 @@
 </head>
 
 <body>
-	<section id='intro'>
-		<p class='intro__overline'>
-			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
-		</p>
-		<h1 class='intro__hed'>Demo: Progress</h1>
-		<p class='intro__dek'>
-			Start scrolling to see how it works.
-		</p>
-	</section>
-	<section id='scroll'>
-		<div class='scroll__text'>
-			<div class='step' data-step='250,220,0'>
-				<p>STEP 1</p>
-				<p class='progress'>0%</p>
+	<main>
+		<section id='intro'>
+			<p class='intro__overline'>
+				<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
+			</p>
+			<h1 class='intro__hed'>Demo: Progress</h1>
+			<p class='intro__dek'>
+				Start scrolling to see how it works.
+			</p>
+		</section>
+		<section id='scroll'>
+			<div class='scroll__text'>
+				<div class='step' data-step='218,165,32'>
+					<p>STEP 1</p>
+					<p class='progress'>0%</p>
+				</div>
+				<div class='step' data-step='0,128,128'>
+					<p>STEP 2</p>
+					<p class='progress'>0%</p>
+				</div>
 			</div>
-			<div class='step' data-step='50,250,200'>
-				<p>STEP 2</p>
-				<p class='progress'>0%</p>
-			</div>
-		</div>
-	</section>
-	<section id='outro'></section>
+		</section>
+		<section id='outro'></section>
+	</main>
+	
 	<script src='https://unpkg.com/d3@5.9.1/dist/d3.min.js'></script>
 	<script src='https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js'></script>
 	<script src='../scrollama.min.js'></script>
 	<script>
 		// using d3 for convenience
-		var container = d3.select('#scroll');
-		var text = container.select('.scroll__text');
-		var step = text.selectAll('.step');
+		var scrollContainer = d3.select('#scroll');
+		var scrollText = scrollContainer.select('.scroll__text');
+		var scrollStep = scrollText.selectAll('.step');
 
 		// initialize the scrollama
 		var scroller = scrollama();
@@ -153,7 +155,7 @@
 		function resize() {
 			var min = 100
 			var h = min + Math.random() * window.innerHeight / 2
-			step.style('height', Math.floor(h) + 'px')
+			scrollStep.style('height', Math.floor(h) + 'px')
 			scroller.resize()
 		}
 

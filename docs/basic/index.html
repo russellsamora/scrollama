@@ -96,7 +96,7 @@
 		}
 
 		.step.is-active {
-			background-color: lightgoldenrodyellow;
+			background-color: rgba(250,220,0, 1);
 		}
 
 		.step p {
@@ -109,38 +109,41 @@
 </head>
 
 <body>
-	<section id='intro'>
-		<p class='intro__overline'>
-			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
-		</p>
-		<h1 class='intro__hed'>Demo: Basic</h1>
-		<p class='intro__dek'>
-			Start scrolling to see how it works.
-		</p>
-	</section>
-	<section id='scroll'>
-		<div class='scroll__text'>
-			<div class='step' data-step='1'>
-				<p>STEP 1</p>
+	<main>
+		<section id='intro'>
+			<p class='intro__overline'>
+				<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
+			</p>
+			<h1 class='intro__hed'>Demo: Basic</h1>
+			<p class='intro__dek'>
+				Start scrolling to see how it works.
+			</p>
+		</section>
+		<section id='scroll'>
+			<div class='scroll__text'>
+				<div class='step' data-step='1'>
+					<p>STEP 1</p>
+				</div>
+				<div class='step' data-step='2'>
+					<p>STEP 2</p>
+				</div>
+				<div class='step' data-step='3'>
+					<p>STEP 3</p>
+				</div>
+				<div class='step' data-step='4'>
+					<p>STEP 4</p>
+				</div>
 			</div>
-			<div class='step' data-step='2'>
-				<p>STEP 2</p>
-			</div>
-			<div class='step' data-step='3'>
-				<p>STEP 3</p>
-			</div>
-			<div class='step' data-step='4'>
-				<p>STEP 4</p>
-			</div>
-		</div>
-	</section>
-	<section id='outro'></section>
+		</section>
+		<section id='outro'></section>
+	</main>
+	
 	<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
 	<script src='../scrollama.min.js'></script>
 	<script>
-		var container = document.querySelector('#scroll');
-		var text = container.querySelector('.scroll__text');
-		var steps = text.querySelectorAll('.step');
+		var scrollContainer = document.querySelector('#scroll');
+		var scrollText = scrollContainer.querySelector('.scroll__text');
+		var scrollStep = scrollText.querySelectorAll('.step');
 
 		// initialize the scrollama
 		var scroller = scrollama();
@@ -162,7 +165,7 @@
 
 		function init() {
 			// set random padding for different step heights (not required)
-			steps.forEach(function (step) {
+			scrollStep.forEach(function (step) {
 				var v = 100 + Math.floor(Math.random() * window.innerHeight / 4);
 				step.style.padding = v + 'px 0px';
 			});
