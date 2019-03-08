@@ -47,6 +47,8 @@ nav {
   background: #f3f3f3;
   padding: 1rem;
   padding-right: 5rem;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .nav__examples {
@@ -56,10 +58,13 @@ nav {
   -webkit-box-align: baseline;
   -ms-flex-align: baseline;
   align-items: baseline;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
-.nav__examples a {
-  margin-left: 0.5rem;
+.nav__examples > * {
+  margin-right: 0.5rem;
 }
 
 #intro {
@@ -114,4 +119,11 @@ nav {
 
 #outro {
   height: 640px;
+}
+
+@media (min-width: 840px) {
+  .nav__examples {
+    margin-top: 0;
+    margin-left: 2rem;
+  }
 }
