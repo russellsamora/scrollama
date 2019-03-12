@@ -7,12 +7,10 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events.
 
-**Notes: As of version 1.4.0, you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details. Although it remains in the API (for now), it is recommended to use the CSS property `position: sticky;` instead of `.onContainerEnter` and `.onContainerExit`. [Full blog post here](https://pudding.cool/process/scrollytelling-sticky/).**
+#### Important Changes
 
-As seen on [The Pudding](https://pudding.cool/):
-
-- [What is a Superteam in the NBA?](https://pudding.cool/2017/10/superteams/)
-- [What City is the Microbrew Capital of the US?](https://pudding.cool/2017/04/beer/)
+- **Version 2.0.0+**: `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/)
+- **Version 1.4.0+**: you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
 
 [Jump to examples.](https://github.com/russellgoldenberg/scrollama#examples)
 
@@ -22,11 +20,7 @@ Scrollytelling can be complicated to implement and difficult to make performant.
 The goal of this library is to provide a simple interface for creating
 scroll-driven interactives. Scrollama is focused on performance by using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
-to handle element position detection. It offers an opinionated (but popular)
-scrollytelling pattern to reduce more involved DOM calculations. The sticky
-graphic pattern (enter-stick-exit) can be seen below. Check out my
-[blog post](https://pudding.cool/process/introducing-scrollama) for a deeper
-introduction.
+to handle element position detection.
 
 [![scrollytelling pattern](https://thumbs.gfycat.com/FearfulHotArabianoryx-size_restricted.gif)](https://pudding.cool/process/how-to-implement-scrollytelling)
 
@@ -39,17 +33,10 @@ with any library, or with no library at all._
   triggers
 - [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
   incremental step progress callback
-- [Sticky Graphic v1a (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
-  using CSS vertically center chart, and position sticky (+ polyfill) for
-  sticking.
-- [Sticky Graphic v1b (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
-  using JS vertically center chart, and position sticky (+ polyfill) for
-  sticking. Added bonus ability to start chart at top of steps then vertically.
-- [Sticky Graphic v2a (CSS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-css) -
-  using CSS vertically center chart, and position fixed and absolute for
-  sticking.
-- [Sticky Graphic v2b (JS, position fixed)](https://russellgoldenberg.github.io/scrollama/fixed-js) -
-  using read position fixed and absolute for sticking.
+- [Sticky Graphic (Side by Side)](https://russellgoldenberg.github.io/scrollama/sticky-side) -
+  using CSS `position: sticky;` to create a fixed graphic to the side of the text.
+- [Sticky Graphic (Overlay)](https://russellgoldenberg.github.io/scrollama/sticky-overlay) -
+  using CSS `position: sticky;` to create a fixed graphic with fullscreen graphic with text overlayed.
 
 ### Installation
 
@@ -58,8 +45,8 @@ with any library, or with no library at all._
 Old school (exposes the `scrollama` global):
 
 ```html
-<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
-<script src='https://unpkg.com/scrollama'></script>
+<script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
+<script src="https://unpkg.com/scrollama"></script>
 ```
 
 New school:
@@ -90,9 +77,9 @@ look like:
 
 ```html
 <!--you don't need the "data-step" attr, but can be useful for storing instructions for JS -->
-<div class='step' data-step='a'></div>
-<div class='step' data-step='b'></div>
-<div class='step' data-step='c'></div>
+<div class="step" data-step="a"></div>
+<div class="step" data-step="b"></div>
+<div class="step" data-step="c"></div>
 ```
 
 ```js
@@ -108,46 +95,6 @@ scroller
   .onStepExit(handleStepExit);
 ```
 
-#### Sticky Graphic
-
-**Update:** I recommend using the CSS property `position:sticky;`. You can simply use the triggers like above, and let the CSS handle everything else. [Full blog post here](https://pudding.cool/process/scrollytelling-sticky/).
-
-To implement the sticky graphic scrollytelling pattern, you need the following
-three elements (container, graphic, steps). The structure should look like:
-
-```html
-<!-- container = ".scroll" -->
-<div class='scroll'>
-  <!-- graphic = ".scroll__graphic" -->
-  <div class='scroll__graphic'>
-    <!--graphic / chart code here-->
-  </div>
-  <div class='scroll__text'>
-    <!-- steps = ".step" -->
-    <div class='step' data-step='a'></div>
-    <div class='step' data-step='b'></div>
-    <div class='step' data-step='c'></div>
-  </div>
-</div>
-```
-
-```js
-// instantiate the scrollama
-const scroller = scrollama();
-
-// setup the instance, pass callback functions
-scroller
-  .setup({
-    step: '.scroll__text .step', // required
-    container: '.scroll', // required (for sticky)
-    graphic: '.scroll__graphic' // required (for sticky)
-  })
-  .onStepEnter(handleStepEnter)
-  .onStepExit(handleStepExit)
-  .onContainerEnter(handleContainerEnter)
-  .onContainerExit(handleContainerExit);
-```
-
 ### API
 
 #### scrollama.setup([options])
@@ -156,17 +103,13 @@ _options:_
 
 - `step` (string): Selector (or array of elements) for the step elements that will trigger changes.
   **required**
-- `container` (string): Selector (or element) for the element that contains everything for
-  the scroller. **optional**
-- `graphic` (string): Selector (or element) for the graphic element that will become fixed.
-  **optional**
 - `offset` (number, 0 - 1): How far from the top of the viewport to trigger a
   step. **(default: 0.5)**
 - `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
-- `threshold` (number, 1+): The granularity of the progress interval, in pixels (smaller = more granular updates). **(default: 4)**
-- `order` (boolean): Whether to preserve step triggering order if they fire out of sync (eg. ensure step 2 enters after 1 exits). **(default: true)**
-- `once` (boolean): Only trigger the step to enter once then remove listener. **default: false**
+- `threshold` (number, 1+): The granularity of the progress interval in pixels (smaller = more granular). **(default: 4)**
+- `order` (boolean): Fire previous step triggers if they were jumped. **(default: true)**
+- `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
 - `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
 
@@ -207,24 +150,6 @@ The argument of the callback is an object: `{ element: DOMElement, index: number
 `index`: The index of the step of all steps
 
 `progress`: The percent of completion of the step (0 - 1)
-
-#### scrollama.onContainerEnter(callback)
-
-Callback that fires when the top of container becomes flush with viewport _or_
-the graphic becomes fully in view coming from the bottom of the container.
-
-The argument of the callback is an object: `{ direction: string }`
-
-`direction`: 'up' or 'down'
-
-#### scrollama.onContainerExit(callback)
-
-Callback that fires when the top of container goes below viewport _or_ the
-graphic becomes not full in view leaving the bottom of the container.
-
-The argument of the callback is an object: `{ direction: string }`
-
-`direction`: 'up' or 'down'
 
 #### scrollama.offsetTrigger([number])
 
