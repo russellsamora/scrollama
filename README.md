@@ -26,7 +26,7 @@ to handle element position detection.
 
 ### Examples
 
-_Note: most of these demos use D3 to keep the code concise, but this can be used
+_Note: most of these examples use D3 to keep the code concise, but this can be used
 with any library, or with no library at all._
 
 - [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step
