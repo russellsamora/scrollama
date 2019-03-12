@@ -20,11 +20,7 @@ Scrollytelling can be complicated to implement and difficult to make performant.
 The goal of this library is to provide a simple interface for creating
 scroll-driven interactives. Scrollama is focused on performance by using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
-to handle element position detection. It offers an opinionated (but popular)
-scrollytelling pattern to reduce more involved DOM calculations. The sticky
-graphic pattern (enter-stick-exit) can be seen below. Check out my
-[blog post](https://pudding.cool/process/introducing-scrollama) for a deeper
-introduction.
+to handle element position detection.
 
 [![scrollytelling pattern](https://thumbs.gfycat.com/FearfulHotArabianoryx-size_restricted.gif)](https://pudding.cool/process/how-to-implement-scrollytelling)
 
@@ -37,12 +33,10 @@ with any library, or with no library at all._
   triggers
 - [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
   incremental step progress callback
-- [Sticky Graphic v1 (CSS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-css) -
-  using CSS vertically center chart, and position sticky (+ polyfill) for
-  sticking.
-- [Sticky Graphic v2 (JS, position sticky)](https://russellgoldenberg.github.io/scrollama/sticky-js) -
-  using JS vertically center chart, and position sticky (+ polyfill) for
-  sticking. Added bonus ability to start chart at top of steps then vertically.
+- [Sticky Graphic (Side by Side)](https://russellgoldenberg.github.io/scrollama/sticky-side) -
+  using CSS `position: sticky;` to create a fixed graphic to the side of the text.
+- [Sticky Graphic (Overlay)](https://russellgoldenberg.github.io/scrollama/sticky-overlay) -
+  using CSS `position: sticky;` to create a fixed graphic with fullscreen graphic with text overlayed.
 
 ### Installation
 
