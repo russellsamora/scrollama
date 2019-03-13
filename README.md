@@ -85,14 +85,20 @@ look like:
 ```js
 // instantiate the scrollama
 const scroller = scrollama();
-
 // setup the instance, pass callback functions
 scroller
   .setup({
-    step: '.step' // required - class name of trigger steps
+    step: '.step'
   })
-  .onStepEnter(handleStepEnter)
-  .onStepExit(handleStepExit);
+  .onStepEnter(response => {
+		// { element, index, direction }
+	})
+  .onStepExit(response => {
+		// { element, index, direction }
+	};
+
+// setup resize event
+window.addEventListener('resize', scroller.resize);
 ```
 
 ### API
