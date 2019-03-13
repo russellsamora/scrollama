@@ -91,10 +91,10 @@ scroller
     step: '.step'
   })
   .onStepEnter(response => {
-		// { element, index, direction }
+    // { element, index, direction }
 	})
   .onStepExit(response => {
-		// { element, index, direction }
+    // { element, index, direction }
 	};
 
 // setup resize event
