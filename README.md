@@ -85,6 +85,7 @@ look like:
 ```js
 // instantiate the scrollama
 const scroller = scrollama();
+
 // setup the instance, pass callback functions
 scroller
   .setup({
