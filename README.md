@@ -207,7 +207,7 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 
 MIT License
 
-Copyright (c) 2017 Russell Goldenberg
+Copyright (c) 2019 Russell Goldenberg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
