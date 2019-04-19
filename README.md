@@ -198,6 +198,7 @@ The `.onStepProgress` function does not perform desirably in Safari, returning i
 - [ScrollMagic](http://scrollmagic.io/)
 - [graph-scroll.js](https://1wheel.github.io/graph-scroll/)
 - [ScrollStory](https://sjwilliams.github.io/scrollstory/)
+- [enter-view](https://github.com/russellgoldenberg/enter-view)
 
 ### Logo
 
