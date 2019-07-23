@@ -204,6 +204,17 @@ The `.onStepProgress` function does not perform desirably in Safari, returning i
 
 Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 
+### Contributors 
+* [russellgoldenberg](https://github.com/russellgoldenberg)
+* [gabrielflorit](https://github.com/gabrielflorit)
+* [tbroadley](https://github.com/tbroadley)
+* [jsonkao](https://github.com/jsonkao)
+* [ianmcampbell](https://github.com/iainmcampbell)
+* [ddazal](https://github.com/ddazal)
+* [albinotonnina](https://github.com/albinotonnina)
+* [SidKwok](https://github.com/SidKwok)
+* [Eelsie](https://github.com/Eelsie)
+
 ### License
 
 MIT License
