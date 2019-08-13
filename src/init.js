@@ -258,7 +258,7 @@ function scrollama() {
     const ss = stepStates[index];
 
     // entering below is only when bottomAdjusted is positive
-    // and topAdjusted is positive
+    // and topAdjusted is negative
     if (
       isIntersecting &&
       topAdjusted <= 0 &&
