@@ -166,21 +166,11 @@ function scrollama() {
     return ("" + r + t);
   }
 
-  //www.gomakethings.com/how-to-get-an-elements-distance-from-the-top-of-the-page-with-vanilla-javascript/
   function getOffsetTop(el) {
-    // Set our distance placeholder
-    var distance = 0;
-
-    // Loop up the DOM
-    if (el.offsetParent) {
-      do {
-        distance += el.offsetTop;
-        el = el.offsetParent;
-      } while (el);
-    }
-
-    // Return our distance
-    return distance < 0 ? 0 : distance;
+    const { top } = el.getBoundingClientRect();
+    const scrollTop = window.pageYOffset;
+    const clientTop = document.body.clientTop || 0;
+    return top + scrollTop - clientTop;
   }
 
   function getPageHeight() {
@@ -217,7 +207,7 @@ function scrollama() {
     offsetMargin = offsetVal * viewH;
 
     if (isReady) {
-      stepOffsetHeight = stepEl.map(function (el) { return el.offsetHeight; });
+      stepOffsetHeight = stepEl.map(function (el) { return el.getBoundingClientRect().height; });
       stepOffsetTop = stepEl.map(getOffsetTop);
       if (isEnabled) { updateIO(); }
     }
