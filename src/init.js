@@ -52,12 +52,10 @@ function scrollama() {
   }
 
   function getOffsetTop(el) {
-    const box = el.getBoundingClientRect();
+    const { top } = el.getBoundingClientRect();
     const scrollTop = window.pageYOffset;
     const clientTop = document.body.clientTop || 0;
-    const top = box.top + scrollTop - clientTop;
-
-    return top
+    return top + scrollTop - clientTop;
   }
 
   function getPageHeight() {
