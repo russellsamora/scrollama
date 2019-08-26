@@ -119,6 +119,8 @@ _options:_
 - `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
 - `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
+- `container` (DOMElement): Provide a custom element that all calculations should be relative to. Only for use if the observed elements are in a scrolling container that is *not* the `body` or `html` element **(default:
+  false)**
 
 #### scrollama.onStepEnter(callback)
 

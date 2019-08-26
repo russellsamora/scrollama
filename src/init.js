@@ -27,7 +27,7 @@ function scrollama() {
   let offsetMargin = 0;
   let viewH = 0;
   let pageH = 0;
-  let previousYOffset = 0;
+  let previousScrolledPx = 0;
   let progressThreshold = 0;
 
   let isReady = false;
@@ -39,6 +39,8 @@ function scrollama() {
   let triggerOnce = false;
 
   let direction = 'down';
+
+  let containerEl = null;
 
   const exclude = [];
 
@@ -71,7 +73,15 @@ function scrollama() {
   function getPageHeight() {
     const body = document.body;
     const html = document.documentElement;
-
+    if (containerEl) return Math.max(
+        containerEl.scrollHeight,
+        containerEl.offsetHeight,
+        body.scrollHeight,
+        body.offsetHeight,
+        html.clientHeight,
+        html.scrollHeight,
+        html.offsetHeight
+      );
     return Math.max(
       body.scrollHeight,
       body.offsetHeight,
@@ -86,9 +96,11 @@ function scrollama() {
   }
 
   function updateDirection() {
-    if (window.pageYOffset > previousYOffset) direction = 'down';
-    else if (window.pageYOffset < previousYOffset) direction = 'up';
-    previousYOffset = window.pageYOffset;
+    const scrolledPx = containerEl ? containerEl.scrollTop : amountScrolled = window.pageYOffset;
+
+    if (scrolledPox > previousScrolledPx) direction = 'down';
+    else if (scrolledPox < previousScrolledPx) direction = 'up';
+    previousScrolledPx = scrolledPx;
   }
 
   function disconnectObserver(name) {
@@ -440,7 +452,8 @@ function scrollama() {
     threshold = 4,
     debug = false,
     order = true,
-    once = false
+    once = false,
+    container = false
   }) => {
     // create id unique to this scrollama instance
     id = generateInstanceID();
@@ -457,6 +470,7 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
+    containerEl = container;
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
