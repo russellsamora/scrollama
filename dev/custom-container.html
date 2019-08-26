@@ -119,62 +119,60 @@
 			background: white;
 			padding: 1rem;
 		}
-
-
 	</style>
 
 </head>
 
 <body>
-	<main data-scrollama-container>
+	<main>
 
 
-	<nav>
-		<a href='#anchor-1'>Jump to 1</a>
-		<a href='#anchor-2'>Jump to 2</a>
-		<a href='#anchor-3'>Jump to 3</a>
-		<a href='#anchor-4'>Jump to 4</a>
-		<a href='#anchor-5'>Jump to 5</a>
-	</nav>
+		<nav>
+			<a href='#anchor-1'>Jump to 1</a>
+			<a href='#anchor-2'>Jump to 2</a>
+			<a href='#anchor-3'>Jump to 3</a>
+			<a href='#anchor-4'>Jump to 4</a>
+			<a href='#anchor-5'>Jump to 5</a>
+		</nav>
 
-	<div id='anchor-1'></div>
+		<div id='anchor-1'></div>
 
-	<section id='intro'>
-		<p class='intro__overline'>
-			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
-		</p>
-		<h1 class='intro__hed'>Demo: Basic</h1>
-		<p class='intro__dek'>
-			Start scrolling to see how it works.
-		</p>
-	</section>
+		<section id='intro'>
+			<p class='intro__overline'>
+				<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
+			</p>
+			<h1 class='intro__hed'>Demo: Basic</h1>
+			<p class='intro__dek'>
+				Start scrolling to see how it works.
+			</p>
+		</section>
 
-	<div id='anchor-2'></div>
-	<section id='scroll'>
-		<div class='scroll__text'>
-			<div class='step' data-step='1'>
-				<p>STEP 1</p>
+		<div id='anchor-2'></div>
+		<section id='scroll'>
+			<div class='scroll__text'>
+				<div class='step' data-step='1'>
+					<p>STEP 1</p>
+				</div>
+				<div class='step' data-step='2'>
+					<p>STEP 2</p>
+				</div>
+
+				<div class='step' data-step='3'>
+
+					<p>STEP 3</p>
+					<div id='anchor-3'></div>
+				</div>
+				<div class='step' data-step='4'>
+
+					<p>STEP 4</p>
+
+				</div>
+
 			</div>
-			<div class='step' data-step='2'>
-				<p>STEP 2</p>
-			</div>
-
-			<div class='step' data-step='3'>
-
-				<p>STEP 3</p>
-				<div id='anchor-3'></div>
-			</div>
-			<div class='step' data-step='4'>
-
-				<p>STEP 4</p>
-
-			</div>
-
-		</div>
-	</section>
-	<div id='anchor-4'></div>
-	<section id='outro'></section>
-	<div id='anchor-5'></div>
+		</section>
+		<div id='anchor-4'></div>
+		<section id='outro'></section>
+		<div id='anchor-5'></div>
 
 	</main>
 
@@ -223,11 +221,12 @@
 				step: '.scroll__text .step',
 				debug: true,
 				offset: 0.2,
+				container: container,
 				// progress: true,
 			})
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit)
-				// .onStepProgress(handleStepProgress)
+			// .onStepProgress(handleStepProgress)
 
 			// setup resize event
 			window.addEventListener('resize', scroller.resize);
