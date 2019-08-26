@@ -86,10 +86,10 @@ function scrollama() {
   }
 
   function updateDirection() {
-    const scrolledPx = containerEl ? containerEl.scrollTop : amountScrolled = window.pageYOffset;
+    const scrolledPx = containerEl ? containerEl.scrollTop : window.pageYOffset;
 
-    if (scrolledPox > previousScrolledPx) direction = 'down';
-    else if (scrolledPox < previousScrolledPx) direction = 'up';
+    if (scrolledPx > previousScrolledPx) direction = 'down';
+    else if (scrolledPx < previousScrolledPx) direction = 'up';
     previousScrolledPx = scrolledPx;
   }
 

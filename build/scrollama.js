@@ -142,7 +142,7 @@ function scrollama() {
   var offsetMargin = 0;
   var viewH = 0;
   var pageH = 0;
-  var previousYOffset = 0;
+  var previousScrolledPx = 0;
   var progressThreshold = 0;
 
   var isReady = false;
@@ -154,6 +154,8 @@ function scrollama() {
   var triggerOnce = false;
 
   var direction = 'down';
+
+  var containerEl = null;
 
   var exclude = [];
 
@@ -167,16 +169,25 @@ function scrollama() {
   }
 
   function getOffsetTop(el) {
-    const { top } = el.getBoundingClientRect();
-    const scrollTop = window.pageYOffset;
-    const clientTop = document.body.clientTop || 0;
+    var ref = el.getBoundingClientRect();
+    var top = ref.top;
+    var scrollTop = window.pageYOffset;
+    var clientTop = document.body.clientTop || 0;
     return top + scrollTop - clientTop;
   }
 
   function getPageHeight() {
     var body = document.body;
     var html = document.documentElement;
-
+    if (containerEl) { return Math.max(
+        containerEl.scrollHeight,
+        containerEl.offsetHeight,
+        body.scrollHeight,
+        body.offsetHeight,
+        html.clientHeight,
+        html.scrollHeight,
+        html.offsetHeight
+      ); }
     return Math.max(
       body.scrollHeight,
       body.offsetHeight,
@@ -191,9 +202,11 @@ function scrollama() {
   }
 
   function updateDirection() {
-    if (window.pageYOffset > previousYOffset) { direction = 'down'; }
-    else if (window.pageYOffset < previousYOffset) { direction = 'up'; }
-    previousYOffset = window.pageYOffset;
+    var scrolledPx = containerEl ? containerEl.scrollTop : window.pageYOffset;
+
+    if (scrolledPx > previousScrolledPx) { direction = 'down'; }
+    else if (scrolledPx < previousScrolledPx) { direction = 'up'; }
+    previousScrolledPx = scrolledPx;
   }
 
   function disconnectObserver(name) {
@@ -375,7 +388,7 @@ function scrollama() {
     var ss = stepStates[index];
 
     // entering below is only when bottomAdjusted is positive
-    // and topAdjusted is positive
+    // and topAdjusted is negative
     if (
       isIntersecting &&
       topAdjusted <= 0 &&
@@ -564,6 +577,7 @@ function scrollama() {
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
     var order = ref.order; if ( order === void 0 ) order = true;
     var once = ref.once; if ( once === void 0 ) once = false;
+    var container = ref.container; if ( container === void 0 ) container = false;
 
     // create id unique to this scrollama instance
     id = generateInstanceID();
@@ -580,6 +594,7 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
+    containerEl = container;
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
