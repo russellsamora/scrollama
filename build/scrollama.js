@@ -167,12 +167,10 @@ function scrollama() {
   }
 
   function getOffsetTop(el) {
-    var box = el.getBoundingClientRect();
-    var scrollTop = window.pageYOffset;
-    var clientTop = document.body.clientTop || 0;
-    var top = box.top + scrollTop - clientTop;
-
-    return top
+    const { top } = el.getBoundingClientRect();
+    const scrollTop = window.pageYOffset;
+    const clientTop = document.body.clientTop || 0;
+    return top + scrollTop - clientTop;
   }
 
   function getPageHeight() {
