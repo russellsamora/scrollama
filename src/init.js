@@ -101,7 +101,7 @@ function scrollama() {
     viewH = window.innerHeight;
     pageH = getPageHeight();
 
-    offsetMargin = offsetVal * viewH;
+    offsetMargin = offsetVal > 1 ? offsetVal : offsetVal * viewH;
 
     if (isReady) {
       stepOffsetHeight = stepEl.map(el => el.getBoundingClientRect().height);
@@ -499,9 +499,8 @@ function scrollama() {
 
   S.offsetTrigger = x => {
     if (x && !isNaN(x)) {
-      if (x > 1) console.error('scrollama error: offset value is greater than 1. Fallbacks to 1.');
       if (x < 0) console.error('scrollama error: offset value is lower than 0. Fallbacks to 0.');
-      offsetVal = Math.min(Math.max(0, x), 1);
+      offsetVal = Math.max(0, x);
       return S;
     } else if (isNaN(x)) {
       console.error('scrollama error: offset value is not a number. Fallbacks to 0.');
