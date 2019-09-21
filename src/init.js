@@ -27,7 +27,7 @@ function scrollama() {
   let offsetMargin = 0;
   let viewH = 0;
   let pageH = 0;
-  let previousScrolledPx = 0;
+  let previousPageYOffset = 0;
   let progressThreshold = 0;
 
   let isReady = false;
@@ -86,11 +86,11 @@ function scrollama() {
   }
 
   function updateDirection() {
-    const scrolledPx = containerEl ? containerEl.scrollTop : window.pageYOffset;
+    const pageYOffset = window.pageYOffset;
 
-    if (scrolledPx > previousScrolledPx) direction = 'down';
-    else if (scrolledPx < previousScrolledPx) direction = 'up';
-    previousScrolledPx = scrolledPx;
+    if (pageYOffset > previousPageYOffset) direction = 'down';
+    else if (pageYOffset < previousPageYOffset) direction = 'up';
+    previousPageYOffset = pageYOffset;
   }
 
   function disconnectObserver(name) {
