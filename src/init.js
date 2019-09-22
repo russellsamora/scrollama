@@ -383,7 +383,7 @@ function scrollama() {
 
   // look below for intersection
   function updateStepBelowIO() {
-    io.stepAbove = stepEl.map((el, i) => {
+    io.stepBelow = stepEl.map((el, i) => {
       const marginTop = -offsetMargin;
       const marginBottom = offsetMargin - viewH + stepOffsetHeight[i];
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
