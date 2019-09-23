@@ -27,8 +27,8 @@ function scrollama() {
   let offsetMargin = 0;
   let viewH = 0;
   let pageH = 0;
-  let previousScrolledPx = 0;
-  let progressThreshold = 0;
+	let previousYOffset = 0;
+	let progressThreshold = 0;
 
   let isReady = false;
   let isEnabled = false;
@@ -39,8 +39,6 @@ function scrollama() {
   let triggerOnce = false;
 
   let direction = 'down';
-
-  let containerEl = null;
 
   const exclude = [];
 
@@ -63,15 +61,7 @@ function scrollama() {
   function getPageHeight() {
     const body = document.body;
     const html = document.documentElement;
-    if (containerEl) return Math.max(
-        containerEl.scrollHeight,
-        containerEl.offsetHeight,
-        body.scrollHeight,
-        body.offsetHeight,
-        html.clientHeight,
-        html.scrollHeight,
-        html.offsetHeight
-      );
+
     return Math.max(
       body.scrollHeight,
       body.offsetHeight,
@@ -85,13 +75,11 @@ function scrollama() {
     return +element.getAttribute('data-scrollama-index');
   }
 
-  function updateDirection() {
-    const scrolledPx = containerEl ? containerEl.scrollTop : window.pageYOffset;
-
-    if (scrolledPx > previousScrolledPx) direction = 'down';
-    else if (scrolledPx < previousScrolledPx) direction = 'up';
-    previousScrolledPx = scrolledPx;
-  }
+	function updateDirection() {
+		if (window.pageYOffset > previousYOffset) direction = 'down';
+		else if (window.pageYOffset < previousYOffset) direction = 'up';
+		previousYOffset = window.pageYOffset;
+	}
 
   function disconnectObserver(name) {
     if (io[name]) io[name].forEach(d => d.disconnect());
@@ -442,8 +430,7 @@ function scrollama() {
     threshold = 4,
     debug = false,
     order = true,
-    once = false,
-    container = false
+    once = false
   }) => {
     // create id unique to this scrollama instance
     id = generateInstanceID();
@@ -460,7 +447,7 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
-    containerEl = container;
+  
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
