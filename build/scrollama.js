@@ -142,8 +142,8 @@ function scrollama() {
   var offsetMargin = 0;
   var viewH = 0;
   var pageH = 0;
-  var previousScrolledPx = 0;
-  var progressThreshold = 0;
+	var previousYOffset = 0;
+	var progressThreshold = 0;
 
   var isReady = false;
   var isEnabled = false;
@@ -154,8 +154,6 @@ function scrollama() {
   var triggerOnce = false;
 
   var direction = 'down';
-
-  var containerEl = null;
 
   var exclude = [];
 
@@ -179,15 +177,7 @@ function scrollama() {
   function getPageHeight() {
     var body = document.body;
     var html = document.documentElement;
-    if (containerEl) { return Math.max(
-        containerEl.scrollHeight,
-        containerEl.offsetHeight,
-        body.scrollHeight,
-        body.offsetHeight,
-        html.clientHeight,
-        html.scrollHeight,
-        html.offsetHeight
-      ); }
+
     return Math.max(
       body.scrollHeight,
       body.offsetHeight,
@@ -201,13 +191,11 @@ function scrollama() {
     return +element.getAttribute('data-scrollama-index');
   }
 
-  function updateDirection() {
-    var scrolledPx = containerEl ? containerEl.scrollTop : window.pageYOffset;
-
-    if (scrolledPx > previousScrolledPx) { direction = 'down'; }
-    else if (scrolledPx < previousScrolledPx) { direction = 'up'; }
-    previousScrolledPx = scrolledPx;
-  }
+	function updateDirection() {
+		if (window.pageYOffset > previousYOffset) { direction = 'down'; }
+		else if (window.pageYOffset < previousYOffset) { direction = 'up'; }
+		previousYOffset = window.pageYOffset;
+	}
 
   function disconnectObserver(name) {
     if (io[name]) { io[name].forEach(function (d) { return d.disconnect(); }); }
@@ -229,13 +217,19 @@ function scrollama() {
   }
 
   function handleEnable(enable) {
-    if (enable && !isEnabled) {
-      if (isReady) { updateIO(); }
-      isEnabled = true;
-      return true;
+    if (enable && !isEnabled) { // enable a disabled scroller
+      if (isReady) { // enable a ready scroller
+        updateIO();
+      } else { // can't enable an unready scroller
+        console.error('scrollama error: enable() called before scroller was ready');
+        isEnabled = false;
+        return; // all is not well, don't set the requested state
+      }
     }
-    OBSERVER_NAMES.forEach(disconnectObserver);
-    isEnabled = false;
+    if (!enable && isEnabled) { // disable an enabled scroller
+      OBSERVER_NAMES.forEach(disconnectObserver);
+    }
+    isEnabled = enable; // all is well, set requested state
   }
 
   function createThreshold(height) {
@@ -511,7 +505,7 @@ function scrollama() {
 
   // look below for intersection
   function updateStepBelowIO() {
-    io.stepAbove = stepEl.map(function (el, i) {
+    io.stepBelow = stepEl.map(function (el, i) {
       var marginTop = -offsetMargin;
       var marginBottom = offsetMargin - viewH + stepOffsetHeight[i];
       var rootMargin = marginTop + "px 0px " + marginBottom + "px 0px";
@@ -577,7 +571,6 @@ function scrollama() {
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
     var order = ref.order; if ( order === void 0 ) order = true;
     var once = ref.once; if ( once === void 0 ) once = false;
-    var container = ref.container; if ( container === void 0 ) container = false;
 
     // create id unique to this scrollama instance
     id = generateInstanceID();
@@ -594,7 +587,7 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
-    containerEl = container;
+  
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
