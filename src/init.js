@@ -62,14 +62,22 @@ function scrollama() {
   function getPageHeight() {
     const body = document.body;
     const html = document.documentElement;
-
-    return Math.max(
+    const heights = [
       body.scrollHeight,
       body.offsetHeight,
       html.clientHeight,
       html.scrollHeight,
-      html.offsetHeight
-    );
+      html.offsetHeight,
+    ];
+
+    if (containerElement) {
+      heights.push(
+        containerElement.scrollHeight,
+        containerElement.offsetHeight,
+      );
+    }
+
+    return Math.max.apply(Math.max, heights);
   }
 
   function getIndex(element) {
