@@ -88,12 +88,11 @@ function scrollama() {
 
   function updateDirection() {
     const pageYOffset = window.pageYOffset;
-    // check for overflow: scroll case, which forces pageYOffset to be constant for most browsers
+    // check for overflow: scroll case, which forces pageYOffset to be constant
     if (containerElement && pageYOffset === previousYOffset) {
       const { top: containerTop } = containerElement.getBoundingClientRect();
-      // can't determine directionality from the scroll position
+      // can determine directionality from the scroll position if the container top has changed
       if (containerTop !== previousContainerTop) {
-        // can determine direction
         if (containerTop < previousContainerTop) direction = 'down';
         else if (containerTop > previousContainerTop) direction = 'up';
       }
@@ -101,7 +100,7 @@ function scrollama() {
       previousYOffset = pageYOffset;
       return;
     }
-    // window.pageYOffset is dynamic: use that to determine direction
+    // can determine directionality if window.pageYOffset has changed
     if (pageYOffset > previousYOffset) direction = 'down';
     else if (pageYOffset < previousYOffset) direction = 'up';
     previousYOffset = pageYOffset;
@@ -459,16 +458,15 @@ function scrollama() {
       && (element.scrollHeight > element.clientHeight);
   }
 
-  // recursively search the DOM for a wrapper container with overflow: scroll and fixed height
+  // recursively search the DOM for a parent container with overflow: scroll and fixed height
   // ends at document
   function anyScrollableParent(element) {
     if (element && element.nodeType === 1) { // check dom elements only, stop at document
-      if (isScrollable(element)) {
-        return element;
-      }
-      return anyScrollableParent(element.parentNode);
+      return isScrollable(element)
+        ? element // if a scrollable element is found return the element
+        : anyScrollableParent(element.parentNode); // if not continue to next parent
     }
-    return false;
+    return false; // didn't find a scrollable parent
   }
 
   const S = {};
