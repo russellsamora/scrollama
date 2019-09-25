@@ -27,7 +27,9 @@ function scrollama() {
   let offsetMargin = 0;
   let viewH = 0;
   let pageH = 0;
-	let previousYOffset = 0;
+  let previousYOffset = 0;
+  let previousContainerTop = 0;
+
 	let progressThreshold = 0;
 
   let isReady = false;
@@ -84,11 +86,26 @@ function scrollama() {
     return +element.getAttribute('data-scrollama-index');
   }
 
-	function updateDirection() {
-		if (window.pageYOffset > previousYOffset) direction = 'down';
-		else if (window.pageYOffset < previousYOffset) direction = 'up';
-		previousYOffset = window.pageYOffset;
-	}
+  function updateDirection() {
+    const pageYOffset = window.pageYOffset;
+    // check for overflow: scroll case, which forces pageYOffset to be constant for most browsers
+    if (containerElement && pageYOffset === previousYOffset) {
+      const { top: containerTop } = containerElement.getBoundingClientRect();
+      // can't determine directionality from the scroll position
+      if (containerTop !== previousContainerTop) {
+        // can determine direction
+        if (containerTop < previousContainerTop) direction = 'down';
+        else if (containerTop > previousContainerTop) direction = 'up';
+      }
+      previousContainerTop = containerTop;
+      previousYOffset = pageYOffset;
+      return;
+    }
+    // window.pageYOffset is dynamic: use that to determine direction
+    if (pageYOffset > previousYOffset) direction = 'down';
+    else if (pageYOffset < previousYOffset) direction = 'up';
+    previousYOffset = pageYOffset;
+  }
 
   function disconnectObserver(name) {
     if (io[name]) io[name].forEach(d => d.disconnect());
