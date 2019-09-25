@@ -189,6 +189,7 @@ Removes all observers and callback functions.
   triggers update with new dimensions.
 - Avoid using `viewport height` (vh) in your CSS because scrolling up and down
   constantly triggers vh to change, which will also trigger a window resize.
+- Avoid enclosing step elements inside scrollable containers, or `div` elements with `overflow: scroll || auto` and fixed `height`. Scrollama with throw errors when this occurs.
 
 ### Known Issues
 
@@ -219,7 +220,7 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 * [jonnyscholes](https://github.com/jonnyscholes)
 * [pldg](https://github.com/pldg)
 * [andysongs](https://github.com/andysongs)
-* [Ryshackleton](https://github.com/Ryshackleton)
+* [ryshackleton](https://github.com/Ryshackleton)
 
 ### License
 
