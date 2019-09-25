@@ -503,16 +503,15 @@ function scrollama() {
     // check for css configurations that don't permit determining scroll direction due to the
     // presence of overflowY: scroll or auto with fixed height, and warn accordingly
     if (containerElement && isScrollable(containerElement)) {
-      console.error('scrollama error: container is scrollable, which causes irregular trigger behavior. Remove any css with overflow: scroll; or overflow: auto; with a fixed height.', containerElement);
+      console.error('scrollama error: specified container must not be scrollable. Remove any css with overflow: scroll; or overflow: auto; on elements with fixed height.', containerElement);
     }
 
     // when no container element is specified, start at the step parent and ensure that no parent
     // element in the dom tree is scrollable
     const scrollableParent = anyScrollableParent(stepEl[0].parentNode);
     if (!containerElement && scrollableParent) {
-      console.error('scrollama error: parent div containing steps is scrollable, which causes irregular trigger behavior. Remove any css with overflow: scroll; or overflow: auto; with a fixed height.', scrollableParent);
+      console.error('scrollama error: step elements cannot be children of a scrollable element. Remove any css on the parent element with overflow: scroll; or overflow: auto; on elements with fixed height.', scrollableParent);
     }
-
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
