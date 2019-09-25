@@ -154,7 +154,7 @@
       }
 
       function buildScroller(sectionId, container) {
-        return scrollama()
+        var scroller = scrollama()
           .setup({
             container: container,
             step: '#' + sectionId + ' .step',
