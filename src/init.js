@@ -453,6 +453,24 @@ function scrollama() {
     if (isDebug) bug.setup({ id, stepEl, offsetVal });
   }
 
+  function isScrollable(element) {
+    const style = window.getComputedStyle(element);
+    return (style.overflowY === 'scroll' || style.overflowY === 'auto')
+      && (element.scrollHeight > element.clientHeight);
+  }
+
+  // recursively search the DOM for a wrapper container with overflow: scroll and fixed height
+  // ends at document
+  function anyScrollableParent(element) {
+    if (element && element.nodeType === 1) { // check dom elements only, stop at document
+      if (isScrollable(element)) {
+        return element;
+      }
+      return anyScrollableParent(element.parentNode);
+    }
+    return false;
+  }
+
   const S = {};
 
   S.setup = ({
@@ -481,6 +499,20 @@ function scrollama() {
     preserveOrder = order;
     triggerOnce = once;
     containerElement = select(container);
+
+    // check for css configurations that don't permit determining scroll direction due to the
+    // presence of overflowY: scroll or auto with fixed height, and warn accordingly
+    if (containerElement && isScrollable(containerElement)) {
+      console.error('scrollama error: container is scrollable, which causes irregular trigger behavior. Remove any css with overflow: scroll; or overflow: auto; with a fixed height.', containerElement);
+    }
+
+    // when no container element is specified, start at the step parent and ensure that no parent
+    // element in the dom tree is scrollable
+    const scrollableParent = anyScrollableParent(stepEl[0].parentNode);
+    if (!containerElement && scrollableParent) {
+      console.error('scrollama error: parent div containing steps is scrollable, which causes irregular trigger behavior. Remove any css with overflow: scroll; or overflow: auto; with a fixed height.', scrollableParent);
+    }
+
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
