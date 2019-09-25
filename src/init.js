@@ -445,7 +445,8 @@ function scrollama() {
     threshold = 4,
     debug = false,
     order = true,
-    once = false
+    once = false,
+    container = false
   }) => {
     // create id unique to this scrollama instance
     id = generateInstanceID();
