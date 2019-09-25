@@ -1,4 +1,4 @@
-import { selectAll } from './dom';
+import { select, selectAll } from './dom';
 import * as bug from './debug';
 
 function scrollama() {
@@ -37,6 +37,7 @@ function scrollama() {
   let progressMode = false;
   let preserveOrder = false;
   let triggerOnce = false;
+  let containerElement = null;
 
   let direction = 'down';
 
@@ -453,7 +454,7 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
-  
+    containerElement = select(container);
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
