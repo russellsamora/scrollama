@@ -12,16 +12,16 @@
 		#scrolly {
 			position: relative;
 			display: -webkit-box;
-    	display: -ms-flexbox;
-    	display: flex;
+			display: -ms-flexbox;
+			display: flex;
 			background-color: #f3f3f3;
 			padding: 1rem;
 		}
 
-		#scrolly > * {
+		#scrolly>* {
 			-webkit-box-flex: 1;
-    	-ms-flex: 1;
-    	flex: 1;
+			-ms-flex: 1;
+			flex: 1;
 		}
 
 
@@ -40,6 +40,7 @@
 			-moz-transform: translate3d(0, 0, 0);
 			transform: translate3d(0, 0, 0);
 			background-color: #8a8a8a;
+			z-index: 0;
 		}
 
 		figure p {
@@ -112,7 +113,7 @@
 		</section>
 
 		<section id='scrolly'>
-			
+
 			<article>
 				<div class='step' data-step='1'>
 					<p>STEP 1</p>
@@ -135,7 +136,7 @@
 
 		<section id='outro'></section>
 	</main>
-	
+
 	<!-- <div class='debug'></div> -->
 	<script src='https://unpkg.com/d3@5.9.1/dist/d3.min.js'></script>
 	<script src='https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js'></script>
@@ -159,7 +160,7 @@
 			step.style('height', stepH + 'px');
 
 			var figureHeight = window.innerHeight / 2
-			var figureMarginTop = (window.innerHeight - figureHeight) / 2  
+			var figureMarginTop = (window.innerHeight - figureHeight) / 2
 
 			figure
 				.style('height', figureHeight + 'px')

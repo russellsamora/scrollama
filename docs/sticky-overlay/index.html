@@ -32,6 +32,7 @@
 			-moz-transform: translate3d(0, 0, 0);
 			transform: translate3d(0, 0, 0);
 			background-color: #8a8a8a;
+			z-index: 0;
 		}
 
 		figure p {
@@ -52,7 +53,7 @@
 		.step {
 			margin: 0 auto 2rem auto;
 			color: #fff;
-			background-color: rgba(0,0,0,0.1)
+			background-color: rgba(0, 0, 0, 0.1)
 		}
 
 		.step:last-child {
@@ -125,12 +126,12 @@
 				</div>
 			</article>
 
-			
+
 		</section>
 
 		<section id='outro'></section>
 	</main>
-	
+
 	<!-- <div class='debug'></div> -->
 	<script src='https://unpkg.com/d3@5.9.1/dist/d3.min.js'></script>
 	<script src='https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js'></script>
@@ -154,7 +155,7 @@
 			step.style('height', stepH + 'px');
 
 			var figureHeight = window.innerHeight / 2
-			var figureMarginTop = (window.innerHeight - figureHeight) / 2  
+			var figureMarginTop = (window.innerHeight - figureHeight) / 2
 
 			figure
 				.style('height', figureHeight + 'px')
