@@ -16,6 +16,14 @@ function selectionToArray(selection) {
   return result;
 }
 
+// public
+function select(selector) {
+  if (selector instanceof Element) { return selector; }
+  else if (typeof selector === 'string')
+    { return document.querySelector(selector); }
+  return null;
+}
+
 function selectAll(selector, parent) {
   if ( parent === void 0 ) parent = document;
 
@@ -142,7 +150,9 @@ function scrollama() {
   var offsetMargin = 0;
   var viewH = 0;
   var pageH = 0;
-	var previousYOffset = 0;
+  var previousYOffset = 0;
+  var previousContainerTop = 0;
+
 	var progressThreshold = 0;
 
   var isReady = false;
@@ -152,6 +162,7 @@ function scrollama() {
   var progressMode = false;
   var preserveOrder = false;
   var triggerOnce = false;
+  var containerElement = null;
 
   var direction = 'down';
 
@@ -177,25 +188,47 @@ function scrollama() {
   function getPageHeight() {
     var body = document.body;
     var html = document.documentElement;
-
-    return Math.max(
+    var heights = [
       body.scrollHeight,
       body.offsetHeight,
       html.clientHeight,
       html.scrollHeight,
-      html.offsetHeight
-    );
+      html.offsetHeight ];
+
+    if (containerElement) {
+      heights.push(
+        containerElement.scrollHeight,
+        containerElement.offsetHeight
+      );
+    }
+
+    return Math.max.apply(Math.max, heights);
   }
 
   function getIndex(element) {
     return +element.getAttribute('data-scrollama-index');
   }
 
-	function updateDirection() {
-		if (window.pageYOffset > previousYOffset) { direction = 'down'; }
-		else if (window.pageYOffset < previousYOffset) { direction = 'up'; }
-		previousYOffset = window.pageYOffset;
-	}
+  function updateDirection() {
+    var pageYOffset = window.pageYOffset;
+    // check for overflow: scroll case, which forces pageYOffset to be constant
+    if (containerElement && pageYOffset === previousYOffset) {
+      var ref = containerElement.getBoundingClientRect();
+      var containerTop = ref.top;
+      // can determine directionality from the scroll position if the container top has changed
+      if (containerTop !== previousContainerTop) {
+        if (containerTop < previousContainerTop) { direction = 'down'; }
+        else if (containerTop > previousContainerTop) { direction = 'up'; }
+      }
+      previousContainerTop = containerTop;
+      previousYOffset = pageYOffset;
+      return;
+    }
+    // can determine directionality if window.pageYOffset has changed
+    if (pageYOffset > previousYOffset) { direction = 'down'; }
+    else if (pageYOffset < previousYOffset) { direction = 'up'; }
+    previousYOffset = pageYOffset;
+  }
 
   function disconnectObserver(name) {
     if (io[name]) { io[name].forEach(function (d) { return d.disconnect(); }); }
@@ -561,6 +594,23 @@ function scrollama() {
     if (isDebug) { setup({ id: id, stepEl: stepEl, offsetVal: offsetVal }); }
   }
 
+  function isScrollable(element) {
+    var style = window.getComputedStyle(element);
+    return (style.overflowY === 'scroll' || style.overflowY === 'auto')
+      && (element.scrollHeight > element.clientHeight);
+  }
+
+  // recursively search the DOM for a parent container with overflow: scroll and fixed height
+  // ends at document
+  function anyScrollableParent(element) {
+    if (element && element.nodeType === 1) { // check dom elements only, stop at document
+      return isScrollable(element)
+        ? element // if a scrollable element is found return the element
+        : anyScrollableParent(element.parentNode); // if not continue to next parent
+    }
+    return false; // didn't find a scrollable parent
+  }
+
   var S = {};
 
   S.setup = function (ref) {
@@ -571,6 +621,7 @@ function scrollama() {
     var debug = ref.debug; if ( debug === void 0 ) debug = false;
     var order = ref.order; if ( order === void 0 ) order = true;
     var once = ref.once; if ( once === void 0 ) once = false;
+    var container = ref.container; if ( container === void 0 ) container = false;
 
     // create id unique to this scrollama instance
     id = generateInstanceID();
@@ -587,7 +638,20 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
-  
+    containerElement = select(container);
+
+    // check for css configurations that don't permit determining scroll direction due to the
+    // presence of overflowY: scroll or auto with fixed height, and warn accordingly
+    if (containerElement && isScrollable(containerElement)) {
+      console.error('scrollama error: specified container must not be scrollable. Remove any css with overflow: scroll; or overflow: auto; on elements with fixed height.', containerElement);
+    }
+
+    // when no container element is specified, start at the step parent and ensure that no parent
+    // element in the dom tree is scrollable
+    var scrollableParent = anyScrollableParent(stepEl[0].parentNode);
+    if (!containerElement && scrollableParent) {
+      console.error('scrollama error: step elements cannot be children of a scrollable element. Remove any css on the parent element with overflow: scroll; or overflow: auto; on elements with fixed height.', scrollableParent);
+    }
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
