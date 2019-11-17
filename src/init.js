@@ -427,6 +427,23 @@ function scrollama() {
     if (isDebug) bug.setup({ id, stepEl, offsetVal });
   }
 
+  function isYScrollable(element) {
+    const style = window.getComputedStyle(element);
+    return (style.overflowY === 'scroll' || style.overflowY === 'auto')
+      && (element.scrollHeight > element.clientHeight);
+  }
+
+  // recursively search the DOM for a parent container with overflowY: scroll and fixed height
+  // ends at document
+  function anyScrollableParent(element) {
+    if (element && element.nodeType === 1) { // check dom elements only, stop at document
+      return isYScrollable(element)
+        ? element // if a scrollable element is found return the element
+        : anyScrollableParent(element.parentNode); // if not continue to next parent
+    }
+    return false; // didn't find a scrollable parent
+  }
+
   const S = {};
 
   S.setup = ({
