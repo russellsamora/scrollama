@@ -600,8 +600,11 @@ function scrollama() {
       return S;
     }
 
-    // start at the step parent and ensure that no parent element in the dom tree is scrollable
-    var scrollableParent = anyScrollableParent(stepEl[0].parentNode);
+    // ensure that no step has a scrollable parent element in the dom tree
+    var scrollableParent = stepEl.reduce(function (foundScrollable, step) { return (
+      foundScrollable || anyScrollableParent(step.parentNode)); }, // check current step for scrollable parent
+      false // assume no scrollable parents to start
+    );
     if (scrollableParent) {
       console.error('scrollama error: step elements cannot be children of a scrollable element. Remove any css on the parent element with overflow: scroll; or overflow: auto; on elements with fixed height.', scrollableParent);
     }
