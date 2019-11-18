@@ -1,0 +1,32 @@
+{
+	"extends": [
+		"airbnb-base",
+		"prettier"
+	],
+	"parser": "babel-eslint",
+	"parserOptions": {
+		"ecmaVersion": 2018,
+		"ecmaFeatures": {
+			"impliedStrict": true,
+			"classes": true
+		}
+	},
+	"env": {
+		"browser": true,
+		"node": true
+	},
+	"rules": {
+		"prettier/prettier": [
+			"error",
+			{
+				"trailingComma": "es5",
+				"singleQuote": true,
+				"printWidth": 80
+			}
+		],
+		"no-console": "off"
+	},
+	"plugins": [
+		"prettier"
+	]
+}

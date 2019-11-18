@@ -16,7 +16,6 @@ function selectionToArray(selection) {
   return result;
 }
 
-// public
 function selectAll(selector, parent) {
   if ( parent === void 0 ) parent = document;
 
@@ -123,13 +122,12 @@ function scrollama() {
     'stepBelow',
     'stepProgress',
     'viewportAbove',
-    'viewportBelow'
-  ];
+    'viewportBelow' ];
 
   var cb = {
     stepEnter: function () {},
     stepExit: function () {},
-    stepProgress: function () {}
+    stepProgress: function () {},
   };
   var io = {};
 
@@ -143,8 +141,8 @@ function scrollama() {
   var offsetMargin = 0;
   var viewH = 0;
   var pageH = 0;
-	var previousYOffset = 0;
-	var progressThreshold = 0;
+  var previousYOffset = 0;
+  var progressThreshold = 0;
 
   var isReady = false;
   var isEnabled = false;
@@ -158,7 +156,7 @@ function scrollama() {
 
   var exclude = [];
 
-  /*** HELPERS ***/
+  /* HELPERS */
   function generateInstanceID() {
     var a = 'abcdefghijklmnopqrstuv';
     var l = a.length;
@@ -192,11 +190,11 @@ function scrollama() {
     return +element.getAttribute('data-scrollama-index');
   }
 
-	function updateDirection() {
-		if (window.pageYOffset > previousYOffset) { direction = 'down'; }
-		else if (window.pageYOffset < previousYOffset) { direction = 'up'; }
-		previousYOffset = window.pageYOffset;
-	}
+  function updateDirection() {
+    if (window.pageYOffset > previousYOffset) { direction = 'down'; }
+    else if (window.pageYOffset < previousYOffset) { direction = 'up'; }
+    previousYOffset = window.pageYOffset;
+  }
 
   function disconnectObserver(name) {
     if (io[name]) { io[name].forEach(function (d) { return d.disconnect(); }); }
@@ -218,16 +216,22 @@ function scrollama() {
   }
 
   function handleEnable(enable) {
-    if (enable && !isEnabled) { // enable a disabled scroller
-      if (isReady) { // enable a ready scroller
+    if (enable && !isEnabled) {
+      // enable a disabled scroller
+      if (isReady) {
+        // enable a ready scroller
         updateIO();
-      } else { // can't enable an unready scroller
-        console.error('scrollama error: enable() called before scroller was ready');
+      } else {
+        // can't enable an unready scroller
+        console.error(
+          'scrollama error: enable() called before scroller was ready'
+        );
         isEnabled = false;
         return; // all is not well, don't set the requested state
       }
     }
-    if (!enable && isEnabled) { // disable an enabled scroller
+    if (!enable && isEnabled) {
+      // disable an enabled scroller
       OBSERVER_NAMES.forEach(disconnectObserver);
     }
     isEnabled = enable; // all is well, set requested state
@@ -237,14 +241,13 @@ function scrollama() {
     var count = Math.ceil(height / progressThreshold);
     var t = [];
     var ratio = 1 / count;
-    for (var i = 0; i < count; i++) {
+    for (var i = 0; i < count; i += 1) {
       t.push(i * ratio);
     }
     return t;
   }
 
-  /*** NOTIFY CALLBACKS ***/
-
+  /* NOTIFY CALLBACKS */
   function notifyStepProgress(element, progress) {
     var index = getIndex(element);
     if (progress !== undefined) { stepStates[index].progress = progress; }
@@ -256,7 +259,7 @@ function scrollama() {
   function notifyOthers(index, location) {
     if (location === 'above') {
       // check if steps above/below were skipped and should be notified first
-      for (var i = 0; i < index; i++) {
+      for (var i = 0; i < index; i += 1) {
         var ss = stepStates[i];
         if (ss.state !== 'enter' && ss.direction !== 'down') {
           notifyStepEnter(stepEl[i], 'down', false);
@@ -268,7 +271,7 @@ function scrollama() {
         // }
       }
     } else if (location === 'below') {
-      for (var i$1 = stepStates.length - 1; i$1 > index; i$1--) {
+      for (var i$1 = stepStates.length - 1; i$1 > index; i$1 -= 1) {
         var ss$1 = stepStates[i$1];
         if (ss$1.state === 'enter') {
           notifyStepExit(stepEl[i$1], 'up');
@@ -281,20 +284,18 @@ function scrollama() {
     }
   }
 
-  function notifyStepEnter(element, direction, check) {
+  function notifyStepEnter(element, dir, check) {
     if ( check === void 0 ) check = true;
 
     var index = getIndex(element);
-    var resp = { element: element, index: index, direction: direction };
+    var resp = { element: element, index: index, direction: dir };
 
     // store most recent trigger
-    stepStates[index].direction = direction;
+    stepStates[index].direction = dir;
     stepStates[index].state = 'enter';
-    if (preserveOrder && check && direction === 'down')
-      { notifyOthers(index, 'above'); }
+    if (preserveOrder && check && dir === 'down') { notifyOthers(index, 'above'); }
 
-    if (preserveOrder && check && direction === 'up')
-      { notifyOthers(index, 'below'); }
+    if (preserveOrder && check && dir === 'up') { notifyOthers(index, 'below'); }
 
     if (cb.stepEnter && !exclude[index]) {
       cb.stepEnter(resp, stepStates);
@@ -305,26 +306,26 @@ function scrollama() {
     if (progressMode) { notifyStepProgress(element); }
   }
 
-  function notifyStepExit(element, direction) {
+  function notifyStepExit(element, dir) {
     var index = getIndex(element);
-    var resp = { element: element, index: index, direction: direction };
+    var resp = { element: element, index: index, direction: dir };
 
     if (progressMode) {
-      if (direction === 'down' && stepStates[index].progress < 1)
+      if (dir === 'down' && stepStates[index].progress < 1)
         { notifyStepProgress(element, 1); }
-      else if (direction === 'up' && stepStates[index].progress > 0)
+      else if (dir === 'up' && stepStates[index].progress > 0)
         { notifyStepProgress(element, 0); }
     }
 
     // store most recent trigger
-    stepStates[index].direction = direction;
+    stepStates[index].direction = dir;
     stepStates[index].state = 'exit';
 
     cb.stepExit(resp, stepStates);
     if (isDebug) { notifyStep({ id: id, index: index, state: 'exit' }); }
   }
 
-  /*** OBSERVER - INTERSECT HANDLING ***/
+  /* OBSERVER - INTERSECT HANDLING */
   // this is good for entering while scrolling down + leaving while scrolling up
   function intersectStepAbove(ref) {
     var entry = ref[0];
@@ -462,7 +463,7 @@ function scrollama() {
     }
   }
 
-  /***  OBSERVER - CREATION ***/
+  /*  OBSERVER - CREATION */
   // jump into viewport
   function updateViewportAboveIO() {
     io.viewportAbove = stepEl.map(function (el, i) {
@@ -544,7 +545,7 @@ function scrollama() {
     if (progressMode) { updateStepProgressIO(); }
   }
 
-  /*** SETUP FUNCTIONS ***/
+  /* SETUP FUNCTIONS */
 
   function indexSteps() {
     stepEl.forEach(function (el, i) { return el.setAttribute('data-scrollama-index', i); });
@@ -554,7 +555,7 @@ function scrollama() {
     stepStates = stepEl.map(function () { return ({
       direction: null,
       state: null,
-      progress: 0
+      progress: 0,
     }); });
   }
 
@@ -564,17 +565,22 @@ function scrollama() {
 
   function isYScrollable(element) {
     var style = window.getComputedStyle(element);
-    return (style.overflowY === 'scroll' || style.overflowY === 'auto')
-      && (element.scrollHeight > element.clientHeight);
+    return (
+      (style.overflowY === 'scroll' || style.overflowY === 'auto') &&
+      element.scrollHeight > element.clientHeight
+    );
   }
 
   // recursively search the DOM for a parent container with overflowY: scroll and fixed height
   // ends at document
   function anyScrollableParent(element) {
-    if (element && element.nodeType === 1) { // check dom elements only, stop at document
+    if (element && element.nodeType === 1) {
+      // check dom elements only, stop at document
+      // if a scrollable element is found return the element
+      // if not continue to next parent
       return isYScrollable(element)
-        ? element // if a scrollable element is found return the element
-        : anyScrollableParent(element.parentNode); // if not continue to next parent
+        ? element
+        : anyScrollableParent(element.parentNode);
     }
     return false; // didn't find a scrollable parent
   }
@@ -601,12 +607,17 @@ function scrollama() {
     }
 
     // ensure that no step has a scrollable parent element in the dom tree
-    var scrollableParent = stepEl.reduce(function (foundScrollable, step) { return (
-      foundScrollable || anyScrollableParent(step.parentNode)); }, // check current step for scrollable parent
-      false // assume no scrollable parents to start
+    // check current step for scrollable parent
+    // assume no scrollable parents to start
+    var scrollableParent = stepEl.reduce(
+      function (foundScrollable, s) { return foundScrollable || anyScrollableParent(s.parentNode); },
+      false
     );
     if (scrollableParent) {
-      console.error('scrollama error: step elements cannot be children of a scrollable element. Remove any css on the parent element with overflow: scroll; or overflow: auto; on elements with fixed height.', scrollableParent);
+      console.error(
+        'scrollama error: step elements cannot be children of a scrollable element. Remove any css on the parent element with overflow: scroll; or overflow: auto; on elements with fixed height.',
+        scrollableParent
+      );
     }
 
     // options
@@ -614,7 +625,6 @@ function scrollama() {
     progressMode = progress;
     preserveOrder = order;
     triggerOnce = once;
-  
 
     S.offsetTrigger(offset);
     progressThreshold = Math.max(1, +threshold);
@@ -647,18 +657,31 @@ function scrollama() {
 
   S.destroy = function () {
     handleEnable(false);
-    Object.keys(cb).forEach(function (c) { return (cb[c] = null); });
-    Object.keys(io).forEach(function (i) { return (io[i] = null); });
+    Object.keys(cb).forEach(function (c) {
+      cb[c] = null;
+    });
+    Object.keys(io).forEach(function (i) {
+      io[i] = null;
+    });
   };
 
   S.offsetTrigger = function (x) {
     if (x && !isNaN(x)) {
-      if (x > 1) { console.error('scrollama error: offset value is greater than 1. Fallbacks to 1.'); }
-      if (x < 0) { console.error('scrollama error: offset value is lower than 0. Fallbacks to 0.'); }
+      if (x > 1)
+        { console.error(
+          'scrollama error: offset value is greater than 1. Fallbacks to 1.'
+        ); }
+      if (x < 0)
+        { console.error(
+          'scrollama error: offset value is lower than 0. Fallbacks to 0.'
+        ); }
       offsetVal = Math.min(Math.max(0, x), 1);
       return S;
-    } else if (isNaN(x)) {
-      console.error('scrollama error: offset value is not a number. Fallbacks to 0.');
+    }
+    if (isNaN(x)) {
+      console.error(
+        'scrollama error: offset value is not a number. Fallbacks to 0.'
+      );
     }
     return offsetVal;
   };
