@@ -16,6 +16,7 @@ function selectionToArray(selection) {
   return result;
 }
 
+// public
 function selectAll(selector, parent) {
   if ( parent === void 0 ) parent = document;
 
@@ -561,6 +562,23 @@ function scrollama() {
     if (isDebug) { setup({ id: id, stepEl: stepEl, offsetVal: offsetVal }); }
   }
 
+  function isYScrollable(element) {
+    var style = window.getComputedStyle(element);
+    return (style.overflowY === 'scroll' || style.overflowY === 'auto')
+      && (element.scrollHeight > element.clientHeight);
+  }
+
+  // recursively search the DOM for a parent container with overflowY: scroll and fixed height
+  // ends at document
+  function anyScrollableParent(element) {
+    if (element && element.nodeType === 1) { // check dom elements only, stop at document
+      return isYScrollable(element)
+        ? element // if a scrollable element is found return the element
+        : anyScrollableParent(element.parentNode); // if not continue to next parent
+    }
+    return false; // didn't find a scrollable parent
+  }
+
   var S = {};
 
   S.setup = function (ref) {
@@ -580,6 +598,15 @@ function scrollama() {
     if (!stepEl.length) {
       console.error('scrollama error: no step elements');
       return S;
+    }
+
+    // ensure that no step has a scrollable parent element in the dom tree
+    var scrollableParent = stepEl.reduce(function (foundScrollable, step) { return (
+      foundScrollable || anyScrollableParent(step.parentNode)); }, // check current step for scrollable parent
+      false // assume no scrollable parents to start
+    );
+    if (scrollableParent) {
+      console.error('scrollama error: step elements cannot be children of a scrollable element. Remove any css on the parent element with overflow: scroll; or overflow: auto; on elements with fixed height.', scrollableParent);
     }
 
     // options

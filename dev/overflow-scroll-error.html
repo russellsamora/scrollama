@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Scrollama Demo: Basic</title>
+    <meta name="description" content="Scrollama Demo: Error when steps are children of multiple scrollable elements" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      /* default / demo page */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+      body {
+        font-weight: 300;
+        color: #2a2a2a;
+        height: 100vh;
+      }
+      main {
+        /* NO OVERFLOW HERE */
+      }
+      p,
+      h1,
+      h2,
+      h3,
+      h4,
+      a {
+        margin: 0;
+        font-weight: 300;
+      }
+      a,
+      a:visited,
+      a:hover {
+        color: #f30;
+        text-decoration: none;
+        border-bottom: 1px solid currentColor;
+      }
+      #intro {
+        max-width: 40rem;
+        margin: 1rem auto;
+        text-align: center;
+      }
+      .intro__overline {
+        font-size: 1.4rem;
+      }
+      .intro__hed {
+        font-size: 1.4rem;
+        margin: 1.5rem auto;
+        text-transform: uppercase;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+      }
+      .intro__dek {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+      }
+      /* demo */
+      #bottom-spacer {
+        height: 100vh;
+      }
+      /* scrollama */
+      #step-container-element {
+        position: relative;
+        height: 500px;
+        width: 50vw;
+        overflow-y: scroll;
+      }
+      .scroll__text {
+        position: relative;
+        padding: 0 1rem;
+        margin: 0 auto;
+        width: 33%;
+      }
+      .step {
+        margin: 2rem auto 4rem auto;
+        border: 1px solid #333;
+        background-color: #fff;
+      }
+      .step.is-active {
+        background-color: lightgoldenrodyellow;
+      }
+      .step p {
+        text-align: center;
+        padding: 1rem;
+        font-size: 1.5rem;
+      }
+      .section_title {
+        position: sticky;
+        top: 0;
+      }
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        background: white;
+        padding: 1rem;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <main>
+      <section id='intro'>
+        <p class='intro__overline'>
+          <a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
+        </p>
+        <h1 class='intro__hed'>Scrollama throws an error when steps are children of a scrollable element</h1>
+        <p class="intro__dek">Calculating the scroll direction is problematic when steps are children of a scrollable element that isn't the page scroll. This page provides an example of what not to do: <strong>do NOT place steps inside a scrollable element</strong> with <em>overflowY: scroll</em> or <em>overflowY: auto</em> and fixed height.</p>
+        <p class="intro__dek">To demonstrate the incorrect behavior:</p>
+        <ul class="intro__dek">
+          <li>ensure that the olive-colored element intersects the trigger (the dotted line)</li>
+          <li>move the mouse pointer inside the olive-colored element</li>
+          <li>scroll up and down with the mouse pointer inside the colored container. You may have to scroll up and down several times before the direction calculation becomes incorrect</li>
+        </ul>
+        <p class="intro__dek"><strong>Notice that step events are not triggered correctly when the inner container scrolls without the window element scrolling.</strong></p>
+      </section>
+    </main>
+
+    <script src="./d3.v4.min.js"></script>
+    <script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
+    <script src="../build/scrollama.js"></script>
+    <script>
+      function buildSection(title, parentSelector, sectionId, nSteps, stepHeight, background) {
+        var scroll = d3.select(parentSelector)
+          .append('section')
+          .append('div')
+          .classed('scroll__text', true)
+          .attr('id', sectionId)
+          .style('background', background);
+        scroll.append('div')
+          .append('h2')
+          .classed('section_title', true)
+          .html(title);
+        var data = d3.range(nSteps);
+        scroll.selectAll('div.step')
+          .data(data)
+          .enter()
+          .append('div')
+          .classed('step', true)
+          .attr('data-step', function (datum) { return datum.toString(); })
+          .style('height', stepHeight + 'px')
+          .append('p')
+          .html(function (datum) { return 'STEP ' + datum; });
+        return scroll.node();
+      }
+      function buildScroller(sectionId) {
+        var scroller = scrollama()
+          .setup({
+            step: '#' + sectionId + ' .step',
+            debug: true,
+            offset: 0.9,
+            progress: true,
+          })
+          .onStepEnter(function handleStepEnter(response) {
+            console.log(response.index, '-------- enter');
+            response.element.classList.add('is-active');
+          })
+          .onStepExit(function handleStepExit(response) {
+            console.log(response.index, '-------- exit');
+            response.element.classList.remove('is-active');
+          })
+          .onStepProgress(function handleStepProgress(response) {
+            console.log(response.index, '-------- progress -', response.progress);
+          });
+        // setup resize event
+        window.addEventListener('resize', scroller.resize);
+      }
+      function init() {
+        var scrollableStepContainerId = 'step-container-element';
+        buildSection("I'm a scrollable element containing steps", 'main', scrollableStepContainerId, 5, 150, 'olive');
+        buildScroller(scrollableStepContainerId);
+        d3.select('main').append('div')
+          .attr('id', 'bottom-spacer');
+      }
+      // kick things off
+      init();
+    </script>
+  </body>
+
+</html>
