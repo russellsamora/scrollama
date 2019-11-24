@@ -4,6 +4,7 @@
 	"description": "Lightweight scrollytelling library using IntersectionObserver",
 	"main": "build/scrollama.js",
 	"browser": "build/scrollama.js",
+	"types": "index.d.ts",
 	"scripts": {
 		"dev": "cross-env NODE_ENV=development rollup -w -c",
 		"build": "npm run pretest && cross-env NODE_ENV=production rollup -c && npm run docs",
