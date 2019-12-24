@@ -218,6 +218,7 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 * [pldg](https://github.com/pldg)
 * [andysongs](https://github.com/andysongs)
 * [Ryshackleton](https://github.com/Ryshackleton)
+* [steven0811](https://github.com/steven0811)
 
 ### License
 
