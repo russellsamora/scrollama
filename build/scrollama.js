@@ -6,59 +6,39 @@
 
 // DOM helper functions
 
-// private
-function selectionToArray(selection) {
-  var len = selection.length;
-  var result = [];
-  for (var i = 0; i < len; i += 1) {
-    result.push(selection[i]);
-  }
-  return result;
-}
-
+// public
 function selectAll(selector, parent) {
   if ( parent === void 0 ) parent = document;
 
   if (typeof selector === 'string') {
-    return selectionToArray(parent.querySelectorAll(selector));
+    return Array.from(parent.querySelectorAll(selector));
   } else if (selector instanceof Element) {
-    return selectionToArray([selector]);
+    return [selector];
   } else if (selector instanceof NodeList) {
-    return selectionToArray(selector);
+    return Array.from(selector);
   } else if (selector instanceof Array) {
     return selector;
   }
   return [];
 }
 
-function getStepId(ref) {
-  var id = ref.id;
-  var i = ref.i;
-
-  return ("scrollama__debug-step--" + id + "-" + i);
-}
-
-function getOffsetId(ref) {
-  var id = ref.id;
-
+function getOffsetId(id) {
   return ("scrollama__debug-offset--" + id);
 }
 
 // SETUP
-
 function setupOffset(ref) {
   var id = ref.id;
   var offsetVal = ref.offsetVal;
   var stepClass = ref.stepClass;
 
   var el = document.createElement('div');
-  el.setAttribute('id', getOffsetId({ id: id }));
-  el.setAttribute('class', 'scrollama__debug-offset');
-
+  el.id = getOffsetId(id);
+  el.className = 'scrollama__debug-offset';
   el.style.position = 'fixed';
   el.style.left = '0';
   el.style.width = '100%';
-  el.style.height = '0px';
+  el.style.height = '0';
   el.style.borderTop = '2px dashed black';
   el.style.zIndex = '9999';
 
@@ -78,28 +58,18 @@ function setup(ref) {
   var offsetVal = ref.offsetVal;
   var stepEl = ref.stepEl;
 
-  var stepClass = stepEl[0].getAttribute('class');
+  var stepClass = stepEl[0].className;
   setupOffset({ id: id, offsetVal: offsetVal, stepClass: stepClass });
 }
 
 // UPDATE
-function updateOffset(ref) {
-  var id = ref.id;
-  var offsetMargin = ref.offsetMargin;
-  var offsetVal = ref.offsetVal;
-
-  var idVal = getOffsetId({ id: id });
-  var el = document.querySelector(("#" + idVal));
-  el.style.top = offsetMargin + "px";
-}
-
 function update(ref) {
   var id = ref.id;
-  var stepOffsetHeight = ref.stepOffsetHeight;
   var offsetMargin = ref.offsetMargin;
-  var offsetVal = ref.offsetVal;
 
-  updateOffset({ id: id, offsetMargin: offsetMargin });
+  var idVal = getOffsetId(id);
+  var el = document.getElementById(idVal);
+  el.style.top = offsetMargin + "px";
 }
 
 function notifyStep(ref) {
@@ -107,9 +77,9 @@ function notifyStep(ref) {
   var index = ref.index;
   var state = ref.state;
 
-  var idVal = getStepId({ id: id, i: index });
-  var elA = document.querySelector(("#" + idVal + "_above"));
-  var elB = document.querySelector(("#" + idVal + "_below"));
+  var prefix = "scrollama__debug-step--" + id + "-" + index;
+  var elA = document.getElementById((prefix + "_above"));
+  var elB = document.getElementById((prefix + "_below"));
   var display = state === 'enter' ? 'block' : 'none';
 
   if (elA) { elA.style.display = display; }
