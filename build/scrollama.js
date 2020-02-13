@@ -435,7 +435,7 @@ function scrollama() {
     var bottom = boundingClientRect.bottom;
     var bottomAdjusted = bottom - offsetMargin;
     if (isIntersecting && bottomAdjusted >= 0) {
-      notifyStepProgress(target, +intersectionRatio.toFixed(3));
+      notifyStepProgress(target, +intersectionRatio);
     }
   }
 
