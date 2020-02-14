@@ -45,7 +45,7 @@ with any library, or with no library at all._
 Old school (exposes the `scrollama` global):
 
 ```html
-<script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
+<script src="https://unpkg.com/intersection-observer"></script>
 <script src="https://unpkg.com/scrollama"></script>
 ```
 
@@ -58,9 +58,9 @@ npm install scrollama intersection-observer --save
 And then import/require it:
 
 ```js
-import 'intersection-observer';
-import scrollama from 'scrollama'; // or...
-const scrollama = require('scrollama');
+import "intersection-observer";
+import scrollama from "scrollama"; // or...
+const scrollama = require("scrollama");
 ```
 
 ### How to use
@@ -89,7 +89,7 @@ const scroller = scrollama();
 // setup the instance, pass callback functions
 scroller
   .setup({
-    step: '.step'
+    step: ".step"
   })
   .onStepEnter(response => {
     // { element, index, direction }
@@ -99,7 +99,7 @@ scroller
   });
 
 // setup resize event
-window.addEventListener('resize', scroller.resize);
+window.addEventListener("resize", scroller.resize);
 ```
 
 ### API
@@ -204,22 +204,23 @@ The `.onStepProgress` function does not perform desirably in Safari, returning i
 
 Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 
-### Contributors 
-* [russellgoldenberg](https://github.com/russellgoldenberg)
-* [gabrielflorit](https://github.com/gabrielflorit)
-* [tbroadley](https://github.com/tbroadley)
-* [jsonkao](https://github.com/jsonkao)
-* [ianmcampbell](https://github.com/iainmcampbell)
-* [ddazal](https://github.com/ddazal)
-* [albinotonnina](https://github.com/albinotonnina)
-* [SidKwok](https://github.com/SidKwok)
-* [Eelsie](https://github.com/Eelsie)
-* [jonnyscholes](https://github.com/jonnyscholes)
-* [pldg](https://github.com/pldg)
-* [andysongs](https://github.com/andysongs)
-* [Ryshackleton](https://github.com/Ryshackleton)
-* [steven0811](https://github.com/steven0811)
-* [smnarnold](https://github.com/smnarnold)
+### Contributors
+
+- [russellgoldenberg](https://github.com/russellgoldenberg)
+- [gabrielflorit](https://github.com/gabrielflorit)
+- [tbroadley](https://github.com/tbroadley)
+- [jsonkao](https://github.com/jsonkao)
+- [ianmcampbell](https://github.com/iainmcampbell)
+- [ddazal](https://github.com/ddazal)
+- [albinotonnina](https://github.com/albinotonnina)
+- [SidKwok](https://github.com/SidKwok)
+- [Eelsie](https://github.com/Eelsie)
+- [jonnyscholes](https://github.com/jonnyscholes)
+- [pldg](https://github.com/pldg)
+- [andysongs](https://github.com/andysongs)
+- [Ryshackleton](https://github.com/Ryshackleton)
+- [steven0811](https://github.com/steven0811)
+- [smnarnold](https://github.com/smnarnold)
 
 ### License
 
