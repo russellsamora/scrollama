@@ -1,228 +1,225 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Scrollama Demo: Basic</title>
+    <meta name="description" content="Scrollama Demo: Basic" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* default / demo page */
 
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Scrollama Demo: Basic</title>
-	<meta name="description" content="Scrollama Demo: Basic">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style>
-		/* default / demo page */
+      * {
+        box-sizing: border-box;
+      }
 
-		* {
-			box-sizing: border-box;
-		}
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
 
-		html,
-		body {
-			margin: 0;
-			padding: 0;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-		}
+      body {
+        min-height: 1280px;
+        font-weight: 300;
+        color: #2a2a2a;
+      }
 
-		body {
-			min-height: 1280px;
-			font-weight: 300;
-			color: #2a2a2a;
-		}
+      p,
+      h1,
+      h2,
+      h3,
+      h4,
+      a {
+        margin: 0;
+        font-weight: 300;
+      }
 
-		p,
-		h1,
-		h2,
-		h3,
-		h4,
-		a {
-			margin: 0;
-			font-weight: 300;
-		}
+      a,
+      a:visited,
+      a:hover {
+        color: #f30;
+        text-decoration: none;
+        border-bottom: 1px solid currentColor;
+      }
 
-		a,
-		a:visited,
-		a:hover {
-			color: #f30;
-			text-decoration: none;
-			border-bottom: 1px solid currentColor;
-		}
+      #intro {
+        max-width: 40rem;
+        margin: 1rem auto;
+        text-align: center;
+      }
 
-		#intro {
-			max-width: 40rem;
-			margin: 1rem auto;
-			text-align: center;
-		}
+      .intro__overline {
+        font-size: 1.4rem;
+      }
 
-		.intro__overline {
-			font-size: 1.4rem;
-		}
+      .intro__hed {
+        font-size: 1.4rem;
+        margin: 1.5rem auto;
+        text-transform: uppercase;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+      }
 
-		.intro__hed {
-			font-size: 1.4rem;
-			margin: 1.5rem auto;
-			text-transform: uppercase;
-			font-weight: 900;
-			letter-spacing: 0.05em;
-		}
+      .intro__dek {
+        font-size: 1.4rem;
+      }
 
-		.intro__dek {
-			font-size: 1.4rem;
-		}
+      /* demo */
 
-		/* demo */
+      #intro {
+        margin-bottom: 300px;
+      }
 
-		#intro {
-			margin-bottom: 300px;
-		}
+      #outro {
+        height: 4400px;
+      }
 
-		#outro {
-			height: 4400px;
-		}
+      /* scrollama */
 
-		/* scrollama */
+      #scroll {
+        position: relative;
+      }
 
-		#scroll {
-			position: relative;
-		}
+      .scroll__text {
+        position: relative;
+        padding: 0 1rem;
+        margin: 0 auto;
+        width: 33%;
+      }
 
-		.scroll__text {
-			position: relative;
-			padding: 0 1rem;
-			margin: 0 auto;
-			width: 33%;
-		}
+      .step {
+        margin: 2rem auto 4rem auto;
+        border: 1px solid #333;
+      }
 
-		.step {
-			margin: 2rem auto 4rem auto;
-			border: 1px solid #333;
-		}
+      .step.is-active {
+        background-color: lightgoldenrodyellow;
+      }
 
-		.step.is-active {
-			background-color: lightgoldenrodyellow;
-		}
+      .step p {
+        text-align: center;
+        padding: 1rem;
+        font-size: 1.5rem;
+      }
 
-		.step p {
-			text-align: center;
-			padding: 1rem;
-			font-size: 1.5rem;
-		}
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        background: white;
+        padding: 1rem;
+      }
+    </style>
+  </head>
 
-		nav {
-			position: fixed;
-			top: 0;
-			left: 0;
-			z-index: 1000;
-			background: white;
-			padding: 1rem;
-		}
-	</style>
+  <body>
+    <nav>
+      <a href="#anchor-1">Jump to 1</a>
+      <a href="#anchor-2">Jump to 2</a>
+      <a href="#anchor-3">Jump to 3</a>
+      <a href="#anchor-4">Jump to 4</a>
+      <a href="#anchor-5">Jump to 5</a>
+    </nav>
 
-</head>
+    <div id="anchor-1"></div>
 
-<body>
-	<nav>
-		<a href='#anchor-1'>Jump to 1</a>
-		<a href='#anchor-2'>Jump to 2</a>
-		<a href='#anchor-3'>Jump to 3</a>
-		<a href='#anchor-4'>Jump to 4</a>
-		<a href='#anchor-5'>Jump to 5</a>
-	</nav>
+    <section id="intro">
+      <p class="intro__overline">
+        <a href="https://github.com/russellgoldenberg/scrollama"
+          >scrollama.js</a
+        >
+      </p>
+      <h1 class="intro__hed">Demo: Basic</h1>
+      <p class="intro__dek">
+        Start scrolling to see how it works.
+      </p>
+    </section>
 
-	<div id='anchor-1'></div>
+    <div id="anchor-2"></div>
+    <section id="scroll">
+      <div class="scroll__text">
+        <div class="step" data-step="1">
+          <p>STEP 1</p>
+        </div>
+        <div class="step" data-step="2">
+          <p>STEP 2</p>
+        </div>
 
-	<section id='intro'>
-		<p class='intro__overline'>
-			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
-		</p>
-		<h1 class='intro__hed'>Demo: Basic</h1>
-		<p class='intro__dek'>
-			Start scrolling to see how it works.
-		</p>
-	</section>
-	
-	<div id='anchor-2'></div>
-	<section id='scroll'>
-		<div class='scroll__text'>
-			<div class='step' data-step='1'>
-				<p>STEP 1</p>
-			</div>
-			<div class='step' data-step='2'>
-				<p>STEP 2</p>
-			</div>
-			
-			<div class='step' data-step='3'>
-				
-				<p>STEP 3</p>
-				<div id='anchor-3'></div>
-			</div>
-			<div class='step' data-step='4'>
-				
-				<p>STEP 4</p>
-				
-			</div>
-			
-		</div>
-	</section>
-	<div id='anchor-4'></div>
-	<section id='outro'></section>
-	<div id='anchor-5'></div>
+        <div class="step" data-step="3">
+          <p>STEP 3</p>
+          <div id="anchor-3"></div>
+        </div>
+        <div class="step" data-step="4">
+          <p>STEP 4</p>
+        </div>
+      </div>
+    </section>
+    <div id="anchor-4"></div>
+    <section id="outro"></section>
+    <div id="anchor-5"></div>
 
-	<script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script>
-	<script src='../build/scrollama.js'></script>
-	<script>
-		var container = document.querySelector('#scroll');
-		var text = container.querySelector('.scroll__text');
-		var steps = text.querySelectorAll('.step');
+    <script src="https://unpkg.com/intersection-observer"></script>
+    <script src="../build/scrollama.js"></script>
+    <script>
+      var container = document.querySelector("#scroll");
+      var text = container.querySelector(".scroll__text");
+      var steps = text.querySelectorAll(".step");
 
-		// initialize the scrollama
-		var scroller = scrollama();
+      // initialize the scrollama
+      var scroller = scrollama();
 
-		// scrollama event handlers
-		function handleStepEnter(response) {
-			// response = { element, direction, index }
-			console.log(response.index, '-------- enter');
-			// add to color to current step
-			response.element.classList.add('is-active');
-		}
+      // scrollama event handlers
+      function handleStepEnter(response) {
+        // response = { element, direction, index }
+        console.log(response.index, "-------- enter");
+        // add to color to current step
+        response.element.classList.add("is-active");
+      }
 
-		function handleStepExit(response) {
-			// response = { element, direction, index }
-			console.log(response.index, '-------- exit');
-			// remove color from current step
-			response.element.classList.remove('is-active');
-		}
+      function handleStepExit(response) {
+        // response = { element, direction, index }
+        console.log(response.index, "-------- exit");
+        // remove color from current step
+        response.element.classList.remove("is-active");
+      }
 
-		function handleStepProgress(response) {
-			// response = { element, progress, index }
-			console.log(response.index, '-------- progress -', response.progress);
-		}
+      function handleStepProgress(response) {
+        // response = { element, progress, index }
+        console.log(response.index, "-------- progress -", response.progress);
+      }
 
-		function init() {
-			// set random padding for different step heights (not required)
-			steps.forEach(function (step) {
-				var v = 100 + Math.floor(Math.random() * window.innerHeight / 4);
-				// step.style.padding = v + 'px 0px';
-				step.style.height = '300px';
-			});
+      function init() {
+        // set random padding for different step heights (not required)
+        steps.forEach(function(step) {
+          var v = 100 + Math.floor((Math.random() * window.innerHeight) / 4);
+          // step.style.padding = v + 'px 0px';
+          step.style.height = "300px";
+        });
 
-			// 1. setup the scroller with the bare-bones options
-			// this will also initialize trigger observations
-			// 3. bind scrollama event handlers (this can be chained like below)
-			scroller.setup({
-				step: '.scroll__text .step',
-				debug: true,
-				offset: 0.2,
-				// progress: true,
-			})
-				.onStepEnter(handleStepEnter)
-				.onStepExit(handleStepExit)
-				// .onStepProgress(handleStepProgress)
+        // 1. setup the scroller with the bare-bones options
+        // this will also initialize trigger observations
+        // 3. bind scrollama event handlers (this can be chained like below)
+        scroller
+          .setup({
+            step: ".scroll__text .step",
+            debug: true,
+            offset: 0.2
+            // progress: true,
+          })
+          .onStepEnter(handleStepEnter)
+          .onStepExit(handleStepExit);
+        // .onStepProgress(handleStepProgress)
 
-			// setup resize event
-			window.addEventListener('resize', scroller.resize);
-		}
+        // setup resize event
+        window.addEventListener("resize", scroller.resize);
+      }
 
-		// kick things off
-		init();
-	</script>
-</body>
-
+      // kick things off
+      init();
+    </script>
+  </body>
 </html>

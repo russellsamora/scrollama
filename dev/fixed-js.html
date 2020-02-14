@@ -1,242 +1,243 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Scrollama Demo: Fixed JS</title>
+    <meta name="description" content="Scrollama Demo: Fixed JS" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* default / demo page */
 
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Scrollama Demo: Fixed JS</title>
-	<meta name="description" content="Scrollama Demo: Fixed JS">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style>
-		/* default / demo page */
+      * {
+        box-sizing: border-box;
+      }
 
-		* {
-			box-sizing: border-box;
-		}
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
 
-		html,
-		body {
-			margin: 0;
-			padding: 0;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-		}
+      body {
+        min-height: 1280px;
+        font-weight: 300;
+        color: #2a2a2a;
+      }
 
-		body {
-			min-height: 1280px;
-			font-weight: 300;
-			color: #2a2a2a;
-		}
+      p,
+      h1,
+      h2,
+      h3,
+      h4,
+      a {
+        margin: 0;
+        font-weight: 300;
+      }
 
-		p,
-		h1,
-		h2,
-		h3,
-		h4,
-		a {
-			margin: 0;
-			font-weight: 300;
-		}
+      a,
+      a:visited,
+      a:hover {
+        color: #f30;
+        text-decoration: none;
+        border-bottom: 1px solid currentColor;
+      }
 
-		a,
-		a:visited,
-		a:hover {
-			color: #f30;
-			text-decoration: none;
-			border-bottom: 1px solid currentColor;
-		}
+      #intro {
+        max-width: 40rem;
+        margin: 1rem auto;
+        text-align: center;
+      }
 
-		#intro {
-			max-width: 40rem;
-			margin: 1rem auto;
-			text-align: center;
-		}
+      .intro__overline {
+        font-size: 1.4rem;
+      }
 
-		.intro__overline {
-			font-size: 1.4rem;
-		}
+      .intro__hed {
+        font-size: 1.4rem;
+        margin: 1.5rem auto;
+        text-transform: uppercase;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+      }
 
-		.intro__hed {
-			font-size: 1.4rem;
-			margin: 1.5rem auto;
-			text-transform: uppercase;
-			font-weight: 900;
-			letter-spacing: 0.05em;
-		}
+      .intro__dek {
+        font-size: 1.4rem;
+      }
 
-		.intro__dek {
-			font-size: 1.4rem;
-		}
+      /* demo */
 
-		/* demo */
+      #intro {
+        margin-bottom: 320px;
+      }
 
-		#intro {
-			margin-bottom: 320px;
-		}
+      #outro {
+        height: 1200px;
+      }
 
-		#outro {
-			height: 1200px;
-		}
+      /* scrollama */
 
-		/* scrollama */
+      #scroll {
+        position: relative;
+        border-top: 2px dashed #000;
+        border-bottom: 2px dashed #000;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+      }
 
-		#scroll {
-			position: relative;
-			border-top: 2px dashed #000;
-			border-bottom: 2px dashed #000;
-			display: -webkit-box;
-			display: -ms-flexbox;
-			display: flex;
-		}
+      figure {
+        position: sticky;
+        width: 100%;
+        top: 0;
+        right: 2rem;
+        -webkit-transform: translate3d(0, 0, 0);
+        -moz-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        background-color: #ddd;
+        border: 1px solid #000;
+      }
 
-		figure {
-			position: sticky;
-			width: 100%;
-			top: 0;
-			right: 2rem;
-			-webkit-transform: translate3d(0, 0, 0);
-			-moz-transform: translate3d(0, 0, 0);
-			transform: translate3d(0, 0, 0);
-			background-color: #ddd;
-			border: 1px solid #000;
-		}
+      article p {
+        text-align: center;
+        padding: 1rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -moz-transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        font-size: 8rem;
+        font-weight: 900;
+        color: #666;
+      }
 
-		article p {
-			text-align: center;
-			padding: 1rem;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			-moz-transform: translate(-50%, -50%);
-			-webkit-transform: translate(-50%, -50%);
-			transform: translate(-50%, -50%);
-			font-size: 8rem;
-			font-weight: 900;
-			color: #666;
-		}
+      article {
+        position: relative;
+        padding: 0 1rem;
+        width: 30rem;
+      }
 
-		article {
-			position: relative;
-			padding: 0 1rem;
-			width: 30rem;
-		}
+      .step {
+        margin: 0 auto 2rem auto;
+        border: 1px solid #333;
+        position: relative;
+        /* border-bottom: none; */
+      }
 
-		.step {
-			margin: 0 auto 2rem auto;
-			border: 1px solid #333;
-			position: relative;
-			/* border-bottom: none; */
-		}
+      .step:last-child {
+        border-bottom: 1px solid #333;
+      }
 
-		.step:last-child {
-			border-bottom: 1px solid #333;
-		}
+      .step.is-active {
+        background-color: lightgoldenrodyellow;
+      }
 
-		.step.is-active {
-			background-color: lightgoldenrodyellow;
-		}
+      .step p {
+        text-align: center;
+        padding: 1rem;
+        font-size: 1.5rem;
+      }
+    </style>
+  </head>
 
-		.step p {
-			text-align: center;
-			padding: 1rem;
-			font-size: 1.5rem;
-		}
-	</style>
+  <body>
+    <section id="intro">
+      <p class="intro__overline">
+        <a href="https://github.com/russellgoldenberg/scrollama"
+          >scrollama.js</a
+        >
+      </p>
+      <h1 class="intro__hed">Demo: Sticky Graphic Position</h1>
+      <p class="intro__dek">
+        Start scrolling to see how it works.
+      </p>
+    </section>
+    <section id="scroll">
+      <article>
+        <div class="step" data-step="1">
+          <p>STEP 1</p>
+        </div>
+        <div class="step" data-step="2">
+          <p>STEP 2</p>
+        </div>
+        <div class="step" data-step="3">
+          <p>STEP 3</p>
+        </div>
+        <div class="step" data-step="4">
+          <p>STEP 4</p>
+        </div>
+      </article>
+      <figure>
+        <p>0</p>
+      </figure>
+    </section>
+    <section id="outro"></section>
+    <script src="d3.v4.min.js"></script>
+    <script src="https://unpkg.com/intersection-observer"></script>
+    <script src="../build/scrollama.js"></script>
+    <script>
+      // using d3 for convenience
+      var container = d3.select("#scroll");
+      var figure = container.select("figure");
+      var article = container.select("article");
+      var step = article.selectAll(".step");
 
-</head>
+      // initialize the scrollama
+      var scroller = scrollama();
 
-<body>
-	<section id='intro'>
-		<p class='intro__overline'>
-			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
-		</p>
-		<h1 class='intro__hed'>Demo: Sticky Graphic Position</h1>
-		<p class='intro__dek'>
-			Start scrolling to see how it works.
-		</p>
-	</section>
-	<section id='scroll'>
-		<article>
-			<div class='step' data-step='1'>
-				<p>STEP 1</p>
-			</div>
-			<div class='step' data-step='2'>
-				<p>STEP 2</p>
-			</div>
-			<div class='step' data-step='3'>
-				<p>STEP 3</p>
-			</div>
-			<div class='step' data-step='4'>
-				<p>STEP 4</p>
-			</div>
-		</article>
-			<figure>
-				<p>0</p>
-			</figure>
-	</section>
-	<section id='outro'></section>
-	<script src='d3.v4.min.js'></script>
-	<!-- <script src='https://unpkg.com/intersection-observer@0.5.0/intersection-observer.js'></script> -->
-	<script src='../build/scrollama.js'></script>
-	<script>
-		// using d3 for convenience
-		var container = d3.select('#scroll');
-		var figure = container.select('figure');
-		var article = container.select('article');
-		var step = article.selectAll('.step');
+      // generic window resize listener event
+      function handleResize() {
+        // 1. update height of step elements
+        var stepHeight = Math.floor(window.innerHeight * 0.75);
+        step.style("height", stepHeight + "px");
 
-		// initialize the scrollama
-		var scroller = scrollama();
+        // 2. update width/height of graphic element
+        var bodyWidth = d3.select("body").node().offsetWidth;
 
-		// generic window resize listener event
-		function handleResize() {
-			// 1. update height of step elements
-			var stepHeight = Math.floor(window.innerHeight * 0.75);
-			step.style('height', stepHeight + 'px');
+        var figureHeight = Math.floor(window.innerHeight * 0.5);
+        figure.style("height", figureHeight + "px");
+        // 3. tell scrollama to update new element dimensions
+        scroller.resize();
+      }
 
-			// 2. update width/height of graphic element
-			var bodyWidth = d3.select('body').node().offsetWidth;
+      // scrollama event handlers
+      function handleStepEnter(response) {
+        console.log(response);
+        // response = { element, direction, index }
 
-			var figureHeight = Math.floor(window.innerHeight * 0.5)
-			figure.style('height', figureHeight + 'px')
-			// 3. tell scrollama to update new element dimensions
-			scroller.resize();
-		}
+        // add color to current step only
+        step.classed("is-active", function(d, i) {
+          return i === response.index;
+        });
 
-		// scrollama event handlers
-		function handleStepEnter(response) {
-			console.log(response)
-			// response = { element, direction, index }
+        // update graphic based on step
+        figure.select("p").text(response.index + 1);
+      }
 
-			// add color to current step only
-			step.classed('is-active', function (d, i) {
-				return i === response.index;
-			})
+      function init() {
+        // 1. force a resize on load to ensure proper dimensions are sent to scrollama
+        handleResize();
 
-			// update graphic based on step
-			figure.select('p').text(response.index + 1);
-		}
+        // 2. setup the scroller passing options
+        // this will also initialize trigger observations
+        // 3. bind scrollama event handlers (this can be chained like below)
+        scroller
+          .setup({
+            step: "article .step",
+            debug: true,
+            offset: 0.75
+          })
+          .onStepEnter(handleStepEnter);
 
-		function init() {
-			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
-			handleResize();
+        // setup resize event
+        window.addEventListener("resize", handleResize);
+      }
 
-			// 2. setup the scroller passing options
-			// this will also initialize trigger observations
-			// 3. bind scrollama event handlers (this can be chained like below)
-			scroller.setup({
-				step: 'article .step',
-				debug: true,
-				offset: 0.75,
-			})
-				.onStepEnter(handleStepEnter)
-
-			// setup resize event
-			window.addEventListener('resize', handleResize);
-		}
-
-		// kick things off
-		init();
-	</script>
-</body>
-
+      // kick things off
+      init();
+    </script>
+  </body>
 </html>
