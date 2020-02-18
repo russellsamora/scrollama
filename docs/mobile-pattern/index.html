@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Scrollama: Basic Example</title>
-    <meta name="description" content="Scrollama: Basic Example" />
+    <title>Scrollama: Mobile Pattern Example</title>
+    <meta name="description" content="Scrollama: Mobile Pattern Example" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="../style.css" />
     <style>
@@ -89,7 +89,7 @@
         </div>
       </nav>
       <section id="intro">
-        <h1 class="intro__hed">Basic Example</h1>
+        <h1 class="intro__hed">Mobile Pattern Example</h1>
         <p class="intro__dek">
           Start scrolling to see how it works.
         </p>
@@ -145,6 +145,10 @@
           step.style.padding = v + "px 0px";
         });
 
+        // find the halfway point of the initial viewport height
+        // (it changes on mobile, but by just using the initial value
+        // you remove jumpiness on scroll direction change)
+        var midpoint = Math.floor(window.innerHeight * 0.5) + "px";
         // 1. setup the scroller with the bare-bones options
         // 		this will also initialize trigger observations
         // 2. bind scrollama event handlers (this can be chained like below)
@@ -152,7 +156,7 @@
           .setup({
             step: "#scrolly article .step",
             debug: true,
-            offset: 0.5
+            offset: midpoint
           })
           .onStepEnter(handleStepEnter)
           .onStepExit(handleStepExit);

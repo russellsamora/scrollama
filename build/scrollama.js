@@ -32,24 +32,24 @@ function setupOffset(ref) {
   var offsetVal = ref.offsetVal;
   var stepClass = ref.stepClass;
 
-  var el = document.createElement('div');
+  var el = document.createElement("div");
   el.id = getOffsetId(id);
-  el.className = 'scrollama__debug-offset';
-  el.style.position = 'fixed';
-  el.style.left = '0';
-  el.style.width = '100%';
-  el.style.height = '0';
-  el.style.borderTop = '2px dashed black';
-  el.style.zIndex = '9999';
+  el.className = "scrollama__debug-offset";
+  el.style.position = "fixed";
+  el.style.left = "0";
+  el.style.width = "100%";
+  el.style.height = "0";
+  el.style.borderTop = "2px dashed black";
+  el.style.zIndex = "9999";
 
-  var text = document.createElement('p');
-  text.innerText = "\"." + stepClass + "\" trigger: " + offsetVal;
-  text.style.fontSize = '12px';
-  text.style.fontFamily = 'monospace';
-  text.style.color = 'black';
-  text.style.margin = '0';
-  text.style.padding = '6px';
-  el.appendChild(text);
+  var p = document.createElement("p");
+  p.innerHTML = "\"." + stepClass + "\" trigger: <span>" + offsetVal + "</span>";
+  p.style.fontSize = "12px";
+  p.style.fontFamily = "monospace";
+  p.style.color = "black";
+  p.style.margin = "0";
+  p.style.padding = "6px";
+  el.appendChild(p);
   document.body.appendChild(el);
 }
 
@@ -66,10 +66,14 @@ function setup(ref) {
 function update(ref) {
   var id = ref.id;
   var offsetMargin = ref.offsetMargin;
+  var offsetVal = ref.offsetVal;
+  var format = ref.format;
 
+  var post = format === "pixels" ? "px" : "";
   var idVal = getOffsetId(id);
   var el = document.getElementById(idVal);
   el.style.top = offsetMargin + "px";
+  el.querySelector("span").innerText = "" + offsetVal + post;
 }
 
 function notifyStep(ref) {
@@ -80,7 +84,7 @@ function notifyStep(ref) {
   var prefix = "scrollama__debug-step--" + id + "-" + index;
   var elA = document.getElementById((prefix + "_above"));
   var elB = document.getElementById((prefix + "_below"));
-  var display = state === 'enter' ? 'block' : 'none';
+  var display = state === "enter" ? "block" : "none";
 
   if (elA) { elA.style.display = display; }
   if (elB) { elB.style.display = display; }
@@ -120,10 +124,15 @@ function scrollama() {
   var triggerOnce = false;
 
   var direction = "down";
+  var format = "percent";
 
   var exclude = [];
 
   /* HELPERS */
+  function err(msg) {
+    console.error(("scrollama error: " + msg));
+  }
+
   function reset() {
     cb = {
       stepEnter: function () {},
@@ -180,7 +189,8 @@ function scrollama() {
     viewH = window.innerHeight;
     pageH = getPageHeight();
 
-    offsetMargin = offsetVal * viewH;
+    var mult = format === "pixels" ? 1 : viewH;
+    offsetMargin = offsetVal * mult;
 
     if (isReady) {
       stepOffsetHeight = stepEl.map(function (el) { return el.getBoundingClientRect().height; });
@@ -188,7 +198,7 @@ function scrollama() {
       if (isEnabled) { updateIO(); }
     }
 
-    if (isDebug) { update({ id: id, stepOffsetHeight: stepOffsetHeight, offsetMargin: offsetMargin, offsetVal: offsetVal }); }
+    if (isDebug) { update({ id: id, offsetMargin: offsetMargin, offsetVal: offsetVal, format: format }); }
   }
 
   function handleEnable(enable) {
@@ -199,9 +209,7 @@ function scrollama() {
         updateIO();
       } else {
         // can't enable an unready scroller
-        console.error(
-          "scrollama error: enable() called before scroller was ready"
-        );
+        err("scrollama error: enable() called before scroller was ready");
         isEnabled = false;
         return; // all is not well, don't set the requested state
       }
@@ -579,7 +587,7 @@ function scrollama() {
     stepEl = selectAll(step);
 
     if (!stepEl.length) {
-      console.error("scrollama error: no step elements");
+      err("no step elements");
       return S;
     }
 
@@ -638,41 +646,44 @@ function scrollama() {
   };
 
   S.offsetTrigger = function (x) {
-    if (x && !isNaN(x)) {
-      if (x > 1)
-        { console.error(
-          "scrollama error: offset value is greater than 1. Fallbacks to 1."
-        ); }
-      if (x < 0)
-        { console.error(
-          "scrollama error: offset value is lower than 0. Fallbacks to 0."
-        ); }
+    if (x === null) { return offsetVal; }
+
+    if (typeof x === "number") {
+      format = "percent";
+      if (x > 1) { err("offset value is greater than 1. Fallback to 1."); }
+      if (x < 0) { err("offset value is lower than 0. Fallback to 0."); }
       offsetVal = Math.min(Math.max(0, x), 1);
-      return S;
+    } else if (typeof x === "string" && x.indexOf("px") > 0) {
+      var v = +x.replace("px", "");
+      if (!isNaN(v)) {
+        format = "pixels";
+        offsetVal = v;
+      } else {
+        err("offset value must be in 'px' format. Fallback to 0.5.");
+        offsetVal = 0.5;
+      }
+    } else {
+      err("offset value does not include 'px'. Fallback to 0.5.");
+      offsetVal = 0.5;
     }
-    if (isNaN(x)) {
-      console.error(
-        "scrollama error: offset value is not a number. Fallbacks to 0."
-      );
-    }
-    return offsetVal;
+    return S;
   };
 
   S.onStepEnter = function (f) {
     if (typeof f === "function") { cb.stepEnter = f; }
-    else { console.error("scrollama error: onStepEnter requires a function"); }
+    else { err("onStepEnter requires a function"); }
     return S;
   };
 
   S.onStepExit = function (f) {
     if (typeof f === "function") { cb.stepExit = f; }
-    else { console.error("scrollama error: onStepExit requires a function"); }
+    else { err("onStepExit requires a function"); }
     return S;
   };
 
   S.onStepProgress = function (f) {
     if (typeof f === "function") { cb.stepProgress = f; }
-    else { console.error("scrollama error: onStepProgress requires a function"); }
+    else { err("onStepProgress requires a function"); }
     return S;
   };
 

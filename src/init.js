@@ -35,10 +35,15 @@ function scrollama() {
   let triggerOnce = false;
 
   let direction = "down";
+  let format = "percent";
 
   const exclude = [];
 
   /* HELPERS */
+  function err(msg) {
+    console.error(`scrollama error: ${msg}`);
+  }
+
   function reset() {
     cb = {
       stepEnter: () => {},
@@ -94,7 +99,8 @@ function scrollama() {
     viewH = window.innerHeight;
     pageH = getPageHeight();
 
-    offsetMargin = offsetVal * viewH;
+    const mult = format === "pixels" ? 1 : viewH;
+    offsetMargin = offsetVal * mult;
 
     if (isReady) {
       stepOffsetHeight = stepEl.map(el => el.getBoundingClientRect().height);
@@ -102,7 +108,7 @@ function scrollama() {
       if (isEnabled) updateIO();
     }
 
-    if (isDebug) bug.update({ id, stepOffsetHeight, offsetMargin, offsetVal });
+    if (isDebug) bug.update({ id, offsetMargin, offsetVal, format });
   }
 
   function handleEnable(enable) {
@@ -113,9 +119,7 @@ function scrollama() {
         updateIO();
       } else {
         // can't enable an unready scroller
-        console.error(
-          "scrollama error: enable() called before scroller was ready"
-        );
+        err("scrollama error: enable() called before scroller was ready");
         isEnabled = false;
         return; // all is not well, don't set the requested state
       }
@@ -475,7 +479,7 @@ function scrollama() {
     stepEl = selectAll(step);
 
     if (!stepEl.length) {
-      console.error("scrollama error: no step elements");
+      err("no step elements");
       return S;
     }
 
@@ -535,41 +539,44 @@ function scrollama() {
   };
 
   S.offsetTrigger = x => {
-    if (x && !isNaN(x)) {
-      if (x > 1)
-        console.error(
-          "scrollama error: offset value is greater than 1. Fallbacks to 1."
-        );
-      if (x < 0)
-        console.error(
-          "scrollama error: offset value is lower than 0. Fallbacks to 0."
-        );
+    if (x === null) return offsetVal;
+
+    if (typeof x === "number") {
+      format = "percent";
+      if (x > 1) err("offset value is greater than 1. Fallback to 1.");
+      if (x < 0) err("offset value is lower than 0. Fallback to 0.");
       offsetVal = Math.min(Math.max(0, x), 1);
-      return S;
+    } else if (typeof x === "string" && x.indexOf("px") > 0) {
+      const v = +x.replace("px", "");
+      if (!isNaN(v)) {
+        format = "pixels";
+        offsetVal = v;
+      } else {
+        err("offset value must be in 'px' format. Fallback to 0.5.");
+        offsetVal = 0.5;
+      }
+    } else {
+      err("offset value does not include 'px'. Fallback to 0.5.");
+      offsetVal = 0.5;
     }
-    if (isNaN(x)) {
-      console.error(
-        "scrollama error: offset value is not a number. Fallbacks to 0."
-      );
-    }
-    return offsetVal;
+    return S;
   };
 
   S.onStepEnter = f => {
     if (typeof f === "function") cb.stepEnter = f;
-    else console.error("scrollama error: onStepEnter requires a function");
+    else err("onStepEnter requires a function");
     return S;
   };
 
   S.onStepExit = f => {
     if (typeof f === "function") cb.stepExit = f;
-    else console.error("scrollama error: onStepExit requires a function");
+    else err("onStepExit requires a function");
     return S;
   };
 
   S.onStepProgress = f => {
     if (typeof f === "function") cb.stepProgress = f;
-    else console.error("scrollama error: onStepProgress requires a function");
+    else err("onStepProgress requires a function");
     return S;
   };
 

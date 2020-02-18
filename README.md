@@ -110,8 +110,7 @@ _options:_
 
 - `step` (string): Selector (or array of elements) for the step elements that will trigger changes.
   **required**
-- `offset` (number, 0 - 1): How far from the top of the viewport to trigger a
-  step. **(default: 0.5)**
+- `offset` (number 0 - 1, or string with "px"): How far from the top of the viewport to trigger a step. **(default: 0.5) (middle of screen)**
 - `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
 - `threshold` (number, 1+): The granularity of the progress interval in pixels (smaller = more granular). **(default: 4)**
@@ -158,9 +157,9 @@ The argument of the callback is an object: `{ element: DOMElement, index: number
 
 `progress`: The percent of completion of the step (0 - 1)
 
-#### scrollama.offsetTrigger([number])
+#### scrollama.offsetTrigger([number or string])
 
-Get or set the offset percentage. Value must be between 0-1.
+Get or set the offset percentage. Value must be between 0-1 (where 0 = top of viewport, 1 = bottom), or a string that includes "px" (e.g., "200px"). If set, returns the scrollama instance.
 
 #### scrollama.resize()
 
