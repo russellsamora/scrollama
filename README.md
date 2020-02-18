@@ -36,7 +36,8 @@ with any library, or with no library at all._
 - [Sticky Graphic (Side by Side)](https://russellgoldenberg.github.io/scrollama/sticky-side) -
   using CSS `position: sticky;` to create a fixed graphic to the side of the text.
 - [Sticky Graphic (Overlay)](https://russellgoldenberg.github.io/scrollama/sticky-overlay) -
-  using CSS `position: sticky;` to create a fixed graphic with fullscreen graphic with text overlayed.
+  using CSS `position: sticky;` to create a fixed graphic with fullscreen graphic with text overlayed. - [Mobile Pattern](https://russellgoldenberg.github.io/scrollama/mobile-pattern) -
+  using pixels instead of percent for offset value so it doesn't jump around on scroll direction change
 
 ### Installation
 
