@@ -111,7 +111,7 @@ window.addEventListener("resize", scroller.resize);
 
 _options:_
 
-- `step` (string): Selector (or array of elements) for the step elements that will trigger changes.
+- `step` (string | HTMLElement[]): Selector (or array of elements) for the step elements that will trigger changes.
   **required**
 - `offset` (number 0 - 1, or string with "px"): How far from the top of the viewport to trigger a step. **(default: 0.5) (middle of screen)**
 - `progress` (boolean): Whether to fire incremental step progress updates or
