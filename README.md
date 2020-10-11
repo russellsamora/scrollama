@@ -7,7 +7,7 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events.
 
-**Current version**: 2.2.0
+**Current version**: 2.2.1
 
 #### Important Changes
 
@@ -93,12 +93,12 @@ const scroller = scrollama();
 // setup the instance, pass callback functions
 scroller
   .setup({
-    step: ".step"
+    step: ".step",
   })
-  .onStepEnter(response => {
+  .onStepEnter((response) => {
     // { element, index, direction }
   })
-  .onStepExit(response => {
+  .onStepExit((response) => {
     // { element, index, direction }
   });
 
