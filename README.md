@@ -1,9 +1,12 @@
 # v3 roadmap
 
+- revamp intersection observer
+- use resize observer for auto resize
 - offset
 - progress
-- preserve order
 - custom offset trigger
+
+- preserve order (only works with ordered steps + offsets)
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 

@@ -96,6 +96,7 @@
         height: 300px;
         position: relative;
         z-index: 1;
+        opacity: 0;
       }
 
       .step:after {
@@ -156,17 +157,16 @@
         <div class="step" data-step="1">
           <p>STEP 1</p>
         </div>
-        <!-- <div class="step" data-step="2">
+        <div class="step" data-step="2" data-offset="0.75">
           <p>STEP 2</p>
         </div>
-
         <div class="step" data-step="3">
           <p>STEP 3</p>
           <div id="anchor-3"></div>
         </div>
         <div class="step" data-step="4">
           <p>STEP 4</p>
-        </div> -->
+        </div>
       </div>
     </section>
     <div id="anchor-4"></div>
@@ -200,7 +200,7 @@
 
       function handleStepProgress(response) {
         // response = { element, progress, index }
-        console.log(response.index, "progress", response.progress);
+        response.element.style.opacity = response.progress;
       }
 
       function init() {
@@ -217,9 +217,8 @@
         scroller
           .setup({
             step: ".scroll__text .step",
-            debug: true,
             offset: 0,
-            progress: false,
+            progress: true,
           })
           .onStepEnter(handleStepEnter)
           .onStepExit(handleStepExit)
