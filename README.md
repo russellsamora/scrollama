@@ -1,12 +1,14 @@
 # v3 roadmap
 
 - revamp intersection observer
-- use resize observer for auto resize
+- use resize observer for auto resize (polyfill note)
 - offset
 - progress
 - custom offset trigger
 
+- progress enter/exit
 - preserve order (only works with ordered steps + offsets)
+- scrollable check needed?
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
