@@ -6,7 +6,7 @@ function scrollama() {
 
   let id;
   let steps = [];
-  let offsetVal = 0;
+  let offsetValue = 0;
   let offsetMargin = 0;
   let previousYOffset = 0;
   let progressThreshold = 0;
@@ -69,9 +69,6 @@ function scrollama() {
   }
 
   function handleResize() {
-    const mult = format === "pixels" ? 1 : window.innerHeight;
-    offsetMargin = offsetVal * mult;
-
     if (isReady) {
       steps = steps.map((step) => ({
         ...step,
@@ -228,11 +225,19 @@ function scrollama() {
   }
 
   function updateStepObserver(step) {
-    const margin = (window.innerHeight - step.height) / 2;
-    const rootMargin = `-${margin}px 0px -${margin}px 0px`;
+    const h = window.innerHeight;
+    // const rem = (h - step.height) / 2;
+    const factor = format === "pixels" ? 1 : h;
+    const margin = offsetValue * factor;
+    const marginTop = step.height / 2 - (h - margin);
+    const marginBottom = step.height / 2 - margin;
+    const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+    console.log({ h, margin, marginTop, marginBottom });
+
     const threshold = 0.5;
     const options = { rootMargin, threshold };
     const observer = new IntersectionObserver(intersectStep, options);
+
     observer.observe(step.node);
     step.observers.step = observer;
 
@@ -250,7 +255,7 @@ function scrollama() {
       div1.style.left = "0";
       div1.style.top = "0";
       div1.style.width = "100%";
-      div1.style.height = `${margin}px`;
+      div1.style.height = `${Math.max(marginTop * -1, 1)}px`;
       div1.style.background = "pink";
       div1.style.zIndex = "0";
 
@@ -260,7 +265,7 @@ function scrollama() {
       div2.style.left = "0";
       div2.style.bottom = "0";
       div2.style.width = "100%";
-      div2.style.height = `${margin}px`;
+      div2.style.height = `${Math.max(marginBottom * -1, 1)}px`;
       div2.style.background = "pink";
       div2.style.zIndex = "0";
 
@@ -274,7 +279,6 @@ function scrollama() {
   }
 
   function updateProgressObserver(step) {
-    console.log(step);
     const margin = (window.innerHeight - step.height) / 2;
     const rootMargin = `-${margin}px 0px -${margin}px 0px`;
     const threshold = createProgressThreshold(step.height);
@@ -314,7 +318,7 @@ function scrollama() {
   }
 
   function addDebug() {
-    if (isDebug) bug.setup({ id, steps, offsetVal });
+    if (isDebug) bug.setup({ id, steps, offsetValue });
   }
 
   function isYScrollable(element) {
@@ -415,25 +419,25 @@ function scrollama() {
   };
 
   S.offsetTrigger = (x) => {
-    if (x === null || x === undefined) return offsetVal;
+    if (x === null || x === undefined) return offsetValue;
 
     if (typeof x === "number") {
       format = "percent";
       if (x > 1) err("offset value is greater than 1. Fallback to 1.");
       if (x < 0) err("offset value is lower than 0. Fallback to 0.");
-      offsetVal = Math.min(Math.max(0, x), 1);
+      offsetValue = Math.min(Math.max(0, x), 1);
     } else if (typeof x === "string" && x.indexOf("px") > 0) {
       const v = +x.replace("px", "");
       if (!isNaN(v)) {
         format = "pixels";
-        offsetVal = v;
+        offsetValue = v;
       } else {
         err("offset value must be in 'px' format. Fallback to 0.5.");
-        offsetVal = 0.5;
+        offsetValue = 0.5;
       }
     } else {
       err("offset value does not include 'px'. Fallback to 0.5.");
-      offsetVal = 0.5;
+      offsetValue = 0.5;
     }
     return S;
   };

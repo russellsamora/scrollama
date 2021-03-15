@@ -1,4 +1,9 @@
-###### scrollama.js
+# v3 roadmap
+
+- offset
+- progress
+- preserve order
+- custom offset trigger
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
