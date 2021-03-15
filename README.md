@@ -7,6 +7,7 @@
 - custom offset trigger
 - progress enter/exit
 
+- rAF scroll updates?
 - preserve order (only works with ordered steps + offsets)
 - scrollable check needed?
 - update docs
