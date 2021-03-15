@@ -93,10 +93,10 @@
       .step {
         margin: 2rem auto 4rem auto;
         border: 1px solid #333;
-        height: 300px;
+        height: 30vh;
         position: relative;
         z-index: 1;
-        opacity: 0;
+        /* opacity: 0; */
       }
 
       .step:after {
@@ -132,11 +132,11 @@
 
   <body>
     <nav>
-      <a href="#anchor-1">Jump to 1</a>
-      <a href="#anchor-2">Jump to 2</a>
-      <a href="#anchor-3">Jump to 3</a>
-      <a href="#anchor-4">Jump to 4</a>
-      <a href="#anchor-5">Jump to 5</a>
+      <a href="#anchor-1">Jump test 1</a>
+      <a href="#anchor-2">Jump test 2</a>
+      <a href="#anchor-3">Jump test 3</a>
+      <a href="#anchor-4">Jump test 4</a>
+      <a href="#anchor-5">Jump test 5</a>
     </nav>
 
     <div id="anchor-1"></div>
@@ -157,16 +157,16 @@
         <div class="step" data-step="1">
           <p>STEP 1</p>
         </div>
-        <div class="step" data-step="2" data-offset="0.75">
+        <!-- <div class="step" data-step="2">
           <p>STEP 2</p>
+          <div id="anchor-3"></div>
         </div>
         <div class="step" data-step="3">
           <p>STEP 3</p>
-          <div id="anchor-3"></div>
         </div>
         <div class="step" data-step="4">
           <p>STEP 4</p>
-        </div>
+        </div> -->
       </div>
     </section>
     <div id="anchor-4"></div>
@@ -200,7 +200,8 @@
 
       function handleStepProgress(response) {
         // response = { element, progress, index }
-        response.element.style.opacity = response.progress;
+        // response.element.style.opacity = response.progress;
+        console.log(response);
       }
 
       function init() {
@@ -217,7 +218,7 @@
         scroller
           .setup({
             step: ".scroll__text .step",
-            offset: 0,
+            offset: 0.5,
             progress: true,
           })
           .onStepEnter(handleStepEnter)
@@ -227,8 +228,8 @@
         // setup resize event
         window.addEventListener("resize", scroller.resize);
         // setTimeout(() => {
-        //   steps[0].style.height = "400px";
-        // }, 1000);
+        //   steps[0].style.height = "100px";
+        // }, 10000);
       }
 
       // kick things off

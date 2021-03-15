@@ -5,8 +5,8 @@
 - offset
 - progress
 - custom offset trigger
-
 - progress enter/exit
+
 - preserve order (only works with ordered steps + offsets)
 - scrollable check needed?
 

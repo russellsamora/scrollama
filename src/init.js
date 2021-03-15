@@ -146,7 +146,6 @@ function scrollama() {
 
     if (!exclude[index]) cb.stepEnter(response);
     if (isTriggerOnce) exclude[index] = true;
-    // if (isProgressMode) notifyProgress(element);
   }
 
   function notifyStepExit(element, dir) {
@@ -157,13 +156,10 @@ function scrollama() {
 
     const response = { element, index, direction: dir };
 
-    // todo
-    // if (isProgressMode) {
-    //   if (dir === 'down' && steps[index].progress < 1)
-    //     notifyStepProgress(element, 1);
-    //   else if (dir === 'up' && steps[index].progress > 0)
-    //     notifyStepProgress(element, 0);
-    // }
+    if (isProgressMode) {
+      if (dir === "down" && step.progress < 1) notifyProgress(element, 1);
+      else if (dir === "up" && step.progress > 0) notifyProgress(element, 0);
+    }
 
     step.direction = dir;
     step.state = "exit";
@@ -192,7 +188,7 @@ function scrollama() {
   }
 
   function intersectProgress([entry]) {
-    // updateDirection();
+    updateDirection();
     const index = getIndex(entry.target);
     const step = steps[index];
     const { isIntersecting, intersectionRatio, target } = entry;
@@ -216,8 +212,8 @@ function scrollama() {
     const off = step.offset || globalOffset;
     const factor = off.format === "pixels" ? 1 : h;
     const offset = off.value * factor;
-    const marginTop = step.height / 2 - (h - offset);
-    const marginBottom = step.height / 2 - offset;
+    const marginTop = step.height / 2 - offset;
+    const marginBottom = step.height / 2 - (h - offset);
     const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
     const threshold = 0.5;
@@ -237,8 +233,8 @@ function scrollama() {
     const off = step.offset || globalOffset;
     const factor = off.format === "pixels" ? 1 : h;
     const offset = off.value * factor;
-    const marginTop = step.height - (h - offset);
-    const marginBottom = -offset;
+    const marginTop = -offset + step.height;
+    const marginBottom = offset - h;
     const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
     const threshold = createProgressThreshold(step.height);
