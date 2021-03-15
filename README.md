@@ -6,12 +6,14 @@
 - progress
 - custom offset trigger
 - progress enter/exit
-
 - rAF scroll updates?
+
 - preserve order (only works with ordered steps + offsets)
-- scrollable check needed?
+- scrollable check needed? (maybe a soft warning)
 - update docs
 - update examples (no stickyfill, mobile pattern obsolete?)
+- clean up comments
+- better debugger
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 

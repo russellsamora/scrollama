@@ -20,15 +20,35 @@
     return [];
   }
 
+  let tick = false;
+  let prev = 0;
+  let y = 0;
+  let direction;
+
+  function update() {
+    if (y > prev) direction = "down";
+    else if (y < prev) direction = "up";
+    prev = y;
+    tick = false;
+  }
+
+  function setupScroll() {
+    const onScroll = () => {
+      y = window.scrollY;
+      if (!tick) {
+        requestAnimationFrame(update);
+        tick = true;
+      }
+    };
+    document.addEventListener("scroll", onScroll);
+  }
+
   function scrollama() {
     let cb = {};
     let steps = [];
     let globalOffset;
 
-    let previousYOffset = 0;
     let progressThreshold = 0;
-
-    let direction;
 
     let isEnabled = false;
     let isProgressMode = false;
@@ -52,12 +72,6 @@
 
     function getIndex(node) {
       return +node.getAttribute("data-scrollama-index");
-    }
-
-    function updateDirection() {
-      if (window.pageYOffset > previousYOffset) direction = "down";
-      else if (window.pageYOffset < previousYOffset) direction = "up";
-      previousYOffset = window.pageYOffset;
     }
 
     function handleResize() {
@@ -104,18 +118,18 @@
     /* NOTIFY CALLBACKS */
     function notifyProgress(element, progress) {
       const index = getIndex(element);
-      if (progress !== undefined) steps[index].progress = progress;
-      const resp = { element, index, progress: steps[index].progress };
-
-      if (steps[index].state === "enter") cb.stepProgress(resp);
+      const step = steps[index];
+      if (progress !== undefined) step.progress = progress;
+      const response = { element, index, progress, direction };
+      if (step.state === "enter") cb.stepProgress(response);
     }
 
-    function notifyStepEnter(element, dir, check = true) {
+    function notifyStepEnter(element, check = true) {
       const index = getIndex(element);
       const step = steps[index];
-      const response = { element, index, direction: dir };
+      const response = { element, index, direction };
 
-      step.direction = dir;
+      step.direction = direction;
       step.state = "enter";
 
       // if (isPreserveOrder && check && dir === 'down') notifyOthers(index, 'above');
@@ -125,20 +139,21 @@
       if (isTriggerOnce) exclude[index] = true;
     }
 
-    function notifyStepExit(element, dir) {
+    function notifyStepExit(element) {
       const index = getIndex(element);
       const step = steps[index];
 
       if (!step.state) return false;
 
-      const response = { element, index, direction: dir };
+      const response = { element, index, direction };
 
       if (isProgressMode) {
-        if (dir === "down" && step.progress < 1) notifyProgress(element, 1);
-        else if (dir === "up" && step.progress > 0) notifyProgress(element, 0);
+        if (direction === "down" && step.progress < 1) notifyProgress(element, 1);
+        else if (direction === "up" && step.progress > 0)
+          notifyProgress(element, 0);
       }
 
-      step.direction = dir;
+      step.direction = direction;
       step.state = "exit";
 
       cb.stepExit(response);
@@ -158,14 +173,12 @@
     }
 
     function intersectStep([entry]) {
-      updateDirection();
-      const { isIntersecting, intersectionRatio, target } = entry;
-      if (isIntersecting) notifyStepEnter(target, direction);
-      else notifyStepExit(target, direction);
+      const { isIntersecting, target } = entry;
+      if (isIntersecting) notifyStepEnter(target);
+      else notifyStepExit(target);
     }
 
     function intersectProgress([entry]) {
-      updateDirection();
       const index = getIndex(entry.target);
       const step = steps[index];
       const { isIntersecting, intersectionRatio, target } = entry;
@@ -331,9 +344,10 @@
       else err("onStepProgress requires a function");
       return S;
     };
-
     return S;
   }
+
+  setupScroll();
 
   return scrollama;
 
