@@ -9,6 +9,8 @@
 
 - preserve order (only works with ordered steps + offsets)
 - scrollable check needed?
+- update docs
+- update examples (no stickyfill, mobile pattern obsolete?)
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
