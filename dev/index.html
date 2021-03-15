@@ -70,7 +70,7 @@
       /* demo */
 
       #intro {
-        margin-bottom: 300px;
+        margin-bottom: 800px;
       }
 
       #outro {
@@ -93,6 +93,19 @@
       .step {
         margin: 2rem auto 4rem auto;
         border: 1px solid #333;
+        height: 300px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .step:after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        height: 1px;
+        background: black;
       }
 
       .step.is-active {
@@ -134,9 +147,7 @@
         >
       </p>
       <h1 class="intro__hed">Demo: Basic</h1>
-      <p class="intro__dek">
-        Start scrolling to see how it works.
-      </p>
+      <p class="intro__dek">Start scrolling to see how it works.</p>
     </section>
 
     <div id="anchor-2"></div>
@@ -145,7 +156,7 @@
         <div class="step" data-step="1">
           <p>STEP 1</p>
         </div>
-        <div class="step" data-step="2">
+        <!-- <div class="step" data-step="2">
           <p>STEP 2</p>
         </div>
 
@@ -155,7 +166,7 @@
         </div>
         <div class="step" data-step="4">
           <p>STEP 4</p>
-        </div>
+        </div> -->
       </div>
     </section>
     <div id="anchor-4"></div>
@@ -175,29 +186,29 @@
       // scrollama event handlers
       function handleStepEnter(response) {
         // response = { element, direction, index }
-        console.log(response.index, "-------- enter");
+        console.log(response.index, "enter");
         // add to color to current step
         response.element.classList.add("is-active");
       }
 
       function handleStepExit(response) {
         // response = { element, direction, index }
-        console.log(response.index, "-------- exit");
+        console.log(response.index, "exit");
         // remove color from current step
         response.element.classList.remove("is-active");
       }
 
       function handleStepProgress(response) {
         // response = { element, progress, index }
-        console.log(response.index, "-------- progress -", response.progress);
+        console.log(response.index, "progress", response.progress);
       }
 
       function init() {
         // set random padding for different step heights (not required)
-        steps.forEach(function(step) {
+        steps.forEach(function (step) {
           var v = 100 + Math.floor((Math.random() * window.innerHeight) / 4);
           // step.style.padding = v + 'px 0px';
-          step.style.height = "300px";
+          // step.style.height = "300px";
         });
 
         // 1. setup the scroller with the bare-bones options
@@ -207,15 +218,18 @@
           .setup({
             step: ".scroll__text .step",
             debug: true,
-            offset: 0.2
-            // progress: true,
+            offset: 0.5,
+            progress: true,
           })
           .onStepEnter(handleStepEnter)
-          .onStepExit(handleStepExit);
-        // .onStepProgress(handleStepProgress)
+          .onStepExit(handleStepExit)
+          .onStepProgress(handleStepProgress);
 
         // setup resize event
         window.addEventListener("resize", scroller.resize);
+        // setTimeout(() => {
+        //   steps[0].style.height = "400px";
+        // }, 1000);
       }
 
       // kick things off

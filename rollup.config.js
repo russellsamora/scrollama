@@ -1,33 +1,30 @@
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import buble from 'rollup-plugin-buble';
-import uglify from 'rollup-plugin-uglify';
-import filesize from 'rollup-plugin-filesize';
+import commonjs from "rollup-plugin-commonjs";
+import resolve from "rollup-plugin-node-resolve";
+import { uglify } from "rollup-plugin-uglify";
+import filesize from "rollup-plugin-filesize";
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === "production";
 
-const file = `build/scrollama${isProd ? '.min' : ''}.js`;
+const file = `build/scrollama${isProd ? ".min" : ""}.js`;
 
 const plugins = [
   resolve({
     jsnext: true,
-    main: true
+    main: true,
   }),
   commonjs({
-    sourceMap: false
+    sourceMap: false,
   }),
-  buble(),
-  filesize()
+  filesize(),
+  isProd && uglify(),
 ];
 
-isProd && plugins.push(uglify());
-
 export default {
-  input: 'index.js',
+  input: "index.js",
   output: {
     file,
-    format: 'umd',
-    name: 'scrollama'
+    format: "umd",
+    name: "scrollama",
   },
-  plugins
+  plugins,
 };
