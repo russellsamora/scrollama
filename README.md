@@ -6,14 +6,17 @@
 - progress
 - custom offset trigger
 - progress enter/exit
-- rAF scroll updates?
+- sinngle rAF scroll updates
+- deprecate resize
+- auto-update on offset trigger date (rename to offset)
 
 - preserve order (only works with ordered steps + offsets)
-- scrollable check needed? (maybe a soft warning)
+- better debugger
+- dont disconnect resize
+- clean up comments/code
 - update docs
 - update examples (no stickyfill, mobile pattern obsolete?)
-- clean up comments
-- better debugger
+- scrollable check needed? (maybe a soft warning)
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
@@ -175,6 +178,8 @@ The argument of the callback is an object: `{ element: DOMElement, index: number
 `index`: The index of the step of all steps
 
 `progress`: The percent of completion of the step (0 - 1)
+
+`direction`: 'up' or 'down'
 
 #### scrollama.offsetTrigger([number or string])
 

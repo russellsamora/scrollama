@@ -43,6 +43,46 @@
     document.addEventListener("scroll", onScroll);
   }
 
+  function err$1(msg) {
+  	console.error(`scrollama error: ${msg}`);
+  }
+
+  function getIndex(node) {
+  	return +node.getAttribute("data-scrollama-index");
+  }
+
+  function createProgressThreshold(height, threshold) {
+      const count = Math.ceil(height / threshold);
+      const t = [];
+      const ratio = 1 / count;
+      for (let i = 0; i < count + 1; i += 1) {
+        t.push(i * ratio);
+      }
+      return t;
+    }
+
+  function parseOffset(x) {
+  	if (typeof x === "string" && x.indexOf("px") > 0) {
+  		const v = +x.replace("px", "");
+  		if (!isNaN(v)) return { format: "pixels", value: v };
+  		else {
+  			err("offset value must be in 'px' format. Fallback to 0.5.");
+  			return { format: "percent", value: 0.5 };
+  		}
+  	} else if (typeof x === "number" || !isNaN(+x)) {
+  		if (x > 1) err("offset value is greater than 1. Fallback to 1.");
+  		if (x < 0) err("offset value is lower than 0. Fallback to 0.");
+  		return { format: "percent", value: Math.min(Math.max(0, x), 1) };
+  	}
+  	return null;
+  }
+
+  function indexSteps(steps) {
+  	steps.forEach((step) =>
+  		step.node.setAttribute("data-scrollama-index", step.index)
+  	);
+  }
+
   function scrollama() {
     let cb = {};
     let steps = [];
@@ -57,10 +97,6 @@
     let exclude = [];
 
     /* HELPERS */
-    function err(msg) {
-      console.error(`scrollama error: ${msg}`);
-    }
-
     function reset() {
       cb = {
         stepEnter: () => {},
@@ -70,49 +106,10 @@
       exclude = [];
     }
 
-    function getIndex(node) {
-      return +node.getAttribute("data-scrollama-index");
-    }
-
-    function handleResize() {
-      steps = steps.map((step) => ({
-        ...step,
-        height: step.node.offsetHeight,
-      }));
-
-      if (isEnabled) updateObservers();
-    }
-
     function handleEnable(shouldEnable) {
       if (shouldEnable && !isEnabled) updateObservers();
       if (!shouldEnable && isEnabled) disconnectObservers();
       isEnabled = shouldEnable;
-    }
-
-    function createProgressThreshold(height) {
-      const count = Math.ceil(height / progressThreshold);
-      const t = [];
-      const ratio = 1 / count;
-      for (let i = 0; i < count + 1; i += 1) {
-        t.push(i * ratio);
-      }
-      return t;
-    }
-
-    function parseOffset(x) {
-      if (typeof x === "string" && x.indexOf("px") > 0) {
-        const v = +x.replace("px", "");
-        if (!isNaN(v)) return { format: "pixels", value: v };
-        else {
-          err("offset value must be in 'px' format. Fallback to 0.5.");
-          return { format: "percent", value: 0.5 };
-        }
-      } else if (typeof x === "number" || !isNaN(+x)) {
-        if (x > 1) err("offset value is greater than 1. Fallback to 1.");
-        if (x < 0) err("offset value is lower than 0. Fallback to 0.");
-        return { format: "percent", value: Math.min(Math.max(0, x), 1) };
-      }
-      return null;
     }
 
     /* NOTIFY CALLBACKS */
@@ -186,7 +183,18 @@
         notifyProgress(target, intersectionRatio);
     }
 
-    /*  OBSERVER - CREATION */
+    /*  OBSERVERS - CREATION */
+
+  	function disconnectObserver({ observers }) {
+      Object.keys(observers).map((name) => {
+        observers[name].disconnect();
+      });
+    }
+
+    function disconnectObservers() {
+      steps.forEach(disconnectObserver);
+    }
+  	
     function updateResizeObserver(step) {
       const observer = new ResizeObserver(resizeStep);
       observer.observe(step.node);
@@ -227,7 +235,7 @@
       const marginBottom = offset - h;
       const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
-      const threshold = createProgressThreshold(step.height);
+      const threshold = createProgressThreshold(step.height, progressThreshold);
       const options = { rootMargin, threshold };
       const observer = new IntersectionObserver(intersectProgress, options);
 
@@ -246,23 +254,9 @@
       if (isProgressMode) updateProgressObservers();
     }
 
-    function disconnectObserver({ observers }) {
-      Object.keys(observers).map((name) => {
-        observers[name].disconnect();
-      });
-    }
-
-    function disconnectObservers() {
-      steps.forEach(disconnectObserver);
-    }
-
+    
     /* SETUP FUNCTIONS */
-
-    function indexSteps() {
-      steps.forEach((step) =>
-        step.node.setAttribute("data-scrollama-index", step.index)
-      );
-    }
+    
 
     const S = {};
 
@@ -286,7 +280,7 @@
       }));
 
       if (!steps.length) {
-        err("no step elements");
+        err$1("no step elements");
         return S;
       }
 
@@ -294,15 +288,10 @@
       isProgressMode = progress;
       isTriggerOnce = once;
       progressThreshold = Math.max(1, +threshold);
+      globalOffset = parseOffset(offset);
       reset();
-      indexSteps();
-      S.offsetTrigger(offset);
-      S.enable();
-      return S;
-    };
-
-    S.resize = () => {
-      handleResize();
+      indexSteps(steps);
+      handleEnable(true);
       return S;
     };
 
@@ -321,27 +310,28 @@
       reset();
     };
 
-    S.offsetTrigger = (x) => {
+    S.offset = (x) => {
       if (x === null || x === undefined) return globalOffset.value;
       globalOffset = parseOffset(x);
+  		updateObservers();
       return S;
     };
 
     S.onStepEnter = (f) => {
       if (typeof f === "function") cb.stepEnter = f;
-      else err("onStepEnter requires a function");
+      else err$1("onStepEnter requires a function");
       return S;
     };
 
     S.onStepExit = (f) => {
       if (typeof f === "function") cb.stepExit = f;
-      else err("onStepExit requires a function");
+      else err$1("onStepExit requires a function");
       return S;
     };
 
     S.onStepProgress = (f) => {
       if (typeof f === "function") cb.stepProgress = f;
-      else err("onStepProgress requires a function");
+      else err$1("onStepProgress requires a function");
       return S;
     };
     return S;

@@ -1,6 +1,12 @@
 import { selectAll } from "./dom";
 import * as bug from "./debug";
 import { setupScroll, direction } from "./scroll";
+import generateId from './generateId';
+import err from './err';
+import getIndex from './getIndex';
+import createProgressThreshold from './createProgressThreshold';
+import parseOffset from './parseOffset';
+import indexSteps from './indexSteps';
 
 function scrollama() {
   let cb = {};
@@ -19,10 +25,6 @@ function scrollama() {
   let exclude = [];
 
   /* HELPERS */
-  function err(msg) {
-    console.error(`scrollama error: ${msg}`);
-  }
-
   function reset() {
     cb = {
       stepEnter: () => {},
@@ -32,60 +34,10 @@ function scrollama() {
     exclude = [];
   }
 
-  function generateID() {
-    const alphabet = "abcdefghijklmnopqrstuvwxyz";
-    const date = Date.now();
-    const result = [];
-    for (let i = 0; i < 6; i += 1) {
-      const char = alphabet[Math.floor(Math.random() * alphabet.length)];
-      result.push(char);
-    }
-    return `${result.join("")}${date}`;
-  }
-
-  function getIndex(node) {
-    return +node.getAttribute("data-scrollama-index");
-  }
-
-  function handleResize() {
-    steps = steps.map((step) => ({
-      ...step,
-      height: step.node.offsetHeight,
-    }));
-
-    if (isEnabled) updateObservers();
-  }
-
   function handleEnable(shouldEnable) {
     if (shouldEnable && !isEnabled) updateObservers();
     if (!shouldEnable && isEnabled) disconnectObservers();
     isEnabled = shouldEnable;
-  }
-
-  function createProgressThreshold(height) {
-    const count = Math.ceil(height / progressThreshold);
-    const t = [];
-    const ratio = 1 / count;
-    for (let i = 0; i < count + 1; i += 1) {
-      t.push(i * ratio);
-    }
-    return t;
-  }
-
-  function parseOffset(x) {
-    if (typeof x === "string" && x.indexOf("px") > 0) {
-      const v = +x.replace("px", "");
-      if (!isNaN(v)) return { format: "pixels", value: v };
-      else {
-        err("offset value must be in 'px' format. Fallback to 0.5.");
-        return { format: "percent", value: 0.5 };
-      }
-    } else if (typeof x === "number" || !isNaN(+x)) {
-      if (x > 1) err("offset value is greater than 1. Fallback to 1.");
-      if (x < 0) err("offset value is lower than 0. Fallback to 0.");
-      return { format: "percent", value: Math.min(Math.max(0, x), 1) };
-    }
-    return null;
   }
 
   /* NOTIFY CALLBACKS */
@@ -187,7 +139,18 @@ function scrollama() {
       notifyProgress(target, intersectionRatio);
   }
 
-  /*  OBSERVER - CREATION */
+  /*  OBSERVERS - CREATION */
+
+	function disconnectObserver({ observers }) {
+    Object.keys(observers).map((name) => {
+      observers[name].disconnect();
+    });
+  }
+
+  function disconnectObservers() {
+    steps.forEach(disconnectObserver);
+  }
+	
   function updateResizeObserver(step) {
     const observer = new ResizeObserver(resizeStep);
     observer.observe(step.node);
@@ -228,7 +191,7 @@ function scrollama() {
     const marginBottom = offset - h;
     const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
-    const threshold = createProgressThreshold(step.height);
+    const threshold = createProgressThreshold(step.height, progressThreshold);
     const options = { rootMargin, threshold };
     const observer = new IntersectionObserver(intersectProgress, options);
 
@@ -247,23 +210,9 @@ function scrollama() {
     if (isProgressMode) updateProgressObservers();
   }
 
-  function disconnectObserver({ observers }) {
-    Object.keys(observers).map((name) => {
-      observers[name].disconnect();
-    });
-  }
-
-  function disconnectObservers() {
-    steps.forEach(disconnectObserver);
-  }
-
+  
   /* SETUP FUNCTIONS */
-
-  function indexSteps() {
-    steps.forEach((step) =>
-      step.node.setAttribute("data-scrollama-index", step.index)
-    );
-  }
+  
 
   const S = {};
 
@@ -297,16 +246,11 @@ function scrollama() {
     isTriggerOnce = once;
     progressThreshold = Math.max(1, +threshold);
 
-    id = generateID();
+    id = generateId();
+    globalOffset = parseOffset(offset);
     reset();
-    indexSteps();
-    S.offsetTrigger(offset);
-    S.enable();
-    return S;
-  };
-
-  S.resize = () => {
-    handleResize();
+    indexSteps(steps);
+    handleEnable(true);
     return S;
   };
 
@@ -325,9 +269,10 @@ function scrollama() {
     reset();
   };
 
-  S.offsetTrigger = (x) => {
+  S.offset = (x) => {
     if (x === null || x === undefined) return globalOffset.value;
     globalOffset = parseOffset(x);
+		updateObservers();
     return S;
   };
 
