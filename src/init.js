@@ -1,12 +1,12 @@
 import { selectAll } from "./dom";
 import * as bug from "./debug";
-import { setupScroll, direction } from "./scroll";
-import generateId from './generateId';
-import err from './err';
-import getIndex from './getIndex';
-import createProgressThreshold from './createProgressThreshold';
-import parseOffset from './parseOffset';
-import indexSteps from './indexSteps';
+import { setupScroll, onScroll, direction } from "./scroll";
+import generateId from "./generateId";
+import err from "./err";
+import getIndex from "./getIndex";
+import createProgressThreshold from "./createProgressThreshold";
+import parseOffset from "./parseOffset";
+import indexSteps from "./indexSteps";
 
 function scrollama() {
   let cb = {};
@@ -50,34 +50,29 @@ function scrollama() {
   }
 
   function notifyOthers(index, location) {
-    // if (location === "above") {
-    //   // check if steps above/below were skipped and should be notified first
-    //   for (let i = 0; i < index; i += 1) {
-    //     const ss = steps[i];
-    //     if (ss.state !== "enter" && ss.direction !== "down") {
-    //       notifyStepEnter(steps[i], "down", false);
-    //       notifyStepExit(steps[i], "down");
-    //     } else if (ss.state === "enter") notifyStepExit(steps[i], "down");
-    //     // else if (ss.direction === 'up') {
-    //     //   notifyStepEnter(steps[i], 'down', false);
-    //     //   notifyStepExit(steps[i], 'down');
-    //     // }
-    //   }
-    // } else if (location === "below") {
-    //   for (let i = steps.length - 1; i > index; i -= 1) {
-    //     const ss = steps[i];
-    //     if (ss.state === "enter") {
-    //       notifyStepExit(steps[i], "up");
-    //     }
-    //     if (ss.direction === "down") {
-    //       notifyStepEnter(steps[i], "up", false);
-    //       notifyStepExit(steps[i], "up");
-    //     }
-    //   }
-    // }
+    if (location === "above") {
+      for (let i = 0; i < index; i += 1) {
+        const step = steps[i];
+        if (step.state !== "enter") {
+          notifyStepEnter(step.node, false);
+          notifyStepExit(step.node);
+        } else if (step.state === "enter") notifyStepExit(step.node);
+      }
+    } else if (location === "below") {
+      for (let i = steps.length - 1; i > index; i -= 1) {
+        const step = steps[i];
+        if (step.state === "enter") notifyStepExit(step.node);
+        if (step.direction === "down") {
+          notifyStepEnter(step.node, false);
+          notifyStepExit(step.node);
+        }
+      }
+    }
   }
 
   function notifyStepEnter(element, check = true) {
+    onScroll();
+
     const index = getIndex(element);
     const step = steps[index];
     const response = { element, index, direction };
@@ -85,8 +80,10 @@ function scrollama() {
     step.direction = direction;
     step.state = "enter";
 
-    // if (isPreserveOrder && check && dir === 'down') notifyOthers(index, 'above');
-    // if (isPreserveOrder && check && dir === 'up') notifyOthers(index, 'below');
+    // if (isPreserveOrder && check && direction !== "up")
+    //   notifyOthers(index, "above");
+    // if (isPreserveOrder && check && direction === "up")
+    //   notifyOthers(index, "below");
 
     if (!exclude[index]) cb.stepEnter(response);
     if (isTriggerOnce) exclude[index] = true;
@@ -112,7 +109,7 @@ function scrollama() {
     cb.stepExit(response);
   }
 
-  /* OBSERVER - INTERSECT HANDLING */
+  /* OBSERVERS - HANDLING */
   function resizeStep([entry]) {
     const index = getIndex(entry.target);
     const step = steps[index];
@@ -121,14 +118,14 @@ function scrollama() {
       step.height = h;
       disconnectObserver(step);
       updateStepObserver(step);
-      updateResizeObserver(step); // todo exclude
+      updateResizeObserver(step);
     }
   }
 
   function intersectStep([entry]) {
     const { isIntersecting, target } = entry;
     if (isIntersecting) notifyStepEnter(target);
-    else notifyStepExit(target, scroll);
+    else notifyStepExit(target);
   }
 
   function intersectProgress([entry]) {
@@ -140,8 +137,7 @@ function scrollama() {
   }
 
   /*  OBSERVERS - CREATION */
-
-	function disconnectObserver({ observers }) {
+  function disconnectObserver({ observers }) {
     Object.keys(observers).map((name) => {
       observers[name].disconnect();
     });
@@ -150,7 +146,7 @@ function scrollama() {
   function disconnectObservers() {
     steps.forEach(disconnectObserver);
   }
-	
+
   function updateResizeObserver(step) {
     const observer = new ResizeObserver(resizeStep);
     observer.observe(step.node);
@@ -210,10 +206,7 @@ function scrollama() {
     if (isProgressMode) updateProgressObservers();
   }
 
-  
-  /* SETUP FUNCTIONS */
-  
-
+  /* SETUP */
   const S = {};
 
   S.setup = ({
@@ -221,8 +214,9 @@ function scrollama() {
     offset = 0.5,
     threshold = 4,
     progress = false,
-    order = true,
+    order = false,
     once = false,
+    debug = false,
   }) => {
     steps = selectAll(step).map((node, index) => ({
       index,
@@ -240,7 +234,6 @@ function scrollama() {
       return S;
     }
 
-    // options
     isProgressMode = progress;
     isPreserveOrder = order;
     isTriggerOnce = once;
@@ -267,12 +260,13 @@ function scrollama() {
   S.destroy = () => {
     handleEnable(false);
     reset();
+    return S;
   };
 
   S.offset = (x) => {
     if (x === null || x === undefined) return globalOffset.value;
     globalOffset = parseOffset(x);
-		updateObservers();
+    updateObservers();
     return S;
   };
 

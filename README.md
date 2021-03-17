@@ -10,7 +10,7 @@
 - deprecate resize
 - auto-update on offset trigger date (rename to offset)
 
-- preserve order (only works with ordered steps + offsets)
+- preserve order: try adding queue (only works with ordered steps + global offset?)
 - better debugger
 - dont disconnect resize
 - clean up comments/code
@@ -136,7 +136,7 @@ _options:_
 - `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
 - `threshold` (number, 1+): The granularity of the progress interval in pixels (smaller = more granular). **(default: 4)**
-- `order` (boolean): Fire previous step triggers if they were jumped. **(default: true)**
+- `order` (boolean): Fire previous step triggers if they were jumped. **(default: false)**
 - `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
 - `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**

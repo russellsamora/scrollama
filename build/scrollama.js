@@ -20,26 +20,18 @@
     return [];
   }
 
-  let tick = false;
   let prev = 0;
   let y = 0;
   let direction;
 
-  function update() {
+  function onScroll() {
+    y = window.scrollY;
     if (y > prev) direction = "down";
     else if (y < prev) direction = "up";
     prev = y;
-    tick = false;
   }
 
   function setupScroll() {
-    const onScroll = () => {
-      y = window.scrollY;
-      if (!tick) {
-        requestAnimationFrame(update);
-        tick = true;
-      }
-    };
     document.addEventListener("scroll", onScroll);
   }
 
@@ -92,6 +84,7 @@
 
     let isEnabled = false;
     let isProgressMode = false;
+    let isPreserveOrder = false;
     let isTriggerOnce = false;
 
     let exclude = [];
@@ -121,7 +114,32 @@
       if (step.state === "enter") cb.stepProgress(response);
     }
 
+    function notifyOthers(index, location) {
+      console.log(location);
+      if (location === "above") {
+        for (let i = 0; i < index; i += 1) {
+          const step = steps[i];
+          console.log(i, "-", step.state);
+          if (step.state !== "enter") {
+            notifyStepEnter(step.node, false);
+            notifyStepExit(step.node);
+          } else if (step.state === "enter") notifyStepExit(step.node);
+        }
+      } else if (location === "below") {
+        for (let i = steps.length - 1; i > index; i -= 1) {
+          const step = steps[i];
+          if (step.state === "enter") notifyStepExit(step.node);
+          if (step.direction === "down") {
+            notifyStepEnter(step.node, false);
+            notifyStepExit(step.node);
+          }
+        }
+      }
+    }
+
     function notifyStepEnter(element, check = true) {
+      onScroll();
+
       const index = getIndex(element);
       const step = steps[index];
       const response = { element, index, direction };
@@ -129,8 +147,10 @@
       step.direction = direction;
       step.state = "enter";
 
-      // if (isPreserveOrder && check && dir === 'down') notifyOthers(index, 'above');
-      // if (isPreserveOrder && check && dir === 'up') notifyOthers(index, 'below');
+      if (isPreserveOrder && check && direction !== "up")
+        notifyOthers(index, "above");
+      if (isPreserveOrder && check && direction === "up")
+        notifyOthers(index, "below");
 
       if (!exclude[index]) cb.stepEnter(response);
       if (isTriggerOnce) exclude[index] = true;
@@ -156,7 +176,7 @@
       cb.stepExit(response);
     }
 
-    /* OBSERVER - INTERSECT HANDLING */
+    /* OBSERVERS - HANDLING */
     function resizeStep([entry]) {
       const index = getIndex(entry.target);
       const step = steps[index];
@@ -165,7 +185,7 @@
         step.height = h;
         disconnectObserver(step);
         updateStepObserver(step);
-        updateResizeObserver(step); // todo exclude
+        updateResizeObserver(step);
       }
     }
 
@@ -184,8 +204,7 @@
     }
 
     /*  OBSERVERS - CREATION */
-
-  	function disconnectObserver({ observers }) {
+    function disconnectObserver({ observers }) {
       Object.keys(observers).map((name) => {
         observers[name].disconnect();
       });
@@ -194,7 +213,7 @@
     function disconnectObservers() {
       steps.forEach(disconnectObserver);
     }
-  	
+
     function updateResizeObserver(step) {
       const observer = new ResizeObserver(resizeStep);
       observer.observe(step.node);
@@ -254,10 +273,7 @@
       if (isProgressMode) updateProgressObservers();
     }
 
-    
-    /* SETUP FUNCTIONS */
-    
-
+    /* SETUP */
     const S = {};
 
     S.setup = ({
@@ -265,8 +281,9 @@
       offset = 0.5,
       threshold = 4,
       progress = false,
-      order = true,
+      order = false,
       once = false,
+      debug = false,
     }) => {
       steps = selectAll(step).map((node, index) => ({
         index,
@@ -284,8 +301,8 @@
         return S;
       }
 
-      // options
       isProgressMode = progress;
+      isPreserveOrder = order;
       isTriggerOnce = once;
       progressThreshold = Math.max(1, +threshold);
       globalOffset = parseOffset(offset);
@@ -308,12 +325,13 @@
     S.destroy = () => {
       handleEnable(false);
       reset();
+      return S;
     };
 
     S.offset = (x) => {
       if (x === null || x === undefined) return globalOffset.value;
       globalOffset = parseOffset(x);
-  		updateObservers();
+      updateObservers();
       return S;
     };
 
