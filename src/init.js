@@ -465,6 +465,7 @@ function scrollama() {
 
   S.setup = ({
     step,
+    parent,
     offset = 0.5,
     progress = false,
     threshold = 4,
@@ -476,7 +477,7 @@ function scrollama() {
     // create id unique to this scrollama instance
     id = generateInstanceID();
 
-    stepEl = selectAll(step);
+    stepEl = selectAll(step, parent);
 
     if (!stepEl.length) {
       err("no step elements");

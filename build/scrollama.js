@@ -573,6 +573,7 @@ function scrollama() {
 
   S.setup = function (ref) {
     var step = ref.step;
+    var parent = ref.parent;
     var offset = ref.offset; if ( offset === void 0 ) offset = 0.5;
     var progress = ref.progress; if ( progress === void 0 ) progress = false;
     var threshold = ref.threshold; if ( threshold === void 0 ) threshold = 4;
@@ -584,7 +585,7 @@ function scrollama() {
     // create id unique to this scrollama instance
     id = generateInstanceID();
 
-    stepEl = selectAll(step);
+    stepEl = selectAll(step, parent);
 
     if (!stepEl.length) {
       err("no step elements");
