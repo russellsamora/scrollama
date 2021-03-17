@@ -226,12 +226,13 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 - [steven0811](https://github.com/steven0811)
 - [smnarnold](https://github.com/smnarnold)
 - [tuckergordon](https://github.com/tuckergordon)
+- [emma-k-alexandra](https://github.com/emma-k-alexandra)
 
 ### License
 
 MIT License
 
-Copyright (c) 2020 Russell Goldenberg
+Copyright (c) 2021 Russell Goldenberg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
