@@ -1,17 +1,20 @@
 let tick = false;
-let prev = 0;
-let y = 0;
+let previousScrollY = 0;
+let currentScrollY = 0;
+let comparisonScrollY = 0;
 let direction;
 
 function onScroll() {
-  y = window.scrollY;
-  if (y > prev) direction = "down";
-  else if (y < prev) direction = "up";
-  prev = y;
+  if (currentScrollY === window.pageYOffset) return;
+  previousScrollY = currentScrollY;
+  currentScrollY = window.pageYOffset;
+  if (currentScrollY > comparisonScrollY) direction = "down";
+  else if (currentScrollY < comparisonScrollY) direction = "up";
+  comparisonScrollY = currentScrollY;
 }
 
 function setupScroll() {
   document.addEventListener("scroll", onScroll);
 }
 
-export { setupScroll, onScroll, direction };
+export { setupScroll, onScroll, direction, previousScrollY, currentScrollY };

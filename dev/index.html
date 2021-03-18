@@ -154,19 +154,19 @@
     <div id="anchor-2"></div>
     <section id="scroll">
       <div class="scroll__text">
+        <div class="step" data-step="0">
+          <p>STEP 0</p>
+        </div>
         <div class="step" data-step="1">
           <p>STEP 1</p>
+          <div id="anchor-3"></div>
         </div>
         <div class="step" data-step="2">
           <p>STEP 2</p>
-          <div id="anchor-3"></div>
         </div>
-        <div class="step" data-step="3">
-          <p>STEP 3</p>
-        </div>
-        <div class="step" data-step="4">
+        <!-- <div class="step" data-step="4">
           <p>STEP 4</p>
-        </div>
+        </div> -->
       </div>
     </section>
     <div id="anchor-4"></div>
@@ -186,14 +186,14 @@
       // scrollama event handlers
       function handleStepEnter(response) {
         // response = { element, direction, index }
-        console.log(response.index + 1, "enter");
+        // console.log(response.index + 1, "enter");
         // add to color to current step
         response.element.classList.add("is-active");
       }
 
       function handleStepExit(response) {
         // response = { element, direction, index }
-        console.log(response.index + 1, "exit");
+        // console.log(response.index + 1, "exit");
         // remove color from current step
         response.element.classList.remove("is-active");
       }

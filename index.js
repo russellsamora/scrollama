@@ -1,3 +1,3 @@
-import init from "./src/init";
+import entry from "./src/entry";
 
-export default init;
+export default entry;

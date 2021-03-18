@@ -1,12 +1,13 @@
 import { selectAll } from "./dom";
 import * as bug from "./debug";
-import { setupScroll, onScroll, direction } from "./scroll";
 import generateId from "./generateId";
 import err from "./err";
 import getIndex from "./getIndex";
 import createProgressThreshold from "./createProgressThreshold";
 import parseOffset from "./parseOffset";
 import indexSteps from "./indexSteps";
+import getOffsetTop from "./getOffsetTop";
+import { setupScroll, direction, onScroll } from "./scroll";
 
 function scrollama() {
   let cb = {};
@@ -50,13 +51,29 @@ function scrollama() {
   }
 
   function notifyOthers(index, location) {
+    console.log(index, location, direction, currentScrollY, previousScrollY);
     if (location === "above") {
-      for (let i = 0; i < index; i += 1) {
+      let i = direction === "down" ? 0 : index - 1;
+      let end = direction === "down" ? i < index : i >= 0;
+      let inc = direction === "down" ? 1 : -1;
+      for (i; end; inc) {
         const step = steps[i];
-        if (step.state !== "enter") {
-          notifyStepEnter(step.node, false);
-          notifyStepExit(step.node);
-        } else if (step.state === "enter") notifyStepExit(step.node);
+        console.log(
+          Object.keys(step)
+            .map((p) => `${p} - ${step[p]}`)
+            .join("\n ")
+        );
+        if (direction === "down") {
+          if (step.state !== "enter" && step.direction !== "down") {
+            notifyStepEnter(step.node, false);
+            notifyStepExit(step.node, false);
+          } else if (step.state === "enter") notifyStepExit(step.node, false);
+        } else if (direction === "up") {
+          if (step.state !== "enter" && step.direction === "down") {
+            notifyStepEnter(step.node, false);
+            notifyStepExit(step.node, false);
+          } else if (step.state === "enter") notifyStepExit(step.node, false);
+        }
       }
     } else if (location === "below") {
       for (let i = steps.length - 1; i > index; i -= 1) {
@@ -64,15 +81,13 @@ function scrollama() {
         if (step.state === "enter") notifyStepExit(step.node);
         if (step.direction === "down") {
           notifyStepEnter(step.node, false);
-          notifyStepExit(step.node);
+          notifyStepExit(step.node, false);
         }
       }
     }
   }
 
   function notifyStepEnter(element, check = true) {
-    onScroll();
-
     const index = getIndex(element);
     const step = steps[index];
     const response = { element, index, direction };
@@ -89,7 +104,7 @@ function scrollama() {
     if (isTriggerOnce) exclude[index] = true;
   }
 
-  function notifyStepExit(element) {
+  function notifyStepExit(element, check = true) {
     const index = getIndex(element);
     const step = steps[index];
 
@@ -105,6 +120,11 @@ function scrollama() {
 
     step.direction = direction;
     step.state = "exit";
+
+    // if (isPreserveOrder && check && direction !== "up")
+    //   notifyOthers(index, "below");
+    // if (isPreserveOrder && check && direction === "up")
+    //   notifyOthers(index, "above");
 
     cb.stepExit(response);
   }
@@ -123,6 +143,8 @@ function scrollama() {
   }
 
   function intersectStep([entry]) {
+    onScroll();
+
     const { isIntersecting, target } = entry;
     if (isIntersecting) notifyStepEnter(target);
     else notifyStepExit(target);
@@ -211,6 +233,7 @@ function scrollama() {
 
   S.setup = ({
     step,
+    parent,
     offset = 0.5,
     threshold = 4,
     progress = false,
@@ -218,13 +241,14 @@ function scrollama() {
     once = false,
     debug = false,
   }) => {
-    steps = selectAll(step).map((node, index) => ({
+    steps = selectAll(step, parent).map((node, index) => ({
       index,
       direction: undefined,
       height: node.offsetHeight,
       node,
       observers: {},
       offset: parseOffset(node.dataset.offset),
+      top: getOffsetTop(node),
       progress: 0,
       state: undefined,
     }));

@@ -10,13 +10,13 @@
 - deprecate resize
 - auto-update on offset trigger date (rename to offset)
 
-- preserve order: try adding queue (only works with ordered steps + global offset?)
 - better debugger
 - dont disconnect resize
-- clean up comments/code
 - update docs
 - update examples (no stickyfill, mobile pattern obsolete?)
+
 - scrollable check needed? (maybe a soft warning)
+- preserve order: try adding queue, store how it was detected last time or position, position jump checks? (only works with ordered steps + global offset?)
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
@@ -140,6 +140,7 @@ _options:_
 - `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
 - `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
+- parent (HTMLElement[]): Parent element for step selector (use if you steps are in shadow DOM). **(default: undefined)**
 
 #### scrollama.onStepEnter(callback)
 
@@ -245,12 +246,13 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 - [steven0811](https://github.com/steven0811)
 - [smnarnold](https://github.com/smnarnold)
 - [tuckergordon](https://github.com/tuckergordon)
+- [emma-k-alexandra](https://github.com/emma-k-alexandra)
 
 ### License
 
 MIT License
 
-Copyright (c) 2020 Russell Goldenberg
+Copyright (c) 2021 Russell Goldenberg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

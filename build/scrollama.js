@@ -20,21 +20,6 @@
     return [];
   }
 
-  let prev = 0;
-  let y = 0;
-  let direction;
-
-  function onScroll() {
-    y = window.scrollY;
-    if (y > prev) direction = "down";
-    else if (y < prev) direction = "up";
-    prev = y;
-  }
-
-  function setupScroll() {
-    document.addEventListener("scroll", onScroll);
-  }
-
   function err$1(msg) {
   	console.error(`scrollama error: ${msg}`);
   }
@@ -75,6 +60,29 @@
   	);
   }
 
+  function getOffsetTop(node) {
+    const { top } = node.getBoundingClientRect();
+    const scrollTop = window.pageYOffset;
+    const clientTop = document.body.clientTop || 0;
+    return top + scrollTop - clientTop;
+  }
+
+  let currentScrollY = 0;
+  let comparisonScrollY = 0;
+  let direction;
+
+  function onScroll() {
+    if (currentScrollY === window.pageYOffset) return;
+    currentScrollY = window.pageYOffset;
+    if (currentScrollY > comparisonScrollY) direction = "down";
+    else if (currentScrollY < comparisonScrollY) direction = "up";
+    comparisonScrollY = currentScrollY;
+  }
+
+  function setupScroll() {
+    document.addEventListener("scroll", onScroll);
+  }
+
   function scrollama() {
     let cb = {};
     let steps = [];
@@ -84,7 +92,6 @@
 
     let isEnabled = false;
     let isProgressMode = false;
-    let isPreserveOrder = false;
     let isTriggerOnce = false;
 
     let exclude = [];
@@ -114,32 +121,7 @@
       if (step.state === "enter") cb.stepProgress(response);
     }
 
-    function notifyOthers(index, location) {
-      console.log(location);
-      if (location === "above") {
-        for (let i = 0; i < index; i += 1) {
-          const step = steps[i];
-          console.log(i, "-", step.state);
-          if (step.state !== "enter") {
-            notifyStepEnter(step.node, false);
-            notifyStepExit(step.node);
-          } else if (step.state === "enter") notifyStepExit(step.node);
-        }
-      } else if (location === "below") {
-        for (let i = steps.length - 1; i > index; i -= 1) {
-          const step = steps[i];
-          if (step.state === "enter") notifyStepExit(step.node);
-          if (step.direction === "down") {
-            notifyStepEnter(step.node, false);
-            notifyStepExit(step.node);
-          }
-        }
-      }
-    }
-
     function notifyStepEnter(element, check = true) {
-      onScroll();
-
       const index = getIndex(element);
       const step = steps[index];
       const response = { element, index, direction };
@@ -147,16 +129,16 @@
       step.direction = direction;
       step.state = "enter";
 
-      if (isPreserveOrder && check && direction !== "up")
-        notifyOthers(index, "above");
-      if (isPreserveOrder && check && direction === "up")
-        notifyOthers(index, "below");
+      // if (isPreserveOrder && check && direction !== "up")
+      //   notifyOthers(index, "above");
+      // if (isPreserveOrder && check && direction === "up")
+      //   notifyOthers(index, "below");
 
       if (!exclude[index]) cb.stepEnter(response);
       if (isTriggerOnce) exclude[index] = true;
     }
 
-    function notifyStepExit(element) {
+    function notifyStepExit(element, check = true) {
       const index = getIndex(element);
       const step = steps[index];
 
@@ -172,6 +154,11 @@
 
       step.direction = direction;
       step.state = "exit";
+
+      // if (isPreserveOrder && check && direction !== "up")
+      //   notifyOthers(index, "below");
+      // if (isPreserveOrder && check && direction === "up")
+      //   notifyOthers(index, "above");
 
       cb.stepExit(response);
     }
@@ -190,6 +177,8 @@
     }
 
     function intersectStep([entry]) {
+      onScroll();
+
       const { isIntersecting, target } = entry;
       if (isIntersecting) notifyStepEnter(target);
       else notifyStepExit(target);
@@ -278,6 +267,7 @@
 
     S.setup = ({
       step,
+      parent,
       offset = 0.5,
       threshold = 4,
       progress = false,
@@ -285,13 +275,14 @@
       once = false,
       debug = false,
     }) => {
-      steps = selectAll(step).map((node, index) => ({
+      steps = selectAll(step, parent).map((node, index) => ({
         index,
         direction: undefined,
         height: node.offsetHeight,
         node,
         observers: {},
         offset: parseOffset(node.dataset.offset),
+        top: getOffsetTop(node),
         progress: 0,
         state: undefined,
       }));
@@ -302,7 +293,6 @@
       }
 
       isProgressMode = progress;
-      isPreserveOrder = order;
       isTriggerOnce = once;
       progressThreshold = Math.max(1, +threshold);
       globalOffset = parseOffset(offset);
