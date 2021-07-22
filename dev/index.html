@@ -172,7 +172,6 @@
 	<section id="outro"></section>
 	<div id="anchor-5"></div>
 
-	<script src="https://unpkg.com/intersection-observer"></script>
 	<script src="../build/scrollama.js"></script>
 	<script>
 		var container = document.querySelector("#scroll");
@@ -184,31 +183,23 @@
 
 		// scrollama event handlers
 		function handleStepEnter(response) {
-			// response = { element, direction, index }
-			// console.log(response.index + 1, "enter");
 			// add to color to current step
 			response.element.classList.add("is-active");
 		}
 
 		function handleStepExit(response) {
-			// response = { element, direction, index }
-			// console.log(response.index + 1, "exit");
 			// remove color from current step
 			response.element.classList.remove("is-active");
 		}
 
 		function handleStepProgress(response) {
-			// response = { element, progress, index }
-			// response.element.style.opacity = response.progress;
-			console.log(response);
+			// console.log(response);
 		}
 
 		function init() {
 			// set random padding for different step heights (not required)
 			steps.forEach(function (step) {
 				var v = 100 + Math.floor((Math.random() * window.innerHeight) / 4);
-				// step.style.padding = v + 'px 0px';
-				// step.style.height = "300px";
 			});
 
 			// 1. setup the scroller with the bare-bones options
@@ -219,18 +210,11 @@
 					step: ".scroll__text .step",
 					offset: 0.5,
 					progress: false,
-					order: true,
 					debug: true
 				})
 				.onStepEnter(handleStepEnter)
 				.onStepExit(handleStepExit)
 				.onStepProgress(handleStepProgress);
-
-			// setup resize event
-			// window.addEventListener("resize", scroller.resize);
-			// setTimeout(() => {
-			//   steps[0].style.height = "100px";
-			// }, 10000);
 		}
 
 		// kick things off
