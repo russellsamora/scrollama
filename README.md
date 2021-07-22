@@ -4,7 +4,14 @@
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
-### 3.0
+**Scrollama** is a modern & lightweight JavaScript library for scrollytelling
+using
+[IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+in favor of scroll events.
+
+**Current version**: 3.0.0
+
+## 3.0
 #### Why 3.0?
 The core parts of the Scrollama code base are being refactored for 3.0 to simplfy and clarify the logic. The goal behind this to ease make future maintainance, bug fixing, and feature additions easier moving forward. If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.
 
@@ -15,21 +22,14 @@ The core parts of the Scrollama code base are being refactored for 3.0 to simplf
 #### Deprecated Features
 * the `order` option
 
-**Scrollama** is a modern & lightweight JavaScript library for scrollytelling
-using
-[IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
-in favor of scroll events.
-
-**Current version**: 3.0.0
-
-#### Important Changes
+## Important Changes
 - **Version 3.0.0+**: `order` has been deprecated.
 - **Version 2.0.0+**: `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/)
 - **Version 1.4.0+**: you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
 
 [Jump to examples.](https://github.com/russellgoldenberg/scrollama#examples)
 
-### Why?
+## Why?
 
 Scrollytelling can be complicated to implement and difficult to make performant.
 The goal of this library is to provide a simple interface for creating
@@ -39,7 +39,7 @@ to handle element position detection.
 
 [![scrollytelling pattern](https://thumbs.gfycat.com/FearfulHotArabianoryx-size_restricted.gif)](https://pudding.cool/process/how-to-implement-scrollytelling)
 
-### Examples
+## Examples
 
 _Note: most of these examples use D3 to keep the code concise, but this can be used
 with any library, or with no library at all._
@@ -55,7 +55,7 @@ with any library, or with no library at all._
 - [Mobile Pattern](https://russellgoldenberg.github.io/scrollama/mobile-pattern) -
   using pixels instead of percent for offset value so it doesn't jump around on scroll direction change
 
-### Installation
+## Installation
 
 **Note: As of version 1.4.0, the IntersectionObserver polyfill has been removed from the build. You must include it yourself for cross-browser support.** Check [here](https://caniuse.com/#feat=intersectionobserver) to see if you need to include the polyfill.
 
@@ -78,7 +78,7 @@ import scrollama from "scrollama"; // or...
 const scrollama = require("scrollama");
 ```
 
-### How to use
+## How to use
 
 #### Basic
 
@@ -194,14 +194,14 @@ Tell scrollama to stop observing for trigger changes.
 
 Removes all observers and callback functions.
 
-### Tips
+## Tips
 - Avoid using `viewport height` (vh) in your CSS because scrolling up and down constantly triggers vh to change, which will also trigger a window resize.
 
-### Known Issues
+## Known Issues
 
 The `.onStepProgress` function does not perform desirably in Safari, returning infrequent updates.
 
-### Alternatives
+## Alternatives
 
 - [Waypoints](http://imakewebthings.com/waypoints/)
 - [ScrollMagic](http://scrollmagic.io/)
@@ -209,11 +209,11 @@ The `.onStepProgress` function does not perform desirably in Safari, returning i
 - [ScrollStory](https://sjwilliams.github.io/scrollstory/)
 - [enter-view](https://github.com/russellgoldenberg/enter-view)
 
-### Logo
+## Logo
 
 Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 
-### Contributors
+## Contributors
 
 - [russellgoldenberg](https://github.com/russellgoldenberg)
 - [gabrielflorit](https://github.com/gabrielflorit)
