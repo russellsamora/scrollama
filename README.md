@@ -52,6 +52,8 @@ with any library, or with no library at all._
   using CSS `position: sticky;` to create a fixed graphic to the side of the text.
 - [Sticky Graphic (Overlay)](https://russellgoldenberg.github.io/scrollama/sticky-overlay) -
   using CSS `position: sticky;` to create a fixed graphic with fullscreen graphic with text overlayed.
+- [Custom Offset](https://russellgoldenberg.github.io/scrollama/custom-offset) -
+  Adding a data attribute to an element to provide a unique offset for a step.
 - [Mobile Pattern](https://russellgoldenberg.github.io/scrollama/mobile-pattern) -
   using pixels instead of percent for offset value so it doesn't jump around on scroll direction change
 
