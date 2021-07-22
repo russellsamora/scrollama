@@ -3,7 +3,8 @@
 </pre>
 
 ### 3.0
-**Why 3.0?** The core parts of the Scrollama code base are being refactored for 3.0 to simplfy and clarify the logic. The goal behind this to ease make future maintainance, bug fixing, and feature additions easier moving forward. If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.
+#### Why 3.0?
+The core parts of the Scrollama code base are being refactored for 3.0 to simplfy and clarify the logic. The goal behind this to ease make future maintainance, bug fixing, and feature additions easier moving forward. If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.
 
 #### New Fetaures
 * Built-in resize using resize observers.
