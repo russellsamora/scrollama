@@ -1,22 +1,8 @@
-# v3 roadmap
+<pre>
+	<a href="https://github.com/russellgoldenberg/scrollama/tree/v3#readme">Get ready for the next release of Scrollama! 🚀</a>
+</pre>
 
-- revamp intersection observer
-- use resize observer for auto resize (polyfill note)
-- offset
-- progress
-- custom offset trigger
-- progress enter/exit
-- sinngle rAF scroll updates
-- deprecate resize
-- auto-update on offset trigger date (rename to offset)
-
-- better debugger
-- dont disconnect resize
-- update docs
-- update examples (no stickyfill, mobile pattern obsolete?)
-
-- scrollable check needed? (maybe a soft warning)
-- preserve order: try adding queue, store how it was detected last time or position, position jump checks? (only works with ordered steps + global offset?)
+The core parts of the Scrollama code base are being refactored for 3.0 to with simpler and clearer logic, making it easier to maintain and add features in the future. If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
@@ -25,10 +11,9 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events.
 
-**Current version**: 2.2.1
+**Current version**: 3.0.0
 
 #### Important Changes
-
 - **Version 2.0.0+**: `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/)
 - **Version 1.4.0+**: you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
 

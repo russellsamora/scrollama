@@ -20,6 +20,52 @@
     return [];
   }
 
+  // SETUP
+  function create(className) {
+  	const el = document.createElement("div");
+  	el.className = `scrollama__debug-step ${className}`;
+  	el.style.position = "fixed";
+  	el.style.left = "0";
+  	el.style.width = "100%";
+  	el.style.zIndex = "9999";
+  	el.style.borderTop = "2px solid black";
+  	el.style.borderBottom = "2px solid black";
+
+  	const p = document.createElement("p");
+  	p.style.position = "absolute";
+  	p.style.left = "0";
+  	p.style.height = "1px";
+  	p.style.width = "100%";
+  	p.style.borderTop = "1px dashed black";
+
+  	el.appendChild(p);
+  	document.body.appendChild(el);
+  	return el;
+  }
+
+  // UPDATE
+  function update({ id, step, marginTop }) {
+  	const { index, height } = step;
+  	const className = `scrollama__debug-step--${id}-${index}`;
+  	let el = document.querySelector(`.${className}`);
+  	if (!el) el = create(className);
+
+  	el.style.top = `${marginTop * -1}px`;
+  	el.style.height = `${height}px`;
+  	el.querySelector("p").style.top = `${height / 2}px`;
+  }
+
+  function generateId() {
+      const alphabet = "abcdefghijklmnopqrstuvwxyz";
+      const date = Date.now();
+      const result = [];
+      for (let i = 0; i < 6; i += 1) {
+        const char = alphabet[Math.floor(Math.random() * alphabet.length)];
+        result.push(char);
+      }
+      return `${result.join("")}${date}`;
+    }
+
   function err$1(msg) {
   	console.error(`scrollama error: ${msg}`);
   }
@@ -84,265 +130,271 @@
   }
 
   function scrollama() {
-    let cb = {};
-    let steps = [];
-    let globalOffset;
+  	let cb = {};
 
-    let progressThreshold = 0;
+  	let id = generateId();
+  	let steps = [];
+  	let globalOffset;
 
-    let isEnabled = false;
-    let isProgressMode = false;
-    let isTriggerOnce = false;
+  	let progressThreshold = 0;
 
-    let exclude = [];
+  	let isEnabled = false;
+  	let isProgress = false;
+  	let isDebug = false;
+  	let isTriggerOnce = false;
 
-    /* HELPERS */
-    function reset() {
-      cb = {
-        stepEnter: () => {},
-        stepExit: () => {},
-        stepProgress: () => {},
-      };
-      exclude = [];
-    }
+  	let exclude = [];
 
-    function handleEnable(shouldEnable) {
-      if (shouldEnable && !isEnabled) updateObservers();
-      if (!shouldEnable && isEnabled) disconnectObservers();
-      isEnabled = shouldEnable;
-    }
+  	/* HELPERS */
+  	function reset() {
+  		cb = {
+  			stepEnter: () => { },
+  			stepExit: () => { },
+  			stepProgress: () => { },
+  		};
+  		exclude = [];
+  	}
 
-    /* NOTIFY CALLBACKS */
-    function notifyProgress(element, progress) {
-      const index = getIndex(element);
-      const step = steps[index];
-      if (progress !== undefined) step.progress = progress;
-      const response = { element, index, progress, direction };
-      if (step.state === "enter") cb.stepProgress(response);
-    }
+  	function handleEnable(shouldEnable) {
+  		if (shouldEnable && !isEnabled) updateObservers();
+  		if (!shouldEnable && isEnabled) disconnectObservers();
+  		isEnabled = shouldEnable;
+  	}
 
-    function notifyStepEnter(element, check = true) {
-      const index = getIndex(element);
-      const step = steps[index];
-      const response = { element, index, direction };
+  	/* NOTIFY CALLBACKS */
+  	function notifyProgress(element, progress) {
+  		const index = getIndex(element);
+  		const step = steps[index];
+  		if (progress !== undefined) step.progress = progress;
+  		const response = { element, index, progress, direction };
+  		if (step.state === "enter") cb.stepProgress(response);
+  	}
 
-      step.direction = direction;
-      step.state = "enter";
+  	function notifyStepEnter(element, check = true) {
+  		const index = getIndex(element);
+  		const step = steps[index];
+  		const response = { element, index, direction };
 
-      // if (isPreserveOrder && check && direction !== "up")
-      //   notifyOthers(index, "above");
-      // if (isPreserveOrder && check && direction === "up")
-      //   notifyOthers(index, "below");
+  		step.direction = direction;
+  		step.state = "enter";
 
-      if (!exclude[index]) cb.stepEnter(response);
-      if (isTriggerOnce) exclude[index] = true;
-    }
+  		// if (isPreserveOrder && check && direction !== "up")
+  		//   notifyOthers(index, "above");
+  		// if (isPreserveOrder && check && direction === "up")
+  		//   notifyOthers(index, "below");
 
-    function notifyStepExit(element, check = true) {
-      const index = getIndex(element);
-      const step = steps[index];
+  		if (!exclude[index]) cb.stepEnter(response);
+  		if (isTriggerOnce) exclude[index] = true;
+  	}
 
-      if (!step.state) return false;
+  	function notifyStepExit(element, check = true) {
+  		const index = getIndex(element);
+  		const step = steps[index];
 
-      const response = { element, index, direction };
+  		if (!step.state) return false;
 
-      if (isProgressMode) {
-        if (direction === "down" && step.progress < 1) notifyProgress(element, 1);
-        else if (direction === "up" && step.progress > 0)
-          notifyProgress(element, 0);
-      }
+  		const response = { element, index, direction };
 
-      step.direction = direction;
-      step.state = "exit";
+  		if (isProgress) {
+  			if (direction === "down" && step.progress < 1) notifyProgress(element, 1);
+  			else if (direction === "up" && step.progress > 0)
+  				notifyProgress(element, 0);
+  		}
 
-      // if (isPreserveOrder && check && direction !== "up")
-      //   notifyOthers(index, "below");
-      // if (isPreserveOrder && check && direction === "up")
-      //   notifyOthers(index, "above");
+  		step.direction = direction;
+  		step.state = "exit";
 
-      cb.stepExit(response);
-    }
+  		cb.stepExit(response);
+  	}
 
-    /* OBSERVERS - HANDLING */
-    function resizeStep([entry]) {
-      const index = getIndex(entry.target);
-      const step = steps[index];
-      const h = entry.target.offsetHeight;
-      if (h !== step.height) {
-        step.height = h;
-        disconnectObserver(step);
-        updateStepObserver(step);
-        updateResizeObserver(step);
-      }
-    }
+  	/* OBSERVERS - HANDLING */
+  	function resizeStep([entry]) {
+  		const index = getIndex(entry.target);
+  		const step = steps[index];
+  		const h = entry.target.offsetHeight;
+  		if (h !== step.height) {
+  			step.height = h;
+  			disconnectObserver(step);
+  			updateStepObserver(step);
+  			updateResizeObserver(step);
+  		}
+  	}
 
-    function intersectStep([entry]) {
-      onScroll();
+  	function intersectStep([entry]) {
+  		onScroll();
 
-      const { isIntersecting, target } = entry;
-      if (isIntersecting) notifyStepEnter(target);
-      else notifyStepExit(target);
-    }
+  		const { isIntersecting, target } = entry;
+  		if (isIntersecting) notifyStepEnter(target);
+  		else notifyStepExit(target);
+  	}
 
-    function intersectProgress([entry]) {
-      const index = getIndex(entry.target);
-      const step = steps[index];
-      const { isIntersecting, intersectionRatio, target } = entry;
-      if (isIntersecting && step.state === "enter")
-        notifyProgress(target, intersectionRatio);
-    }
+  	function intersectProgress([entry]) {
+  		const index = getIndex(entry.target);
+  		const step = steps[index];
+  		const { isIntersecting, intersectionRatio, target } = entry;
+  		if (isIntersecting && step.state === "enter")
+  			notifyProgress(target, intersectionRatio);
+  	}
 
-    /*  OBSERVERS - CREATION */
-    function disconnectObserver({ observers }) {
-      Object.keys(observers).map((name) => {
-        observers[name].disconnect();
-      });
-    }
+  	/*  OBSERVERS - CREATION */
+  	function disconnectObserver({ observers }) {
+  		Object.keys(observers).map((name) => {
+  			observers[name].disconnect();
+  		});
+  	}
 
-    function disconnectObservers() {
-      steps.forEach(disconnectObserver);
-    }
+  	function disconnectObservers() {
+  		steps.forEach(disconnectObserver);
+  	}
 
-    function updateResizeObserver(step) {
-      const observer = new ResizeObserver(resizeStep);
-      observer.observe(step.node);
-      step.observers.resize = observer;
-    }
+  	function updateResizeObserver(step) {
+  		const observer = new ResizeObserver(resizeStep);
+  		observer.observe(step.node);
+  		step.observers.resize = observer;
+  	}
 
-    function updateResizeObservers() {
-      steps.forEach(updateResizeObserver);
-    }
+  	function updateResizeObservers() {
+  		steps.forEach(updateResizeObserver);
+  	}
 
-    function updateStepObserver(step) {
-      const h = window.innerHeight;
-      const off = step.offset || globalOffset;
-      const factor = off.format === "pixels" ? 1 : h;
-      const offset = off.value * factor;
-      const marginTop = step.height / 2 - offset;
-      const marginBottom = step.height / 2 - (h - offset);
-      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+  	function updateStepObserver(step) {
+  		const h = window.innerHeight;
+  		const off = step.offset || globalOffset;
+  		const factor = off.format === "pixels" ? 1 : h;
+  		const offset = off.value * factor;
+  		const marginTop = step.height / 2 - offset;
+  		const marginBottom = step.height / 2 - (h - offset);
+  		const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
-      const threshold = 0.5;
-      const options = { rootMargin, threshold };
-      const observer = new IntersectionObserver(intersectStep, options);
+  		const threshold = 0.5;
+  		const options = { rootMargin, threshold };
+  		const observer = new IntersectionObserver(intersectStep, options);
 
-      observer.observe(step.node);
-      step.observers.step = observer;
-    }
+  		observer.observe(step.node);
+  		step.observers.step = observer;
 
-    function updateStepObservers() {
-      steps.forEach(updateStepObserver);
-    }
+  		if (isDebug) update({ id, step, marginTop, marginBottom });
+  	}
 
-    function updateProgressObserver(step) {
-      const h = window.innerHeight;
-      const off = step.offset || globalOffset;
-      const factor = off.format === "pixels" ? 1 : h;
-      const offset = off.value * factor;
-      const marginTop = -offset + step.height;
-      const marginBottom = offset - h;
-      const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+  	function updateStepObservers() {
+  		steps.forEach(updateStepObserver);
+  	}
 
-      const threshold = createProgressThreshold(step.height, progressThreshold);
-      const options = { rootMargin, threshold };
-      const observer = new IntersectionObserver(intersectProgress, options);
+  	function updateProgressObserver(step) {
+  		const h = window.innerHeight;
+  		const off = step.offset || globalOffset;
+  		const factor = off.format === "pixels" ? 1 : h;
+  		const offset = off.value * factor;
+  		const marginTop = -offset + step.height;
+  		const marginBottom = offset - h;
+  		const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
 
-      observer.observe(step.node);
-      step.observers.progress = observer;
-    }
+  		const threshold = createProgressThreshold(step.height, progressThreshold);
+  		const options = { rootMargin, threshold };
+  		const observer = new IntersectionObserver(intersectProgress, options);
 
-    function updateProgressObservers() {
-      steps.forEach(updateProgressObserver);
-    }
+  		observer.observe(step.node);
+  		step.observers.progress = observer;
+  	}
 
-    function updateObservers() {
-      disconnectObservers();
-      updateResizeObservers();
-      updateStepObservers();
-      if (isProgressMode) updateProgressObservers();
-    }
+  	function updateProgressObservers() {
+  		steps.forEach(updateProgressObserver);
+  	}
 
-    /* SETUP */
-    const S = {};
+  	function updateObservers() {
+  		disconnectObservers();
+  		updateResizeObservers();
+  		updateStepObservers();
+  		if (isProgress) updateProgressObservers();
+  	}
 
-    S.setup = ({
-      step,
-      parent,
-      offset = 0.5,
-      threshold = 4,
-      progress = false,
-      order = false,
-      once = false,
-      debug = false,
-    }) => {
-      steps = selectAll(step, parent).map((node, index) => ({
-        index,
-        direction: undefined,
-        height: node.offsetHeight,
-        node,
-        observers: {},
-        offset: parseOffset(node.dataset.offset),
-        top: getOffsetTop(node),
-        progress: 0,
-        state: undefined,
-      }));
+  	/* SETUP */
+  	const S = {};
 
-      if (!steps.length) {
-        err$1("no step elements");
-        return S;
-      }
+  	S.setup = ({
+  		step,
+  		parent,
+  		offset = 0.5,
+  		threshold = 4,
+  		progress = false,
+  		once = false,
+  		debug = false,
+  	}) => {
+  		steps = selectAll(step, parent).map((node, index) => ({
+  			index,
+  			direction: undefined,
+  			height: node.offsetHeight,
+  			node,
+  			observers: {},
+  			offset: parseOffset(node.dataset.offset),
+  			top: getOffsetTop(node),
+  			progress: 0,
+  			state: undefined,
+  		}));
 
-      isProgressMode = progress;
-      isTriggerOnce = once;
-      progressThreshold = Math.max(1, +threshold);
-      globalOffset = parseOffset(offset);
-      reset();
-      indexSteps(steps);
-      handleEnable(true);
-      return S;
-    };
+  		if (!steps.length) {
+  			err$1("no step elements");
+  			return S;
+  		}
 
-    S.enable = () => {
-      handleEnable(true);
-      return S;
-    };
+  		isProgress = progress;
+  		isTriggerOnce = once;
+  		isDebug = debug;
+  		progressThreshold = Math.max(1, +threshold);
+  		globalOffset = parseOffset(offset);
 
-    S.disable = () => {
-      handleEnable(false);
-      return S;
-    };
+  		reset();
+  		indexSteps(steps);
+  		handleEnable(true);
+  		return S;
+  	};
 
-    S.destroy = () => {
-      handleEnable(false);
-      reset();
-      return S;
-    };
+  	S.enable = () => {
+  		handleEnable(true);
+  		return S;
+  	};
 
-    S.offset = (x) => {
-      if (x === null || x === undefined) return globalOffset.value;
-      globalOffset = parseOffset(x);
-      updateObservers();
-      return S;
-    };
+  	S.disable = () => {
+  		handleEnable(false);
+  		return S;
+  	};
 
-    S.onStepEnter = (f) => {
-      if (typeof f === "function") cb.stepEnter = f;
-      else err$1("onStepEnter requires a function");
-      return S;
-    };
+  	S.destroy = () => {
+  		handleEnable(false);
+  		reset();
+  		return S;
+  	};
 
-    S.onStepExit = (f) => {
-      if (typeof f === "function") cb.stepExit = f;
-      else err$1("onStepExit requires a function");
-      return S;
-    };
+  	S.resize = () => {
+  		updateObservers();
+  		return S;
+  	};
 
-    S.onStepProgress = (f) => {
-      if (typeof f === "function") cb.stepProgress = f;
-      else err$1("onStepProgress requires a function");
-      return S;
-    };
-    return S;
+  	S.offset = (x) => {
+  		if (x === null || x === undefined) return globalOffset.value;
+  		globalOffset = parseOffset(x);
+  		updateObservers();
+  		return S;
+  	};
+
+  	S.onStepEnter = (f) => {
+  		if (typeof f === "function") cb.stepEnter = f;
+  		else err$1("onStepEnter requires a function");
+  		return S;
+  	};
+
+  	S.onStepExit = (f) => {
+  		if (typeof f === "function") cb.stepExit = f;
+  		else err$1("onStepExit requires a function");
+  		return S;
+  	};
+
+  	S.onStepProgress = (f) => {
+  		if (typeof f === "function") cb.stepProgress = f;
+  		else err$1("onStepProgress requires a function");
+  		return S;
+  	};
+  	return S;
   }
 
   setupScroll();
