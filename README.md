@@ -2,6 +2,8 @@
 <a href="https://github.com/russellgoldenberg/scrollama/tree/v3#readme">Get ready for the next release of Scrollama! 🚀</a>
 </pre>
 
+<img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
+
 ### 3.0
 #### Why 3.0?
 The core parts of the Scrollama code base are being refactored for 3.0 to simplfy and clarify the logic. The goal behind this to ease make future maintainance, bug fixing, and feature additions easier moving forward. If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.
@@ -12,8 +14,6 @@ The core parts of the Scrollama code base are being refactored for 3.0 to simplf
 
 #### Deprecated Features
 * the `order` option
-
-<img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
 **Scrollama** is a modern & lightweight JavaScript library for scrollytelling
 using
