@@ -1,8 +1,16 @@
 <pre>
-	<a href="https://github.com/russellgoldenberg/scrollama/tree/v3#readme">Get ready for the next release of Scrollama! 🚀</a>
+<a href="https://github.com/russellgoldenberg/scrollama/tree/v3#readme">Get ready for the next release of Scrollama! 🚀</a>
 </pre>
 
-The core parts of the Scrollama code base are being refactored for 3.0 to with simpler and clearer logic, making it easier to maintain and add features in the future. If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.
+### 3.0
+**Why 3.0?** The core parts of the Scrollama code base are being refactored for 3.0 to simplfy and clarify the logic. The goal behind this to ease make future maintainance, bug fixing, and feature additions easier moving forward. If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.
+
+#### New Fetaures
+* Built-in resize using resize observers.
+* Custom offsets on steps with data attributes
+
+#### Deprecated Features
+* the `order` option
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
@@ -14,6 +22,7 @@ in favor of scroll events.
 **Current version**: 3.0.0
 
 #### Important Changes
+- **Version 3.0.0+**: `order` has been deprecated.
 - **Version 2.0.0+**: `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/)
 - **Version 1.4.0+**: you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
 
@@ -52,7 +61,6 @@ with any library, or with no library at all._
 Old school (exposes the `scrollama` global):
 
 ```html
-<script src="https://unpkg.com/intersection-observer"></script>
 <script src="https://unpkg.com/scrollama"></script>
 ```
 
@@ -65,7 +73,6 @@ npm install scrollama intersection-observer --save
 And then import/require it:
 
 ```js
-import "intersection-observer";
 import scrollama from "scrollama"; // or...
 const scrollama = require("scrollama");
 ```
@@ -104,9 +111,6 @@ scroller
   .onStepExit((response) => {
     // { element, index, direction }
   });
-
-// setup resize event
-window.addEventListener("resize", scroller.resize);
 ```
 
 ### API
@@ -121,7 +125,6 @@ _options:_
 - `progress` (boolean): Whether to fire incremental step progress updates or
   not. **(default: false)**
 - `threshold` (number, 1+): The granularity of the progress interval in pixels (smaller = more granular). **(default: 4)**
-- `order` (boolean): Fire previous step triggers if they were jumped. **(default: false)**
 - `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
 - `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
@@ -173,7 +176,7 @@ Get or set the offset percentage. Value must be between 0-1 (where 0 = top of vi
 
 #### scrollama.resize()
 
-Tell scrollama to get latest dimensions the browser/DOM. It is best practice to
+**This is no longer necessary with the addition of a built-in resize observer**. Tell scrollama to get latest dimensions the browser/DOM. It is best practice to
 throttle resize in your code, update the DOM elements, then call this function
 at the end.
 
@@ -191,11 +194,7 @@ Tell scrollama to stop observing for trigger changes.
 Removes all observers and callback functions.
 
 ### Tips
-
-- Always call `scrollama.resize()` after a window resize event to ensure scroll
-  triggers update with new dimensions.
-- Avoid using `viewport height` (vh) in your CSS because scrolling up and down
-  constantly triggers vh to change, which will also trigger a window resize.
+- Avoid using `viewport height` (vh) in your CSS because scrolling up and down constantly triggers vh to change, which will also trigger a window resize.
 
 ### Known Issues
 
