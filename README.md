@@ -114,7 +114,7 @@ scroller
   });
 ```
 
-### API
+## API
 
 #### scrollama.setup([options])
 
@@ -233,7 +233,7 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 - [tuckergordon](https://github.com/tuckergordon)
 - [emma-k-alexandra](https://github.com/emma-k-alexandra)
 
-### License
+## License
 
 MIT License
 
