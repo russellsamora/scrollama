@@ -9,7 +9,7 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events.
 
-**Current version**: 3.0.0
+**Current version**: 3.0.1
 
 ## 3.0
 #### Why 3.0?
