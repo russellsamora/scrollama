@@ -1,4 +1,6 @@
-###### scrollama.js
+<pre>
+<a href="https://github.com/russellgoldenberg/scrollama/tree/v3#readme">Get ready for the next release of Scrollama! 🚀</a>
+</pre>
 
 <img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
