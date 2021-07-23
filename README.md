@@ -193,6 +193,10 @@ Tell scrollama to stop observing for trigger changes.
 
 Removes all observers and callback functions.
 
+#### custom offset
+
+To override the offset passed in the options, set a custom offset for an individual element using data attributes. For example: `<div class="step" data-offset="0.25">` or `data-offset="100px"`.
+
 ## Scrollama In The Wild
 * [The Billionaire Playbook - ProPublica](https://www.propublica.org/article/the-billionaire-playbook-how-sports-owners-use-their-teams-to-avoid-millions-in-taxes)
 * [Women's Pockets are Inferior - The Pudding](https://pudding.cool/2018/08/pockets/)
