@@ -54,6 +54,7 @@ with any library, or with no library at all._
   using pixels instead of percent for offset value so it doesn't jump around on scroll direction change
 
 ## Installation
+*This is installation for 2.0, see above for 3.0*
 
 **Note: As of version 1.4.0, the IntersectionObserver polyfill has been removed from the build. You must include it yourself for cross-browser support.** Check [here](https://caniuse.com/#feat=intersectionobserver) to see if you need to include the polyfill.
 
