@@ -196,12 +196,27 @@ Tell scrollama to stop observing for trigger changes.
 
 Removes all observers and callback functions.
 
+## Scrollama In The Wild
+* [The Billionaire Playbook - ProPublica](https://www.propublica.org/article/the-billionaire-playbook-how-sports-owners-use-their-teams-to-avoid-millions-in-taxes)
+* [Women's Pockets are Inferior - The Pudding](https://pudding.cool/2018/08/pockets/)
+* [Trump approval rating - Politico](https://www.politico.com/interactives/2019/trump-approval-rating-polls/)
+* [How the opioid epidemic evolved - Washington Post](https://www.washingtonpost.com/graphics/2019/investigations/opioid-pills-overdose-analysis/)
+* [US Covid-19 deaths, explained in 8 charts and maps - Vox](https://www.vox.com/22252693/covid-19-deaths-us-who-died)
+* [Life After Death on Wikipedia - The Pudding](https://pudding.cool/2018/08/wiki-death/)
+* [YouTube With Me - YouTube](https://youtube.com/trends/articles/with-me-interactive/)
+* [Unchecked Power - ProPublica](https://projects.propublica.org/nypd-unchecked-power/) 
+* [Trump's environmental policies rule only part of America - Politico](https://www.politico.com/interactives/2018/trump-environmental-policies-rollbacks/)
+* [The story of New Zealand’s Covid-19 lockdown, in graphs - Stuff](https://interactives.stuff.co.nz/2020/05/coronavirus-covid-19-data-new-zealand/)
+* [Trump and Biden's Paths to Victory in the 2020 Election - Wall Street Journal](https://www.wsj.com/graphics/the-paths-to-victory/)
+* [The sicence of superspreading - Science](https://vis.sciencemag.org/covid-clusters/)
+* [El dominio histórico de la derecha en Madrid - elDiario.es](https://www.eldiario.es/madrid/gana-derecha-elecciones-madrid-mayoritaria-30-rico_1_7347696.html)
+* [The Permutation Test - Jared Wilber](https://www.jwilber.me/permutationtest/)
+* [Constellations - Nadieh Bremer](https://nbremer.github.io/planet-constellations/)
+* [Remote Triggering of Earthquakes - Will Chase](https://www.williamrchase.com/vizrisk/vizrisk_main/)
+* [Scrollytelling - Mapbox](https://demos.mapbox.com/scrollytelling/)
+
 ## Tips
 - Avoid using `viewport height` (vh) in your CSS because scrolling up and down constantly triggers vh to change, which will also trigger a window resize.
-
-## Known Issues
-
-The `.onStepProgress` function does not perform desirably in Safari, returning infrequent updates.
 
 ## Alternatives
 
