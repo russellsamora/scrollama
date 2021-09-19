@@ -13,6 +13,7 @@ declare namespace scrollama {
     order?: boolean;
     once?: boolean;
     debug?: boolean;
+    parent?: HTMLElement;
   };
 
   export type ProgressCallbackResponse = {
