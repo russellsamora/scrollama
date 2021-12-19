@@ -5,8 +5,6 @@ using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
 in favor of scroll events. *Current version: 3.0.1*
 
-**If you would like to try out a pre-release of 3.0, use the next tag during installation `npm install scrollama@next`.**
-
 ## 3.0
 #### Why 3.0?
 The core parts of the Scrollama code base are being refactored for 3.0 to simplfy and clarify the logic. The goal behind this to ease make future maintainance, bug fixing, and feature additions easier moving forward.
