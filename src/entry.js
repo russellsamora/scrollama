@@ -226,6 +226,8 @@ function scrollama() {
 	}
 
 	/* SETUP */
+	setupScroll();
+
 	const S = {};
 
 	S.setup = ({
@@ -313,7 +315,5 @@ function scrollama() {
 	};
 	return S;
 }
-
-setupScroll();
 
 export default scrollama;
