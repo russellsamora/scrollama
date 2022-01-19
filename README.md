@@ -3,7 +3,7 @@
 **Scrollama** is a modern & lightweight JavaScript library for scrollytelling
 using
 [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
-in favor of scroll events. *Current version: 3.0.2*
+in favor of scroll events. *Current version: 3.0.3*
 
 ## 3.0
 #### Why 3.0?
@@ -246,6 +246,7 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 - [smnarnold](https://github.com/smnarnold)
 - [tuckergordon](https://github.com/tuckergordon)
 - [emma-k-alexandra](https://github.com/emma-k-alexandra)
+- [noslouch](https://github.com/noslouch)
 
 ## License
 
