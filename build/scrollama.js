@@ -113,13 +113,26 @@
     return top + scrollTop - clientTop;
   }
 
+  let containerElement;
+
+  function setContainerElement(element) {
+    containerElement = element;
+  }
+
+  function getContainerElement(element) {
+    return containerElement;
+  }
+
   let currentScrollY = 0;
   let comparisonScrollY = 0;
   let direction;
 
   function onScroll() {
-    if (currentScrollY === window.pageYOffset) return;
-    currentScrollY = window.pageYOffset;
+    let containerElement = getContainerElement();
+    let scrollTop = containerElement.scrollTop ? containerElement.scrollTop : window.pageYOffset;
+
+    if (currentScrollY === scrollTop) return;
+    currentScrollY = scrollTop;
     if (currentScrollY > comparisonScrollY) direction = "down";
     else if (currentScrollY < comparisonScrollY) direction = "up";
     comparisonScrollY = currentScrollY;
@@ -309,6 +322,8 @@
   	}
 
   	/* SETUP */
+  	setupScroll();
+
   	const S = {};
 
   	S.setup = ({
@@ -319,6 +334,7 @@
   		progress = false,
   		once = false,
   		debug = false,
+  		container = window
   	}) => {
   		steps = selectAll(step, parent).map((node, index) => ({
   			index,
@@ -344,6 +360,7 @@
   		globalOffset = parseOffset(offset);
 
   		reset();
+  		setContainerElement(container);
   		indexSteps(steps);
   		handleEnable(true);
   		return S;
@@ -396,8 +413,6 @@
   	};
   	return S;
   }
-
-  setupScroll();
 
   return scrollama;
 
