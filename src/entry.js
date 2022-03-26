@@ -8,6 +8,7 @@ import parseOffset from "./parseOffset";
 import indexSteps from "./indexSteps";
 import getOffsetTop from "./getOffsetTop";
 import { setupScroll, direction, onScroll } from "./scroll";
+import { setContainerElement } from "./globals";
 
 function scrollama() {
 	let cb = {};
@@ -238,6 +239,7 @@ function scrollama() {
 		progress = false,
 		once = false,
 		debug = false,
+		container = window
 	}) => {
 		steps = selectAll(step, parent).map((node, index) => ({
 			index,
@@ -263,6 +265,7 @@ function scrollama() {
 		globalOffset = parseOffset(offset);
 
 		reset();
+		setContainerElement(container);
 		indexSteps(steps);
 		handleEnable(true);
 		return S;
