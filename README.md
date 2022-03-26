@@ -115,17 +115,16 @@ scroller
 
 _options:_
 
-- `step` (string | HTMLElement[]): Selector (or array of elements) for the step elements that will trigger changes.
-  **required**
-- `offset` (number 0 - 1, or string with "px"): How far from the top of the viewport to trigger a step. **(default: 0.5) (middle of screen)**
-- `progress` (boolean): Whether to fire incremental step progress updates or
-  not. **(default: false)**
-- `threshold` (number, 1+): The granularity of the progress interval in pixels (smaller = more granular). **(default: 4)**
-- `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
-- `debug` (boolean): Whether to show visual debugging tools or not. **(default:
-  false)**
-- `parent` (HTMLElement[]): Parent element for step selector (use if you steps are in shadow DOM). **(default: undefined)**
-- `container` (HTMLElement): Parent element for the scroll story (use if scrollama is nested in a HTML element with overflow set to scoll or auto). **(default: undefined)**
+| Option  | Type | Description | Default |
+| --- | --- | --- | --- |
+| step | string or HTMLElement[] | **required**  Selector (or array of elements) for the step elements that will trigger changes. |
+| offset | number 0 - 1, or string with "px" | How far from the top of the viewport to trigger a step. | 0.5 |
+| progress | boolean | Whether to fire incremental step progress updates or not. | false |
+| threshold | number, 1+ | The granularity of the progress interval in pixels (smaller = more granular). | 4 |
+| once | boolean | Only trigger the step to enter once then remove listener. | false || 
+| debug | boolean | Whether to show visual debugging tools or not. | false |
+| parent | HTMLElement[] | Parent element for step selector (use if you steps are in shadow DOM). | undefined |
+| container | HTMLElement | Parent element for the scroll story (use if scrollama is nested in a HTML element with overflow set to `scroll` or `auto`) | undefined |
 
 #### scrollama.onStepEnter(callback)
 
