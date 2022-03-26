@@ -124,8 +124,8 @@ _options:_
 - `once` (boolean): Only trigger the step to enter once then remove listener. **(default: false)**
 - `debug` (boolean): Whether to show visual debugging tools or not. **(default:
   false)**
-- parent (HTMLElement[]): Parent element for step selector (use if you steps are in shadow DOM). **(default: undefined)**
-- container(HTMLElement): Parent element for the scroll story (use if scrollama is nested in a HTML element with overflow set to scoll or auto). **(default: undefined)**
+- `parent` (HTMLElement[]): Parent element for step selector (use if you steps are in shadow DOM). **(default: undefined)**
+- `container` (HTMLElement): Parent element for the scroll story (use if scrollama is nested in a HTML element with overflow set to scoll or auto). **(default: undefined)**
 
 #### scrollama.onStepEnter(callback)
 
