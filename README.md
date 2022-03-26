@@ -118,9 +118,9 @@ _options:_
 | Option  | Type | Description | Default |
 | --- | --- | --- | --- |
 | step | string or HTMLElement[] | **required**  Selector (or array of elements) for the step elements that will trigger changes. |
-| offset | number 0 - 1, or string with "px" | How far from the top of the viewport to trigger a step. | 0.5 |
+| offset | number (0 - 1, or string with "px") | How far from the top of the viewport to trigger a step. | 0.5 |
 | progress | boolean | Whether to fire incremental step progress updates or not. | false |
-| threshold | number, 1+ | The granularity of the progress interval in pixels (smaller = more granular). | 4 |
+| threshold | number (1 or higher) | The granularity of the progress interval in pixels (smaller = more granular). | 4 |
 | once | boolean | Only trigger the step to enter once then remove listener. | false || 
 | debug | boolean | Whether to show visual debugging tools or not. | false |
 | parent | HTMLElement[] | Parent element for step selector (use if you steps are in shadow DOM). | undefined |
