@@ -8,7 +8,6 @@ import parseOffset from "./parseOffset";
 import indexSteps from "./indexSteps";
 import getOffsetTop from "./getOffsetTop";
 import { setupScroll, direction, onScroll } from "./scroll";
-import { setContainerElement } from "./globals";
 
 function scrollama() {
 	let cb = {};
@@ -16,6 +15,7 @@ function scrollama() {
 	let id = generateId();
 	let steps = [];
 	let globalOffset;
+	let containerElement;
 
 	let progressThreshold = 0;
 
@@ -139,7 +139,7 @@ function scrollama() {
 	}
 
 	function intersectStep([entry]) {
-		onScroll();
+		onScroll(containerElement);
 
 		const { isIntersecting, target } = entry;
 		if (isIntersecting) notifyStepEnter(target);
@@ -239,7 +239,7 @@ function scrollama() {
 		progress = false,
 		once = false,
 		debug = false,
-		container = window
+		container = undefined
 	}) => {
 		steps = selectAll(step, parent).map((node, index) => ({
 			index,
@@ -263,9 +263,9 @@ function scrollama() {
 		isDebug = debug;
 		progressThreshold = Math.max(1, +threshold);
 		globalOffset = parseOffset(offset);
+		containerElement = container;
 
 		reset();
-		setContainerElement(container);
 		indexSteps(steps);
 		handleEnable(true);
 		return S;

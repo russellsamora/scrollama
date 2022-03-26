@@ -113,33 +113,22 @@
     return top + scrollTop - clientTop;
   }
 
-  let containerElement;
-
-  function setContainerElement(element) {
-    containerElement = element;
-  }
-
-  function getContainerElement(element) {
-    return containerElement;
-  }
-
   let currentScrollY = 0;
   let comparisonScrollY = 0;
   let direction;
 
-  function onScroll() {
-    let containerElement = getContainerElement();
-    let scrollTop = containerElement.scrollTop ? containerElement.scrollTop : window.pageYOffset;
+  function onScroll(container) {
+  	const scrollTop = container ? container.scrollTop : window.pageYOffset;
 
-    if (currentScrollY === scrollTop) return;
-    currentScrollY = scrollTop;
-    if (currentScrollY > comparisonScrollY) direction = "down";
-    else if (currentScrollY < comparisonScrollY) direction = "up";
-    comparisonScrollY = currentScrollY;
+  	if (currentScrollY === scrollTop) return;
+  	currentScrollY = scrollTop;
+  	if (currentScrollY > comparisonScrollY) direction = "down";
+  	else if (currentScrollY < comparisonScrollY) direction = "up";
+  	comparisonScrollY = currentScrollY;
   }
 
   function setupScroll() {
-    document.addEventListener("scroll", onScroll);
+  	document.addEventListener("scroll", onScroll);
   }
 
   function scrollama() {
@@ -148,6 +137,7 @@
   	let id = generateId();
   	let steps = [];
   	let globalOffset;
+  	let containerElement;
 
   	let progressThreshold = 0;
 
@@ -234,7 +224,7 @@
   	}
 
   	function intersectStep([entry]) {
-  		onScroll();
+  		onScroll(containerElement);
 
   		const { isIntersecting, target } = entry;
   		if (isIntersecting) notifyStepEnter(target);
@@ -334,7 +324,7 @@
   		progress = false,
   		once = false,
   		debug = false,
-  		container = window
+  		container = undefined
   	}) => {
   		steps = selectAll(step, parent).map((node, index) => ({
   			index,
@@ -358,9 +348,9 @@
   		isDebug = debug;
   		progressThreshold = Math.max(1, +threshold);
   		globalOffset = parseOffset(offset);
+  		containerElement = container;
 
   		reset();
-  		setContainerElement(container);
   		indexSteps(steps);
   		handleEnable(true);
   		return S;
