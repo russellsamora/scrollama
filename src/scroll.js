@@ -1,6 +1,6 @@
-let previousScrollY = 0;
-let currentScrollY = 0;
-let comparisonScrollY = 0;
+let previousScrollY;
+let currentScrollY;
+let comparisonScrollY;
 let direction;
 
 function onScroll(container) {
@@ -15,8 +15,11 @@ function onScroll(container) {
 	comparisonScrollY = currentScrollY;
 }
 
-function setupScroll() {
-	document.addEventListener("scroll", onScroll);
+function setupScroll(container) {
+	previousScrollY = 0;
+	currentScrollY = 0;
+	comparisonScrollY = 0;
+	document.addEventListener("scroll", () => onScroll(container));
 }
 
 export { setupScroll, onScroll, direction, previousScrollY, currentScrollY };

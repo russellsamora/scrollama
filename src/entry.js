@@ -227,8 +227,6 @@ function scrollama() {
 	}
 
 	/* SETUP */
-	setupScroll();
-
 	const S = {};
 
 	S.setup = ({
@@ -241,6 +239,9 @@ function scrollama() {
 		debug = false,
 		container = undefined
 	}) => {
+
+		setupScroll(container);
+
 		steps = selectAll(step, parent).map((node, index) => ({
 			index,
 			direction: undefined,

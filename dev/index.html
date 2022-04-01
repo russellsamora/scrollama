@@ -4,87 +4,16 @@
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>Scrollama Demo: Basic</title>
-	<meta name="description" content="Scrollama Demo: Basic" />
+	<title>Scrollama: Basic Example</title>
+	<meta name="description" content="Scrollama: Basic Example" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="../docs/style.css" />
 	<style>
-		/* default / demo page */
-
-		* {
-			box-sizing: border-box;
-		}
-
-		html,
-		body {
-			margin: 0;
-			padding: 0;
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-				Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-		}
-
-		body {
-			min-height: 1280px;
-			font-weight: 300;
-			color: #2a2a2a;
-		}
-
-		p,
-		h1,
-		h2,
-		h3,
-		h4,
-		a {
-			margin: 0;
-			font-weight: 300;
-		}
-
-		a,
-		a:visited,
-		a:hover {
-			color: #f30;
-			text-decoration: none;
-			border-bottom: 1px solid currentColor;
-		}
-
-		#intro {
-			max-width: 40rem;
-			margin: 1rem auto;
-			text-align: center;
-		}
-
-		.intro__overline {
-			font-size: 1.4rem;
-		}
-
-		.intro__hed {
-			font-size: 1.4rem;
-			margin: 1.5rem auto;
-			text-transform: uppercase;
-			font-weight: 900;
-			letter-spacing: 0.05em;
-		}
-
-		.intro__dek {
-			font-size: 1.4rem;
-		}
-
-		/* demo */
-
-		#intro {
-			margin-bottom: 800px;
-		}
-
-		#outro {
-			height: 4400px;
-		}
-
-		/* scrollama */
-
-		#scroll {
+		#scrolly {
 			position: relative;
 		}
 
-		.scroll__text {
+		article {
 			position: relative;
 			padding: 0 1rem;
 			margin: 0 auto;
@@ -93,25 +22,13 @@
 
 		.step {
 			margin: 2rem auto 4rem auto;
-			border: 1px solid #333;
-			height: 30vh;
-			position: relative;
-			z-index: 1;
-			/* opacity: 0; */
-		}
-
-		.step:after {
-			content: "";
-			display: block;
-			position: absolute;
-			top: 50%;
-			width: 100%;
-			height: 1px;
-			background: black;
+			background-color: #3b3b3b;
+			color: #fff;
 		}
 
 		.step.is-active {
-			background-color: lightgoldenrodyellow;
+			background-color: goldenrod;
+			color: #3b3b3b;
 		}
 
 		.step p {
@@ -119,102 +36,79 @@
 			padding: 1rem;
 			font-size: 1.5rem;
 		}
-
-		nav {
-			position: fixed;
-			top: 0;
-			left: 0;
-			z-index: 1000;
-			background: white;
-			padding: 1rem;
-		}
 	</style>
 </head>
 
 <body>
-	<nav>
-		<a href="#anchor-1">Jump test 1</a>
-		<a href="#anchor-2">Jump test 2</a>
-		<a href="#anchor-3">Jump test 3</a>
-		<a href="#anchor-4">Jump test 4</a>
-		<a href="#anchor-5">Jump test 5</a>
-	</nav>
-
-	<div id="anchor-1"></div>
-
-	<section id="intro">
-		<p class="intro__overline">
-			<a href="https://github.com/russellgoldenberg/scrollama">scrollama.js</a>
-		</p>
-		<h1 class="intro__hed">Demo: Basic</h1>
-		<p class="intro__dek">Start scrolling to see how it works.</p>
-	</section>
-
-	<div id="anchor-2"></div>
-	<section id="scroll">
-		<div class="scroll__text">
-			<div class="step" data-step="0">
-				<p>STEP 0</p>
-			</div>
-			<div class="step" data-step="1">
-				<p>STEP 1</p>
-				<div id="anchor-3"></div>
-			</div>
-			<div class="step" data-step="2">
-				<p>STEP 2</p>
-			</div>
-			<!-- <div class="step" data-step="4">
-          <p>STEP 4</p>
-        </div> -->
-		</div>
-	</section>
-	<div id="anchor-4"></div>
-	<section id="outro"></section>
-	<div id="anchor-5"></div>
+	<main>
+		<section id="intro">
+			<h1 class="intro__hed">Basic Example</h1>
+			<p class="intro__dek">
+				Start scrolling to see how it works.
+			</p>
+		</section>
+		<section id="scrolly">
+			<article>
+				<div class="step" data-step="1">
+					<p>STEP 1</p>
+				</div>
+				<div class="step" data-step="2">
+					<p>STEP 2</p>
+				</div>
+				<div class="step" data-step="3">
+					<p>STEP 3</p>
+				</div>
+				<div class="step" data-step="4">
+					<p>STEP 4</p>
+				</div>
+			</article>
+		</section>
+		<section id="outro"></section>
+	</main>
 
 	<script src="../build/scrollama.js"></script>
 	<script>
-		var container = document.querySelector("#scroll");
-		var text = container.querySelector(".scroll__text");
-		var steps = text.querySelectorAll(".step");
+		var scrolly = document.querySelector("#scrolly");
+		var article = scrolly.querySelector("article");
+		var step = article.querySelectorAll(".step");
 
 		// initialize the scrollama
 		var scroller = scrollama();
 
 		// scrollama event handlers
 		function handleStepEnter(response) {
+			// response = { element, direction, index }
+			console.log(response);
 			// add to color to current step
 			response.element.classList.add("is-active");
 		}
 
 		function handleStepExit(response) {
+			// response = { element, direction, index }
+			console.log(response);
 			// remove color from current step
 			response.element.classList.remove("is-active");
 		}
 
-		function handleStepProgress(response) {
-			// console.log(response);
-		}
-
 		function init() {
 			// set random padding for different step heights (not required)
-			steps.forEach(function (step) {
+			step.forEach(function (step) {
 				var v = 100 + Math.floor((Math.random() * window.innerHeight) / 4);
+				step.style.padding = v + "px 0px";
 			});
 
 			// 1. setup the scroller with the bare-bones options
-			// this will also initialize trigger observations
-			// 3. bind scrollama event handlers (this can be chained like below)
+			// 		this will also initialize trigger observations
+			// 2. bind scrollama event handlers (this can be chained like below)
 			scroller
 				.setup({
-					step: ".scroll__text .step",
-					offset: 0.5,
-					progress: false,
-					debug: true
+					step: "#scrolly article .step",
+					debug: false,
+					offset: 0.5
 				})
 				.onStepEnter(handleStepEnter)
-				.onStepExit(handleStepExit)
-				.onStepProgress(handleStepProgress);
+				.onStepExit(handleStepExit);
+
 		}
 
 		// kick things off

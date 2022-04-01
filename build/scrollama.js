@@ -113,8 +113,8 @@
     return top + scrollTop - clientTop;
   }
 
-  let currentScrollY = 0;
-  let comparisonScrollY = 0;
+  let currentScrollY;
+  let comparisonScrollY;
   let direction;
 
   function onScroll(container) {
@@ -127,8 +127,10 @@
   	comparisonScrollY = currentScrollY;
   }
 
-  function setupScroll() {
-  	document.addEventListener("scroll", onScroll);
+  function setupScroll(container) {
+  	currentScrollY = 0;
+  	comparisonScrollY = 0;
+  	document.addEventListener("scroll", () => onScroll(container));
   }
 
   function scrollama() {
@@ -312,8 +314,6 @@
   	}
 
   	/* SETUP */
-  	setupScroll();
-
   	const S = {};
 
   	S.setup = ({
@@ -326,6 +326,9 @@
   		debug = false,
   		container = undefined
   	}) => {
+
+  		setupScroll(container);
+
   		steps = selectAll(step, parent).map((node, index) => ({
   			index,
   			direction: undefined,
