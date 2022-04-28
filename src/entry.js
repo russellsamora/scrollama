@@ -139,7 +139,7 @@ function scrollama() {
 	}
 
 	function intersectStep([entry]) {
-		onScroll(containerElement);
+		onScroll(null, containerElement);
 
 		const { isIntersecting, target } = entry;
 		if (isIntersecting) notifyStepEnter(target);

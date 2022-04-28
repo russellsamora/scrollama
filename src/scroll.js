@@ -3,7 +3,7 @@ let currentScrollY = 0;
 let comparisonScrollY = 0;
 let direction;
 
-function onScroll(container) {
+function onScroll(event, container) {
 	const scrollTop = container ? container.scrollTop : window.pageYOffset;
 
 	if (currentScrollY === scrollTop) return;

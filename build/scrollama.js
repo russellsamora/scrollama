@@ -117,7 +117,7 @@
   let comparisonScrollY = 0;
   let direction;
 
-  function onScroll(container) {
+  function onScroll(event, container) {
   	const scrollTop = container ? container.scrollTop : window.pageYOffset;
 
   	if (currentScrollY === scrollTop) return;
@@ -224,7 +224,7 @@
   	}
 
   	function intersectStep([entry]) {
-  		onScroll(containerElement);
+  		onScroll(null, containerElement);
 
   		const { isIntersecting, target } = entry;
   		if (isIntersecting) notifyStepEnter(target);
