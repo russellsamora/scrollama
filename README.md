@@ -50,6 +50,8 @@ with any library, or with no library at all._
   Adding a data attribute to an element to provide a unique offset for a step.
 - [Mobile Pattern](https://russellgoldenberg.github.io/scrollama/mobile-pattern) -
   using pixels instead of percent for offset value so it doesn't jump around on scroll direction change
+- [iframe Embed](https://russellgoldenberg.github.io/scrollama/iframe) -
+  Embedding a Scrollama instance inside an iframe using `root` option
 
 ## Installation
 **Note: As of version 1.4.0, the IntersectionObserver polyfill has been removed from the build. You must include it yourself for cross-browser support.** Check [here](https://caniuse.com/#feat=intersectionobserver) to see if you need to include the polyfill.
@@ -125,6 +127,7 @@ _options:_
 | debug | boolean | Whether to show visual debugging tools or not. | false |
 | parent | HTMLElement[] | Parent element for step selector (use if you steps are in shadow DOM). | undefined |
 | container | HTMLElement | Parent element for the scroll story (use if scrollama is nested in a HTML element with overflow set to `scroll` or `auto`) | undefined |
+| root | HTMLElement | The element that is used as the viewport for checking visibility of the target. Must be the ancestor of the target. Defaults to the browser viewport if not specified or if null. See more details about usage of root on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API#intersection_observer_concepts_and_usage). | undefined |
 
 #### scrollama.onStepEnter(callback)
 

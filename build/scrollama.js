@@ -140,6 +140,7 @@
   	let steps = [];
   	let globalOffset;
   	let containerElement;
+  	let rootElement;
 
   	let progressThreshold = 0;
 
@@ -273,6 +274,9 @@
 
   		const threshold = 0.5;
   		const options = { rootMargin, threshold };
+  		if (rootElement) {
+  			options.root = rootElement;
+  		}
   		const observer = new IntersectionObserver(intersectStep, options);
 
   		observer.observe(step.node);
@@ -324,7 +328,8 @@
   		progress = false,
   		once = false,
   		debug = false,
-  		container = undefined
+  		container = undefined,
+  		root = undefined
   	}) => {
 
   		setupScroll(container);
@@ -352,6 +357,7 @@
   		progressThreshold = Math.max(1, +threshold);
   		globalOffset = parseOffset(offset);
   		containerElement = container;
+  		rootElement = root;
 
   		reset();
   		indexSteps(steps);
