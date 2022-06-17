@@ -271,12 +271,10 @@
   		const marginTop = step.height / 2 - offset;
   		const marginBottom = step.height / 2 - (h - offset);
   		const rootMargin = `${marginTop}px 0px ${marginBottom}px 0px`;
+  		const root = rootElement;
 
   		const threshold = 0.5;
-  		const options = { rootMargin, threshold };
-  		if (rootElement) {
-  			options.root = rootElement;
-  		}
+  		const options = { rootMargin, threshold, root };
   		const observer = new IntersectionObserver(intersectStep, options);
 
   		observer.observe(step.node);
@@ -329,7 +327,7 @@
   		once = false,
   		debug = false,
   		container = undefined,
-  		root = undefined
+  		root = null
   	}) => {
 
   		setupScroll(container);
