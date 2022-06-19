@@ -172,14 +172,8 @@
 			figure.select("p").text(response.index + 1);
 		}
 
-		function setupStickyfill() {
-			d3.selectAll(".sticky").each(function () {
-				Stickyfill.add(this);
-			});
-		}
 
 		function init() {
-			setupStickyfill();
 
 			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
 			handleResize();
