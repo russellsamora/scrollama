@@ -15,9 +15,9 @@
 	"jsnext:main": "index",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/russellgoldenberg/scrollama.git"
+		"url": "https://github.com/russellsamora/scrollama.git"
 	},
-	"homepage": "https://github.com/russellgoldenberg/scrollama#readme",
+	"homepage": "https://github.com/russellsamora/scrollama#readme",
 	"keywords": [
 		"scrollytelling",
 		"scroll",
@@ -32,7 +32,7 @@
 		"view",
 		"trigger"
 	],
-	"author": "Russell Goldenberg (@russellgoldenberg)",
+	"author": "Russell Samora",
 	"license": "MIT",
 	"devDependencies": {
 		"cross-env": "^7.0.3",

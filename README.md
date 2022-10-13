@@ -1,4 +1,4 @@
-<img src="https://russellgoldenberg.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
+<img src="https://russellsamora.github.io/scrollama/logo.png" width="160" alt="scrollama.js"/>
 
 **Scrollama** is a modern & lightweight JavaScript library for scrollytelling
 using
@@ -19,9 +19,9 @@ The core parts of the Scrollama code base are being refactored for 3.0 to simplf
 ## Important Changes
 - **Version 3.0.0+**: `order` has been deprecated.
 - **Version 2.0.0+**: `.onContainerEnter` and `.onContainerExit` have been deprecated in favor of CSS property `position: sticky;`. [How to use position sticky.](https://pudding.cool/process/scrollytelling-sticky/)
-- **Version 1.4.0+**: you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellgoldenberg/scrollama#installation) for details.
+- **Version 1.4.0+**: you must manually add the IntersectionObserver polyfill for cross-browser support. See [installation](https://github.com/russellsamora/scrollama#installation) for details.
 
-[Jump to examples.](https://github.com/russellgoldenberg/scrollama#examples)
+[Jump to examples.](https://github.com/russellsamora/scrollama#examples)
 
 ## Why?
 
@@ -38,19 +38,19 @@ to handle element position detection.
 _Note: most of these examples use D3 to keep the code concise, but this can be used
 with any library, or with no library at all._
 
-- [Basic](https://russellgoldenberg.github.io/scrollama/basic) - just step
+- [Basic](https://russellsamora.github.io/scrollama/basic) - just step
   triggers
-- [Progress](https://russellgoldenberg.github.io/scrollama/progress) -
+- [Progress](https://russellsamora.github.io/scrollama/progress) -
   incremental step progress callback
-- [Sticky Graphic (Side by Side)](https://russellgoldenberg.github.io/scrollama/sticky-side) -
+- [Sticky Graphic (Side by Side)](https://russellsamora.github.io/scrollama/sticky-side) -
   using CSS `position: sticky;` to create a fixed graphic to the side of the text.
-- [Sticky Graphic (Overlay)](https://russellgoldenberg.github.io/scrollama/sticky-overlay) -
+- [Sticky Graphic (Overlay)](https://russellsamora.github.io/scrollama/sticky-overlay) -
   using CSS `position: sticky;` to create a fixed graphic with fullscreen graphic with text overlayed.
-- [Custom Offset](https://russellgoldenberg.github.io/scrollama/custom-offset) -
+- [Custom Offset](https://russellsamora.github.io/scrollama/custom-offset) -
   Adding a data attribute to an element to provide a unique offset for a step.
-- [Mobile Pattern](https://russellgoldenberg.github.io/scrollama/mobile-pattern) -
+- [Mobile Pattern](https://russellsamora.github.io/scrollama/mobile-pattern) -
   using pixels instead of percent for offset value so it doesn't jump around on scroll direction change
-- [iframe Embed](https://russellgoldenberg.github.io/scrollama/iframe) -
+- [iframe Embed](https://russellsamora.github.io/scrollama/iframe) -
   Embedding a Scrollama instance inside an iframe using `root` option
 
 ## Installation
@@ -224,7 +224,7 @@ To override the offset passed in the options, set a custom offset for an individ
 - [ScrollMagic](http://scrollmagic.io/)
 - [graph-scroll.js](https://1wheel.github.io/graph-scroll/)
 - [ScrollStory](https://sjwilliams.github.io/scrollstory/)
-- [enter-view](https://github.com/russellgoldenberg/enter-view)
+- [enter-view](https://github.com/russellsamora/enter-view)
 
 ## Logo
 
@@ -234,7 +234,7 @@ Logo by the awesome [Elaina Natario](https://twitter.com/elainanatario)
 
 MIT License
 
-Copyright (c) 2021 Russell Goldenberg
+Copyright (c) 2022 Russell Samora
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
