@@ -65,7 +65,7 @@ Old school (exposes the `scrollama` global):
 New school:
 
 ```sh
-npm install scrollama intersection-observer --save
+npm install scrollama --save
 ```
 
 And then import/require it:
